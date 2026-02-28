@@ -8,7 +8,13 @@ import { uploadFile, downloadFile, bufferHash } from "@/lib/storage";
 
 export const GEMINI_MODEL = "gemini-3-pro-image-preview";
 
-const genai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+let _genai: GoogleGenAI | null = null;
+function getGenAI(): GoogleGenAI {
+    if (!_genai) {
+        _genai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+    }
+    return _genai;
+}
 
 interface GenerateImageInput {
     referenceImagePaths: string[]; // Supabase storage paths (e.g. subjects/{id}/ref_0.png)
@@ -67,7 +73,7 @@ export async function generateAndSaveImage(
         parts.push({ text: fullPrompt });
 
         // Call Gemini
-        const response = await genai.models.generateContent({
+        const response = await getGenAI().models.generateContent({
             model: GEMINI_MODEL,
             contents: [{ role: "user", parts }],
             config: {
