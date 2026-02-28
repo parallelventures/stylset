@@ -133,6 +133,11 @@ a {
   font-weight: 500;
 }
 
+.sidebar-link:active {
+  transform: scale(0.96);
+  filter: blur(0.5px);
+}
+
 .sidebar-link svg {
   width: 16px;
   height: 16px;
