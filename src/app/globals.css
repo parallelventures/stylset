@@ -224,6 +224,11 @@ a {
   white-space: nowrap;
 }
 
+.btn:active {
+  transform: scale(0.96);
+  filter: blur(0.5px);
+}
+
 .btn-primary {
   background: var(--black);
   color: var(--white);
