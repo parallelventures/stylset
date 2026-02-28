@@ -1,0 +1,12 @@
+services:
+  styleset:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=file:./prisma/dev.db
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    volumes:
+      - ./data:/app/data
+      - ./prisma/dev.db:/app/prisma/dev.db
+    restart: unless-stopped

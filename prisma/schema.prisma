@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Subject {
+  id                   String   @id @default(uuid())
+  name                 String
+  description          String?
+  referenceImagePaths  String   @default("[]")
+  lockedAttributesJson String   @default("{}")
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  slideGenerations SlideGeneration[]
+  slideshowSets    SlideshowSet[]
+}
+
+model HairstylePreset {
+  id                 String   @id @default(uuid())
+  name               String
+  description        String?
+  hairstylePrompt    String
+  negativeHairPrompt String?
+  tags               String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  slideGenerations SlideGeneration[]
+}
+
+model SlideRequestTemplate {
+  id             String   @id @default(uuid())
+  name           String
+  basePromptJson String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  slideGenerations SlideGeneration[]
+  slideshowSets    SlideshowSet[]
+}
+
+model SlideGeneration {
+  id              String   @id @default(uuid())
+  slideshowSetId  String
+  subjectId       String
+  templateId      String?
+  presetId        String?
+  orderIndex      Int
+  inputJson       String   @default("{}")
+  finalPromptText String   @default("")
+  model           String   @default("gemini-3-pro-image-preview")
+  status          String   @default("queued")
+  outputImagePath String?
+  error           String?
+  retryCount      Int      @default(0)
+  createdAt       DateTime @default(now())
+
+  subject  Subject              @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  template SlideRequestTemplate? @relation(fields: [templateId], references: [id])
+  preset   HairstylePreset?     @relation(fields: [presetId], references: [id])
+  set      SlideshowSet         @relation(fields: [slideshowSetId], references: [id], onDelete: Cascade)
+}
+
+model SlideshowSet {
+  id           String   @id @default(uuid())
+  subjectId    String
+  templateId   String?
+  name         String
+  description  String?
+  status       String   @default("idle")
+  outputDir    String?
+  manifestPath String?
+  zipPath      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  subject      Subject              @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  template     SlideRequestTemplate? @relation(fields: [templateId], references: [id])
+  slides       SlideGeneration[]
+}
+
+model CronJob {
+  id         String   @id @default(uuid())
+  name       String
+  schedule   String
+  enabled    Boolean  @default(true)
+  actionType String   @default("GENERATE_DAILY_SETS")
+  configJson String   @default("{}")
+  lastRunAt  DateTime?
+  lastResult String?
+  lastError  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model AgentRun {
+  id            String   @id @default(uuid())
+  status        String   @default("running") // running|completed|failed
+  setsPlanned   Int      @default(5)
+  setsCompleted Int      @default(0)
+  setsFailed    Int      @default(0)
+  slidesTotal   Int      @default(0)
+  slidesOk      Int      @default(0)
+  slidesFailed  Int      @default(0)
+  configJson    String   @default("{}")
+  error         String?
+  startedAt     DateTime @default(now())
+  completedAt   DateTime?
+}

@@ -1,0 +1,129 @@
+/**
+ * Set Generator — per-subject quick-generate.
+ * Uses Supabase Storage.
+ */
+import prisma from "@/lib/prisma";
+import { composePrompt } from "@/lib/prompts";
+import { generateAndSaveImage } from "@/services/geminiImage";
+import { uploadJson, setImagePath, setManifestPath, getFileUrl } from "@/lib/storage";
+import { v4 as uuid } from "uuid";
+
+const CONCURRENCY = 2;
+
+export async function generateSet(setId: string): Promise<void> {
+    const set = await prisma.slideshowSet.findUniqueOrThrow({
+        where: { id: setId },
+        include: {
+            subject: true,
+            template: true,
+            slides: { orderBy: { orderIndex: "asc" }, include: { preset: true } },
+        },
+    });
+
+    await prisma.slideshowSet.update({
+        where: { id: setId },
+        data: { status: "generating" },
+    });
+
+    const refPaths: string[] = JSON.parse(set.subject.referenceImagePaths || "[]");
+    const lockedAttrs = JSON.parse(set.subject.lockedAttributesJson || "{}");
+    const basePrompt = set.template ? JSON.parse(set.template.basePromptJson) : {};
+
+    let failCount = 0;
+
+    for (let i = 0; i < set.slides.length; i += CONCURRENCY) {
+        const batch = set.slides.slice(i, i + CONCURRENCY);
+        await Promise.allSettled(
+            batch.map(async (slide) => {
+                try {
+                    await prisma.slideGeneration.update({
+                        where: { id: slide.id },
+                        data: { status: "running" },
+                    });
+
+                    let hairstylePrompt = "";
+                    let negativeHairPrompt = "";
+                    try {
+                        const input = JSON.parse(slide.inputJson || "{}");
+                        hairstylePrompt = input.hairstylePrompt || slide.preset?.hairstylePrompt || "";
+                        negativeHairPrompt = input.negativeHairPrompt || slide.preset?.negativeHairPrompt || "";
+                    } catch {
+                        hairstylePrompt = slide.preset?.hairstylePrompt || "";
+                    }
+
+                    const composed = composePrompt({
+                        lockedAttributes: lockedAttrs,
+                        basePrompt,
+                        hairstylePrompt,
+                        negativeHairPrompt: negativeHairPrompt || undefined,
+                    });
+
+                    const outputFileName = `${String(slide.orderIndex).padStart(3, "0")}.png`;
+                    const storagePath = setImagePath(setId, outputFileName);
+
+                    const result = await generateAndSaveImage(
+                        {
+                            referenceImagePaths: refPaths,
+                            finalPromptText: composed.finalPrompt,
+                            negativePrompt: composed.finalNegativePrompt,
+                        },
+                        storagePath,
+                    );
+
+                    if (result.success) {
+                        await prisma.slideGeneration.update({
+                            where: { id: slide.id },
+                            data: {
+                                status: "succeeded",
+                                outputImagePath: storagePath,
+                                finalPromptText: composed.finalPrompt,
+                            },
+                        });
+                    } else {
+                        throw new Error(result.error || "No image");
+                    }
+                } catch (error: unknown) {
+                    failCount++;
+                    const msg = error instanceof Error ? error.message : String(error);
+                    await prisma.slideGeneration.update({
+                        where: { id: slide.id },
+                        data: { status: "failed", error: msg },
+                    });
+                }
+            })
+        );
+    }
+
+    // Manifest
+    const slides = await prisma.slideGeneration.findMany({
+        where: { slideshowSetId: setId },
+        orderBy: { orderIndex: "asc" },
+        include: { preset: true },
+    });
+
+    const manifest = {
+        setId,
+        name: set.name,
+        subjectId: set.subjectId,
+        createdAt: new Date().toISOString(),
+        slides: slides.map((s) => ({
+            orderIndex: s.orderIndex,
+            storagePath: s.outputImagePath,
+            publicUrl: s.outputImagePath ? getFileUrl(s.outputImagePath) : null,
+            status: s.status,
+            hairstyle: s.preset?.name || "",
+        })),
+    };
+
+    const manifestStorage = setManifestPath(setId);
+    await uploadJson(manifestStorage, manifest);
+
+    await prisma.slideshowSet.update({
+        where: { id: setId },
+        data: {
+            status: failCount > 0 ? "failed" : "ready",
+            outputDir: `sets/${setId}`,
+            manifestPath: manifestStorage,
+        },
+    });
+}
