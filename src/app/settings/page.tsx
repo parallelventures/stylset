@@ -1,6 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+
+const springTransition = {
+    type: "spring" as const,
+    damping: 20,
+    stiffness: 100,
+    mass: 0.8
+};
 
 export default function SettingsPage() {
     const [settings, setSettings] = useState({
@@ -58,13 +66,18 @@ export default function SettingsPage() {
                                     checked={settings.pauseBetweenSets}
                                     onChange={(e) => handleChange("pauseBetweenSets", e.target.checked)}
                                 />
-                                <div className="switch-track" style={{
-                                    width: 40, height: 24, background: settings.pauseBetweenSets ? "var(--primary)" : "var(--gray-300)", borderRadius: 12, position: "relative", transition: "0.2s"
-                                }}>
-                                    <div className="switch-thumb" style={{
-                                        width: 20, height: 20, background: "white", borderRadius: "50%", position: "absolute", top: 2, left: settings.pauseBetweenSets ? 18 : 2, transition: "0.2s"
-                                    }} />
-                                </div>
+                                <motion.div
+                                    className="switch-track"
+                                    animate={{ backgroundColor: settings.pauseBetweenSets ? "var(--primary)" : "var(--gray-300)" }}
+                                    style={{ width: 40, height: 24, borderRadius: 12, position: "relative" }}
+                                >
+                                    <motion.div
+                                        className="switch-thumb"
+                                        animate={{ x: settings.pauseBetweenSets ? 16 : 0 }}
+                                        transition={springTransition}
+                                        style={{ width: 20, height: 20, background: "white", borderRadius: "50%", position: "absolute", top: 2, left: 2 }}
+                                    />
+                                </motion.div>
                             </div>
                             <div>
                                 <div style={{ fontWeight: 500 }}>Pause between sets</div>

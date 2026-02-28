@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { springAnimation } from "@/app/template";
 
 interface Preset {
     id: string;
@@ -132,67 +134,82 @@ export default function PresetsPage() {
                 </div>
             )}
 
-            {showModal && (
-                <div className="modal-overlay" onClick={() => setShowModal(false)}>
-                    <div className="modal" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header">
-                            <h3>New Hairstyle Preset</h3>
-                            <button className="btn btn-icon btn-secondary" onClick={() => setShowModal(false)}>
-                                ✕
-                            </button>
-                        </div>
-                        <form onSubmit={handleCreate}>
-                            <div className="form-group">
-                                <label className="form-label">Name</label>
-                                <input name="name" className="form-input" placeholder="e.g. Sleek Bun" required />
+            <AnimatePresence>
+                {showModal && (
+                    <motion.div
+                        className="modal-overlay"
+                        onClick={() => setShowModal(false)}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                    >
+                        <motion.div
+                            className="modal"
+                            onClick={(e) => e.stopPropagation()}
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            transition={springAnimation}
+                        >
+                            <div className="modal-header">
+                                <h3>New Hairstyle Preset</h3>
+                                <button className="btn btn-icon btn-secondary" onClick={() => setShowModal(false)}>
+                                    ✕
+                                </button>
                             </div>
-                            <div className="form-group">
-                                <label className="form-label">Description</label>
-                                <input name="description" className="form-input" placeholder="Optional" />
-                            </div>
-                            <div className="form-group">
-                                <label className="form-label">Hairstyle Prompt</label>
-                                <textarea
-                                    name="hairstylePrompt"
-                                    className="form-textarea"
-                                    placeholder="Describe ONLY the hairstyle..."
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label className="form-label">Negative Hair Prompt</label>
-                                <textarea
-                                    name="negativeHairPrompt"
-                                    className="form-textarea"
-                                    rows={2}
-                                    placeholder="What to avoid (optional)"
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label className="form-label">Tags (JSON array)</label>
-                                <input
-                                    name="tags"
-                                    className="form-input mono"
-                                    placeholder='["updo", "formal"]'
-                                />
-                            </div>
-                            {error && (
-                                <div style={{ color: "var(--danger)", fontSize: 13, marginBottom: 12 }}>
-                                    {error}
+                            <form onSubmit={handleCreate}>
+                                <div className="form-group">
+                                    <label className="form-label">Name</label>
+                                    <input name="name" className="form-input" placeholder="e.g. Sleek Bun" required />
                                 </div>
-                            )}
-                            <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>
-                                    Cancel
-                                </button>
-                                <button type="submit" className="btn btn-primary" disabled={loading}>
-                                    {loading ? <span className="spinner" /> : "Create"}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
+                                <div className="form-group">
+                                    <label className="form-label">Description</label>
+                                    <input name="description" className="form-input" placeholder="Optional" />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">Hairstyle Prompt</label>
+                                    <textarea
+                                        name="hairstylePrompt"
+                                        className="form-textarea"
+                                        placeholder="Describe ONLY the hairstyle..."
+                                        required
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">Negative Hair Prompt</label>
+                                    <textarea
+                                        name="negativeHairPrompt"
+                                        className="form-textarea"
+                                        rows={2}
+                                        placeholder="What to avoid (optional)"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">Tags (JSON array)</label>
+                                    <input
+                                        name="tags"
+                                        className="form-input mono"
+                                        placeholder='["updo", "formal"]'
+                                    />
+                                </div>
+                                {error && (
+                                    <div style={{ color: "var(--danger)", fontSize: 13, marginBottom: 12 }}>
+                                        {error}
+                                    </div>
+                                )}
+                                <div className="modal-footer">
+                                    <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>
+                                        Cancel
+                                    </button>
+                                    <button type="submit" className="btn btn-primary" disabled={loading}>
+                                        {loading ? <span className="spinner" /> : "Create"}
+                                    </button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </>
     );
 }

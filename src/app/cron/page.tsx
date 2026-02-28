@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { springAnimation } from "@/app/template";
 
 interface CronJobData {
     id: string;
@@ -152,10 +154,10 @@ export default function CronPage() {
                                         {j.lastResult && (
                                             <span
                                                 className={`badge ${j.lastResult === "success"
-                                                        ? "badge-success"
-                                                        : j.lastResult === "failed"
-                                                            ? "badge-danger"
-                                                            : "badge-neutral"
+                                                    ? "badge-success"
+                                                    : j.lastResult === "failed"
+                                                        ? "badge-danger"
+                                                        : "badge-neutral"
                                                     }`}
                                                 title={j.lastError || ""}
                                             >
@@ -191,72 +193,87 @@ export default function CronPage() {
                 </div>
             )}
 
-            {showModal && (
-                <div className="modal-overlay" onClick={() => setShowModal(false)}>
-                    <div className="modal" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header">
-                            <h3>New Cron Job</h3>
-                            <button className="btn btn-icon btn-secondary" onClick={() => setShowModal(false)}>
-                                ✕
-                            </button>
-                        </div>
-                        <form onSubmit={handleCreate}>
-                            <div className="form-group">
-                                <label className="form-label">Name</label>
-                                <input name="name" className="form-input" placeholder="Daily hairstyle set" required />
-                            </div>
-                            <div className="form-group">
-                                <label className="form-label">Schedule</label>
-                                <input
-                                    name="schedule"
-                                    className="form-input mono"
-                                    placeholder="daily, hourly, 0 0 * * *, etc."
-                                    defaultValue="daily"
-                                    required
-                                />
-                                <div className="text-xs text-muted mt-2">
-                                    Supports: daily, hourly, or cron expressions
-                                </div>
-                            </div>
-                            <div className="form-group">
-                                <label className="form-label">Config JSON</label>
-                                <textarea
-                                    name="configJson"
-                                    className="form-textarea mono"
-                                    rows={8}
-                                    required
-                                    defaultValue={JSON.stringify(
-                                        {
-                                            subjectId: "",
-                                            templateId: "",
-                                            presetIds: [],
-                                            namingPattern: "Daily set {date}",
-                                        },
-                                        null,
-                                        2
-                                    )}
-                                />
-                                <div className="text-xs text-muted mt-2">
-                                    Must include subjectId and either presetIds or customHairstyles array
-                                </div>
-                            </div>
-                            {error && (
-                                <div style={{ color: "var(--danger)", fontSize: 13, marginBottom: 12 }}>
-                                    {error}
-                                </div>
-                            )}
-                            <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>
-                                    Cancel
-                                </button>
-                                <button type="submit" className="btn btn-primary" disabled={loading}>
-                                    {loading ? <span className="spinner" /> : "Create"}
+            <AnimatePresence>
+                {showModal && (
+                    <motion.div
+                        className="modal-overlay"
+                        onClick={() => setShowModal(false)}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                    >
+                        <motion.div
+                            className="modal"
+                            onClick={(e) => e.stopPropagation()}
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            transition={springAnimation}
+                        >
+                            <div className="modal-header">
+                                <h3>New Cron Job</h3>
+                                <button className="btn btn-icon btn-secondary" onClick={() => setShowModal(false)}>
+                                    ✕
                                 </button>
                             </div>
-                        </form>
-                    </div>
-                </div>
-            )}
+                            <form onSubmit={handleCreate}>
+                                <div className="form-group">
+                                    <label className="form-label">Name</label>
+                                    <input name="name" className="form-input" placeholder="Daily hairstyle set" required />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">Schedule</label>
+                                    <input
+                                        name="schedule"
+                                        className="form-input mono"
+                                        placeholder="daily, hourly, 0 0 * * *, etc."
+                                        defaultValue="daily"
+                                        required
+                                    />
+                                    <div className="text-xs text-muted mt-2">
+                                        Supports: daily, hourly, or cron expressions
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">Config JSON</label>
+                                    <textarea
+                                        name="configJson"
+                                        className="form-textarea mono"
+                                        rows={8}
+                                        required
+                                        defaultValue={JSON.stringify(
+                                            {
+                                                subjectId: "",
+                                                templateId: "",
+                                                presetIds: [],
+                                                namingPattern: "Daily set {date}",
+                                            },
+                                            null,
+                                            2
+                                        )}
+                                    />
+                                    <div className="text-xs text-muted mt-2">
+                                        Must include subjectId and either presetIds or customHairstyles array
+                                    </div>
+                                </div>
+                                {error && (
+                                    <div style={{ color: "var(--danger)", fontSize: 13, marginBottom: 12 }}>
+                                        {error}
+                                    </div>
+                                )}
+                                <div className="modal-footer">
+                                    <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>
+                                        Cancel
+                                    </button>
+                                    <button type="submit" className="btn btn-primary" disabled={loading}>
+                                        {loading ? <span className="spinner" /> : "Create"}
+                                    </button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </>
     );
 }

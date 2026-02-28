@@ -4,6 +4,8 @@ import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { storageUrl } from "@/lib/urls";
+import { motion, AnimatePresence } from "framer-motion";
+import { springAnimation } from "@/app/template";
 
 interface Subject {
     id: string;
@@ -189,114 +191,129 @@ export default function SubjectsPage() {
                 </div>
             )}
 
-            {showModal && (
-                <div className="modal-overlay" onClick={() => setShowModal(false)}>
-                    <div className="modal" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header">
-                            <h3>New Subject</h3>
-                            <button
-                                className="btn btn-icon btn-secondary"
-                                onClick={() => setShowModal(false)}
-                            >
-                                ✕
-                            </button>
-                        </div>
-
-                        <form onSubmit={handleCreate}>
-                            <div className="form-group">
-                                <label className="form-label">Name</label>
-                                <input
-                                    name="name"
-                                    className="form-input"
-                                    placeholder="e.g. Model A"
-                                    required
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label className="form-label">Description (optional)</label>
-                                <textarea
-                                    name="description"
-                                    className="form-textarea"
-                                    placeholder="Brief notes about the subject"
-                                    rows={2}
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label className="form-label">Reference Photos</label>
-                                <div
-                                    className="upload-zone"
-                                    onClick={() => fileInputRef.current?.click()}
-                                >
-                                    <p style={{ fontWeight: 500, color: "var(--text)" }}>Click to upload</p>
-                                    <p className="text-xs text-muted">PNG, JPG, WebP — These are immutable after creation</p>
-                                </div>
-                                <input
-                                    ref={fileInputRef}
-                                    type="file"
-                                    accept="image/*"
-                                    multiple
-                                    onChange={handleFiles}
-                                    style={{ display: "none" }}
-                                />
-                                {previews.length > 0 && (
-                                    <div className="upload-preview">
-                                        {previews.map((p, i) => (
-                                            <img key={i} src={p} alt="" className="upload-preview-img" />
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="form-group">
-                                <label className="form-label">Scene attributes (JSON)</label>
-                                <textarea
-                                    name="lockedAttributesJson"
-                                    className="form-textarea mono"
-                                    rows={4}
-                                    defaultValue={JSON.stringify(
-                                        {
-                                            wardrobe: "current outfit in reference",
-                                            background: "same as reference",
-                                            lighting: "same as reference",
-                                            camera: "same framing as reference",
-                                        },
-                                        null,
-                                        2
-                                    )}
-                                />
-                                <div className="text-xs text-muted" style={{ marginTop: 4 }}>
-                                    These attributes are locked — only hairstyle will change across generations
-                                </div>
-                            </div>
-
-                            {error && (
-                                <div style={{ color: "var(--danger)", fontSize: 13, marginBottom: 12 }}>
-                                    {error}
-                                </div>
-                            )}
-
-                            <div className="modal-footer">
+            <AnimatePresence>
+                {showModal && (
+                    <motion.div
+                        className="modal-overlay"
+                        onClick={() => setShowModal(false)}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                    >
+                        <motion.div
+                            className="modal"
+                            onClick={(e) => e.stopPropagation()}
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            transition={springAnimation}
+                        >
+                            <div className="modal-header">
+                                <h3>New Subject</h3>
                                 <button
-                                    type="button"
-                                    className="btn btn-secondary"
+                                    className="btn btn-icon btn-secondary"
                                     onClick={() => setShowModal(false)}
                                 >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="btn btn-primary"
-                                    disabled={loading || files.length === 0}
-                                >
-                                    {loading ? <span className="spinner" /> : "Create Subject"}
+                                    ✕
                                 </button>
                             </div>
-                        </form>
-                    </div>
-                </div>
-            )}
+
+                            <form onSubmit={handleCreate}>
+                                <div className="form-group">
+                                    <label className="form-label">Name</label>
+                                    <input
+                                        name="name"
+                                        className="form-input"
+                                        placeholder="e.g. Model A"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Description (optional)</label>
+                                    <textarea
+                                        name="description"
+                                        className="form-textarea"
+                                        placeholder="Brief notes about the subject"
+                                        rows={2}
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Reference Photos</label>
+                                    <div
+                                        className="upload-zone"
+                                        onClick={() => fileInputRef.current?.click()}
+                                    >
+                                        <p style={{ fontWeight: 500, color: "var(--text)" }}>Click to upload</p>
+                                        <p className="text-xs text-muted">PNG, JPG, WebP — These are immutable after creation</p>
+                                    </div>
+                                    <input
+                                        ref={fileInputRef}
+                                        type="file"
+                                        accept="image/*"
+                                        multiple
+                                        onChange={handleFiles}
+                                        style={{ display: "none" }}
+                                    />
+                                    {previews.length > 0 && (
+                                        <div className="upload-preview">
+                                            {previews.map((p, i) => (
+                                                <img key={i} src={p} alt="" className="upload-preview-img" />
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Scene attributes (JSON)</label>
+                                    <textarea
+                                        name="lockedAttributesJson"
+                                        className="form-textarea mono"
+                                        rows={4}
+                                        defaultValue={JSON.stringify(
+                                            {
+                                                wardrobe: "current outfit in reference",
+                                                background: "same as reference",
+                                                lighting: "same as reference",
+                                                camera: "same framing as reference",
+                                            },
+                                            null,
+                                            2
+                                        )}
+                                    />
+                                    <div className="text-xs text-muted" style={{ marginTop: 4 }}>
+                                        These attributes are locked — only hairstyle will change across generations
+                                    </div>
+                                </div>
+
+                                {error && (
+                                    <div style={{ color: "var(--danger)", fontSize: 13, marginBottom: 12 }}>
+                                        {error}
+                                    </div>
+                                )}
+
+                                <div className="modal-footer">
+                                    <button
+                                        type="button"
+                                        className="btn btn-secondary"
+                                        onClick={() => setShowModal(false)}
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="btn btn-primary"
+                                        disabled={loading || files.length === 0}
+                                    >
+                                        {loading ? <span className="spinner" /> : "Create Subject"}
+                                    </button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </>
     );
 }
