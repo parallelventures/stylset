@@ -65,6 +65,10 @@ export function setManifestPath(setId: string): string {
     return `sets/${setId}/manifest.json`;
 }
 
+export function setZipPath(setId: string): string {
+    return `sets/${setId}/set.zip`;
+}
+
 // ─── Create the bucket if it doesn't exist ───
 export async function ensureBucket(): Promise<void> {
     const { error } = await getSupabase().storage.createBucket(BUCKET, {

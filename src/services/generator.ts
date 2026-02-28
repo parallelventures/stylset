@@ -5,7 +5,8 @@
 import prisma from "@/lib/prisma";
 import { composePrompt } from "@/lib/prompts";
 import { generateAndSaveImage } from "@/services/geminiImage";
-import { uploadJson, setImagePath, setManifestPath, getFileUrl } from "@/lib/storage";
+import { uploadJson, setImagePath, setManifestPath, setZipPath, getFileUrl } from "@/lib/storage";
+import { createAndUploadZip } from "@/lib/zip";
 import { v4 as uuid } from "uuid";
 
 const CONCURRENCY = 2;
@@ -118,12 +119,27 @@ export async function generateSet(setId: string): Promise<void> {
     const manifestStorage = setManifestPath(setId);
     await uploadJson(manifestStorage, manifest);
 
+    // Zip the set if there are any successful slides
+    let zipStoragePath: string | null = null;
+    const slidesToZip = slides
+        .filter((s) => s.status === "succeeded" && !!s.outputImagePath)
+        .map((s) => ({
+            filename: `${String(s.orderIndex).padStart(3, "0")}.png`,
+            storagePath: s.outputImagePath as string,
+        }));
+
+    if (slidesToZip.length > 0) {
+        zipStoragePath = setZipPath(setId);
+        await createAndUploadZip(slidesToZip, zipStoragePath);
+    }
+
     await prisma.slideshowSet.update({
         where: { id: setId },
         data: {
             status: failCount > 0 ? "failed" : "ready",
             outputDir: `sets/${setId}`,
             manifestPath: manifestStorage,
+            zipPath: zipStoragePath,
         },
     });
 }

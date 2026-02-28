@@ -12,10 +12,12 @@ import {
     getFileUrl,
     setImagePath,
     setManifestPath,
+    setZipPath,
     bufferHash,
     downloadFile,
 } from "@/lib/storage";
 import { validatePromptSafety } from "@/lib/validation";
+import { createAndUploadZip } from "@/lib/zip";
 import { v4 as uuid } from "uuid";
 
 const DEFAULT_SETS_PER_DAY = 5;
@@ -149,11 +151,31 @@ export async function runDailyAgent(configOverride?: Partial<AgentConfig>): Prom
             const manifestStoragePath = setManifestPath(setId);
             const manifestUrl = await uploadJson(manifestStoragePath, manifest);
 
+            // Zip the set
+            let zipStoragePath: string | null = null;
+            if (setSlidesFailed === 0 || slidesOk > 0) {
+                const slidesToZip = manifest.slides
+                    .filter((s) => s.status === "succeeded" && !!s.storagePath)
+                    .map((s) => {
+                        const idx = String(s.orderIndex).padStart(3, "0");
+                        return {
+                            filename: `${idx}.png`,
+                            storagePath: s.storagePath as string, // Checked above
+                        };
+                    });
+
+                if (slidesToZip.length > 0) {
+                    zipStoragePath = setZipPath(setId);
+                    await createAndUploadZip(slidesToZip, zipStoragePath);
+                }
+            }
+
             await prisma.slideshowSet.update({
                 where: { id: setId },
                 data: {
                     status: setSlidesFailed > 0 ? "failed" : "ready",
                     manifestPath: manifestStoragePath,
+                    zipPath: zipStoragePath,
                 },
             });
 
