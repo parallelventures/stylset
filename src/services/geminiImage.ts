@@ -8,6 +8,14 @@ import { uploadFile, downloadFile, bufferHash } from "@/lib/storage";
 
 export const GEMINI_MODEL = "gemini-3-pro-image-preview";
 
+/* ─── Rate limiter ─── */
+const MIN_CALL_INTERVAL_MS = 4000; // minimum 4s between API calls
+const RATE_LIMIT_RETRIES = 3; // retries specifically for 429 errors
+const RATE_LIMIT_BASE_MS = 8000; // starting backoff for 429
+const RATE_LIMIT_MAX_MS = 60000; // max backoff cap
+
+let _lastCallTime = 0;
+
 let _keys: string[] = [];
 
 function getApiKeys(): string[] {
@@ -88,42 +96,71 @@ export async function generateAndSaveImage(
 
         let lastError: unknown;
         for (const apiKey of shuffledKeys) {
-            try {
-                // Call Gemini
-                const response = await getGenAI(apiKey).models.generateContent({
-                    model: GEMINI_MODEL,
-                    contents: [{ role: "user", parts }],
-                    config: {
-                        // @ts-ignore
-                        responseModalities: ["image"],
-                        // @ts-ignore
-                        addWatermark: false,
-                        outputMimeType: "image/png"
-                    },
-                });
-
-                // Extract image
-                if (!response.candidates?.[0]?.content?.parts) {
-                    throw new Error("No response parts from Gemini");
-                }
-
-                for (const part of response.candidates[0].content.parts) {
-                    if (part.inlineData?.data) {
-                        const buffer = Buffer.from(part.inlineData.data, "base64");
-                        const hash = bufferHash(buffer);
-
-                        // Upload to Supabase Storage
-                        const publicUrl = await uploadFile(outputStoragePath, buffer, "image/png");
-
-                        return { success: true, publicUrl, hash };
+            // Rate-limit retry loop for each key
+            for (let rateLimitAttempt = 0; rateLimitAttempt <= RATE_LIMIT_RETRIES; rateLimitAttempt++) {
+                try {
+                    // Enforce minimum interval between calls
+                    const now = Date.now();
+                    const elapsed = now - _lastCallTime;
+                    if (elapsed < MIN_CALL_INTERVAL_MS) {
+                        const waitMs = MIN_CALL_INTERVAL_MS - elapsed;
+                        await new Promise((r) => setTimeout(r, waitMs));
                     }
-                }
+                    _lastCallTime = Date.now();
 
-                throw new Error("Empty image response");
-            } catch (err: unknown) {
-                const msg = err instanceof Error ? err.message : String(err);
-                console.warn(`[Gemini] Key ending in *${apiKey.slice(-4)} failed:`, msg);
-                lastError = err;
+                    // Call Gemini
+                    const response = await getGenAI(apiKey).models.generateContent({
+                        model: GEMINI_MODEL,
+                        contents: [{ role: "user", parts }],
+                        config: {
+                            // @ts-ignore
+                            responseModalities: ["image"],
+                            // @ts-ignore
+                            addWatermark: false,
+                            outputMimeType: "image/png"
+                        },
+                    });
+
+                    // Extract image
+                    if (!response.candidates?.[0]?.content?.parts) {
+                        throw new Error("No response parts from Gemini");
+                    }
+
+                    for (const part of response.candidates[0].content.parts) {
+                        if (part.inlineData?.data) {
+                            const buffer = Buffer.from(part.inlineData.data, "base64");
+                            const hash = bufferHash(buffer);
+
+                            // Upload to Supabase Storage
+                            const publicUrl = await uploadFile(outputStoragePath, buffer, "image/png");
+
+                            return { success: true, publicUrl, hash };
+                        }
+                    }
+
+                    throw new Error("Empty image response");
+                } catch (err: unknown) {
+                    const msg = err instanceof Error ? err.message : String(err);
+                    const isRateLimit = msg.includes("429") ||
+                        msg.toLowerCase().includes("rate") ||
+                        msg.toLowerCase().includes("quota") ||
+                        msg.toLowerCase().includes("resource_exhausted") ||
+                        msg.toLowerCase().includes("too many requests");
+
+                    if (isRateLimit && rateLimitAttempt < RATE_LIMIT_RETRIES) {
+                        const backoff = Math.min(
+                            RATE_LIMIT_BASE_MS * Math.pow(2, rateLimitAttempt),
+                            RATE_LIMIT_MAX_MS
+                        );
+                        console.warn(`[Gemini] Rate limited (attempt ${rateLimitAttempt + 1}/${RATE_LIMIT_RETRIES}), backing off ${backoff}ms`);
+                        await new Promise((r) => setTimeout(r, backoff));
+                        continue; // retry same key
+                    }
+
+                    console.warn(`[Gemini] Key ending in *${apiKey.slice(-4)} failed:`, msg);
+                    lastError = err;
+                    break; // move to next key
+                }
             }
         }
 

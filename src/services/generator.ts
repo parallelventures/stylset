@@ -9,7 +9,8 @@ import { uploadJson, setImagePath, setManifestPath, setZipPath, getFileUrl } fro
 import { createAndUploadZip } from "@/lib/zip";
 import { v4 as uuid } from "uuid";
 
-const CONCURRENCY = 2;
+const CONCURRENCY = 1;
+const BATCH_DELAY_MS = 2000;
 
 export async function generateSet(setId: string): Promise<void> {
     const set = await prisma.slideshowSet.findUniqueOrThrow({
@@ -93,6 +94,11 @@ export async function generateSet(setId: string): Promise<void> {
                 }
             })
         );
+
+        // Delay between batches to avoid rate limits
+        if (i + CONCURRENCY < set.slides.length) {
+            await new Promise((r) => setTimeout(r, BATCH_DELAY_MS));
+        }
     }
 
     // Manifest

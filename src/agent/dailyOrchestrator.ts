@@ -22,9 +22,11 @@ import { v4 as uuid } from "uuid";
 
 const DEFAULT_SETS_PER_DAY = 5;
 const DEFAULT_SLIDES_PER_SET = 6;
-const CONCURRENCY = 2;
+const CONCURRENCY = 1;
 const MAX_RETRIES = 2;
-const RETRY_BASE_MS = 3000;
+const RETRY_BASE_MS = 8000;
+const BATCH_DELAY_MS = 3000; // delay between slides within a set
+const SET_COOLDOWN_MS = 5000; // delay between sets
 
 interface AgentConfig {
     subjectId: string;
@@ -172,6 +174,11 @@ export async function runDailyAgent(configOverride?: Partial<AgentConfig>, resum
                         setSlidesFailed++;
                     }
                 }
+
+                // Delay between slide batches to avoid rate limits
+                if (i + CONCURRENCY < slideIds.length) {
+                    await sleep(BATCH_DELAY_MS);
+                }
             }
 
             // Build manifest and upload to Supabase
@@ -234,6 +241,12 @@ export async function runDailyAgent(configOverride?: Partial<AgentConfig>, resum
                     data: { status: "paused" },
                 });
                 return runId;
+            }
+
+            // Cooldown between sets to avoid rate limits
+            if (setIdx < setsPerDay - 1) {
+                console.log(`[Agent] Cooling down ${SET_COOLDOWN_MS / 1000}s before next set...`);
+                await sleep(SET_COOLDOWN_MS);
             }
 
         } catch (error: unknown) {
