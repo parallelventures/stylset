@@ -20,7 +20,7 @@ import { validatePromptSafety } from "@/lib/validation";
 import { createAndUploadZip } from "@/lib/zip";
 import { v4 as uuid } from "uuid";
 
-const DEFAULT_SETS_PER_DAY = 1;
+const DEFAULT_SETS_PER_DAY = 5;
 const DEFAULT_SLIDES_PER_SET = 6;
 const CONCURRENCY = 2;
 const MAX_RETRIES = 2;
