@@ -4,7 +4,7 @@
  * All files go to the "styleset" bucket in Supabase Storage.
  * Paths: subjects/{id}/ref_0.png, sets/{id}/images/000.png, etc.
  */
-import { supabase, BUCKET, getPublicUrl } from "./supabase";
+import { getSupabase, BUCKET, getPublicUrl } from "./supabase";
 import crypto from "crypto";
 
 // ─── Upload a buffer to Supabase Storage ───
@@ -13,7 +13,7 @@ export async function uploadFile(
     buffer: Buffer,
     contentType = "image/png",
 ): Promise<string> {
-    const { error } = await supabase.storage
+    const { error } = await getSupabase().storage
         .from(BUCKET)
         .upload(storagePath, buffer, {
             contentType,
@@ -33,7 +33,7 @@ export async function uploadJson(storagePath: string, data: unknown): Promise<st
 
 // ─── Download a file as Buffer ───
 export async function downloadFile(storagePath: string): Promise<Buffer> {
-    const { data, error } = await supabase.storage
+    const { data, error } = await getSupabase().storage
         .from(BUCKET)
         .download(storagePath);
 
@@ -67,7 +67,7 @@ export function setManifestPath(setId: string): string {
 
 // ─── Create the bucket if it doesn't exist ───
 export async function ensureBucket(): Promise<void> {
-    const { error } = await supabase.storage.createBucket(BUCKET, {
+    const { error } = await getSupabase().storage.createBucket(BUCKET, {
         public: true,
         fileSizeLimit: 52428800, // 50MB
     });
