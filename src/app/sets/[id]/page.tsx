@@ -98,6 +98,19 @@ export default function SetDetailPage({
                 </div>
 
                 <div className="flex gap-2">
+                    {(set.status === "generating" || set.status === "idle") && (
+                        <button
+                            className="btn btn-secondary btn-sm"
+                            onClick={async () => {
+                                const res = await fetch(`/api/sets/${id}/fix`, { method: "POST" });
+                                const data = await res.json();
+                                alert(`Fixed: ${data.stuckFixed} stuck slides. New status: ${data.status}. ${data.retriggered ? "Re-triggered generation!" : ""}`);
+                                loadSet();
+                            }}
+                        >
+                            🔧 Fix & Retry
+                        </button>
+                    )}
                     {set.manifestPath && (
                         <a
                             href={storageUrl(set.manifestPath)}
