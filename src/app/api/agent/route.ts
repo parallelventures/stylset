@@ -55,6 +55,7 @@ export async function POST(req: NextRequest) {
             templateId: body.templateId,
             setsPerDay: body.setsPerDay,
             slidesPerSet: body.slidesPerSet,
+            pauseBetweenSets: body.pauseBetweenSets,
         };
 
         // Start agent in background

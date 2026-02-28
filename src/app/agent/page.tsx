@@ -38,6 +38,7 @@ export default function AgentPage() {
     const [error, setError] = useState("");
     const [setsPerDay, setSetsPerDay] = useState(5);
     const [slidesPerSet, setSlidesPerSet] = useState(6);
+    const [pauseBetweenSets, setPauseBetweenSets] = useState(false);
 
     const load = useCallback(() => {
         fetch("/api/agent")
@@ -58,7 +59,7 @@ export default function AgentPage() {
         setRunning(true);
         setError("");
         try {
-            const body: Record<string, unknown> = { setsPerDay, slidesPerSet };
+            const body: Record<string, unknown> = { setsPerDay, slidesPerSet, pauseBetweenSets };
             if (status?.defaultSubject) {
                 body.subjectId = status.defaultSubject.id;
             }
@@ -74,6 +75,25 @@ export default function AgentPage() {
             setError(err instanceof Error ? err.message : "Agent run failed");
         } finally {
             setRunning(false);
+        }
+    }
+
+    async function handleCancel(id: string) {
+        if (!confirm("Cancel this run?")) return;
+        try {
+            await fetch(`/api/agent/${id}/cancel`, { method: "POST" });
+            load();
+        } catch (err: unknown) {
+            alert(err instanceof Error ? err.message : "Failed to cancel");
+        }
+    }
+
+    async function handleResume(id: string) {
+        try {
+            await fetch(`/api/agent/${id}/resume`, { method: "POST" });
+            setTimeout(load, 1000);
+        } catch (err: unknown) {
+            alert(err instanceof Error ? err.message : "Failed to resume");
         }
     }
 
@@ -133,7 +153,7 @@ export default function AgentPage() {
             )}
 
             {/* Config */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 24 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1.5fr", gap: 12, marginBottom: 24 }}>
                 <div className="card">
                     <div className="card-meta">Active Subject</div>
                     <div className="card-title" style={{ marginTop: 4 }}>
@@ -174,6 +194,19 @@ export default function AgentPage() {
                                 <option key={n} value={n}>{n}</option>
                             ))}
                         </select>
+                    </div>
+                </div>
+                <div className="card">
+                    <div className="card-meta">Verification</div>
+                    <div style={{ marginTop: 8 }}>
+                        <label className="flex items-center gap-2" style={{ cursor: "pointer", fontSize: 13 }}>
+                            <input
+                                type="checkbox"
+                                checked={pauseBetweenSets}
+                                onChange={(e) => setPauseBetweenSets(e.target.checked)}
+                            />
+                            Pause between sets
+                        </label>
                     </div>
                 </div>
             </div>
@@ -232,6 +265,7 @@ export default function AgentPage() {
                                     <th>Sets</th>
                                     <th>Slides</th>
                                     <th>Duration</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -248,10 +282,10 @@ export default function AgentPage() {
                                             <td>
                                                 <span
                                                     className={`badge ${run.status === "completed"
-                                                            ? "badge-success"
-                                                            : run.status === "running"
-                                                                ? "badge-warning"
-                                                                : "badge-danger"
+                                                        ? "badge-success"
+                                                        : run.status === "running"
+                                                            ? "badge-warning"
+                                                            : "badge-danger"
                                                         }`}
                                                 >
                                                     {run.status === "running" ? "Running…" : run.status}
@@ -266,6 +300,20 @@ export default function AgentPage() {
                                                 {run.slidesFailed > 0 && <span style={{ color: "var(--danger)" }}> · {run.slidesFailed} failed</span>}
                                             </td>
                                             <td className="text-sm text-secondary mono">{duration}</td>
+                                            <td>
+                                                <div className="flex gap-2">
+                                                    {run.status === "paused" && (
+                                                        <button className="btn btn-primary btn-sm" onClick={() => handleResume(run.id)}>
+                                                            Resume
+                                                        </button>
+                                                    )}
+                                                    {(run.status === "running" || run.status === "paused") && (
+                                                        <button className="btn btn-danger btn-sm" onClick={() => handleCancel(run.id)}>
+                                                            Cancel
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </td>
                                         </tr>
                                     );
                                 })}

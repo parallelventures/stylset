@@ -31,11 +31,12 @@ interface AgentConfig {
     templateId?: string;
     setsPerDay?: number;
     slidesPerSet?: number;
+    pauseBetweenSets?: boolean;
 }
 
-export async function runDailyAgent(configOverride?: Partial<AgentConfig>): Promise<string> {
+export async function runDailyAgent(configOverride?: Partial<AgentConfig>, resumeRunId?: string): Promise<string> {
     console.log("\n═══════════════════════════════════════════");
-    console.log("  STYLESET AGENT — Starting daily run");
+    console.log(`  STYLESET AGENT — ${resumeRunId ? "Resuming run" : "Starting daily run"}`);
     console.log("═══════════════════════════════════════════\n");
 
     const config = await resolveConfig(configOverride);
@@ -59,25 +60,52 @@ export async function runDailyAgent(configOverride?: Partial<AgentConfig>): Prom
         throw new Error(`Need at least ${slidesPerSet} presets, have ${allPresets.length}`);
     }
 
-    const runId = uuid();
-    await prisma.agentRun.create({
-        data: {
-            id: runId,
-            setsPlanned: setsPerDay,
-            slidesTotal: setsPerDay * slidesPerSet,
-            configJson: JSON.stringify(config),
-        },
-    });
+    let runId = resumeRunId;
+    let setsCompleted = 0, setsFailed = 0, slidesOk = 0, slidesFailed = 0;
 
-    console.log(`[Agent] Run ${runId.slice(0, 8)}`);
+    if (runId) {
+        const existingRun = await prisma.agentRun.findUnique({ where: { id: runId } });
+        if (!existingRun) throw new Error("Run not found to resume");
+
+        await prisma.agentRun.update({
+            where: { id: runId },
+            data: { status: "running" }
+        });
+
+        setsCompleted = existingRun.setsCompleted;
+        setsFailed = existingRun.setsFailed;
+        slidesOk = existingRun.slidesOk;
+        slidesFailed = existingRun.slidesFailed;
+        console.log(`[Agent] Resuming Run ${runId.slice(0, 8)} from set ${setsCompleted + setsFailed + 1}`);
+    } else {
+        runId = uuid();
+        await prisma.agentRun.create({
+            data: {
+                id: runId,
+                setsPlanned: setsPerDay,
+                slidesTotal: setsPerDay * slidesPerSet,
+                configJson: JSON.stringify(config),
+            },
+        });
+        console.log(`[Agent] Run ${runId.slice(0, 8)}`);
+    }
+
     console.log(`[Agent] Subject: ${subject.name}`);
     console.log(`[Agent] Plan: ${setsPerDay}×${slidesPerSet} = ${setsPerDay * slidesPerSet} images\n`);
 
     const recentUsedPresetIds = await getRecentlyUsedPresets(7);
-    let setsCompleted = 0, setsFailed = 0, slidesOk = 0, slidesFailed = 0;
     const usedPresetsToday = new Set<string>();
 
-    for (let setIdx = 0; setIdx < setsPerDay; setIdx++) {
+    const startingSetIdx = setsCompleted + setsFailed;
+
+    for (let setIdx = startingSetIdx; setIdx < setsPerDay; setIdx++) {
+        // Check for cancellation before starting the set
+        const checkRun = await prisma.agentRun.findUnique({ where: { id: runId } });
+        if (checkRun?.status === "cancelled") {
+            console.log(`[Agent] Run ${runId.slice(0, 8)} was cancelled by user.`);
+            return runId;
+        }
+
         console.log(`\n───── Set ${setIdx + 1}/${setsPerDay} ─────`);
 
         try {
@@ -186,10 +214,41 @@ export async function runDailyAgent(configOverride?: Partial<AgentConfig>): Prom
                 setsCompleted++;
                 console.log(`[Agent] Set ${setIdx + 1} ✓ complete — manifest: ${manifestUrl}`);
             }
+
+            // Sync progress so far
+            await prisma.agentRun.update({
+                where: { id: runId },
+                data: {
+                    setsCompleted,
+                    setsFailed,
+                    slidesOk,
+                    slidesFailed,
+                },
+            });
+
+            // Pause if required and not the last set
+            if (config.pauseBetweenSets && setIdx < setsPerDay - 1) {
+                console.log(`[Agent] Pausing between sets. Paused after Set ${setIdx + 1}.`);
+                await prisma.agentRun.update({
+                    where: { id: runId },
+                    data: { status: "paused" },
+                });
+                return runId;
+            }
+
         } catch (error: unknown) {
             setsFailed++;
             console.error(`[Agent] Set ${setIdx + 1} FAILED:`, error instanceof Error ? error.message : error);
+            await prisma.agentRun.update({
+                where: { id: runId },
+                data: { setsFailed }
+            });
         }
+    }
+
+    const finaleCheck = await prisma.agentRun.findUnique({ where: { id: runId } });
+    if (finaleCheck?.status === "cancelled" || finaleCheck?.status === "paused") {
+        return runId; // Do not overwrite if cancelled or paused manually mid-execution
     }
 
     await prisma.agentRun.update({
