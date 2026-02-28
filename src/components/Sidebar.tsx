@@ -108,8 +108,6 @@ export function Sidebar() {
                             key={item.href}
                             href={item.href}
                             className={`sidebar-link ${isActive ? "active" : ""}`}
-                            data-tooltip={item.tooltip}
-                            data-tooltip-pos="bottom"
                         >
                             {item.icon}
                             {item.label}
