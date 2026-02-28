@@ -121,12 +121,26 @@ export async function generateAndSaveImage(
                         },
                     });
 
-                    // Extract image
-                    if (!response.candidates?.[0]?.content?.parts) {
-                        throw new Error("No response parts from Gemini");
+                    // Extract image from response
+                    const candidate = response.candidates?.[0];
+
+                    if (!candidate?.content?.parts) {
+                        // Log detailed info about why there are no parts
+                        const finishReason = candidate?.finishReason || "unknown";
+                        const safetyRatings = candidate?.safetyRatings
+                            ?.map((r: { category?: string; probability?: string }) => `${r.category}:${r.probability}`)
+                            .join(", ") || "none";
+                        const blockReason = (response as unknown as Record<string, unknown>).promptFeedback
+                            ? JSON.stringify((response as unknown as Record<string, unknown>).promptFeedback)
+                            : "none";
+
+                        console.warn(`[Gemini] Empty response — finishReason: ${finishReason}, safety: [${safetyRatings}], blockReason: ${blockReason}`);
+
+                        // Treat as retryable — often transient or safety filter flicker
+                        throw new Error(`No image generated (finishReason: ${finishReason})`);
                     }
 
-                    for (const part of response.candidates[0].content.parts) {
+                    for (const part of candidate.content.parts) {
                         if (part.inlineData?.data) {
                             const buffer = Buffer.from(part.inlineData.data, "base64");
                             const hash = bufferHash(buffer);
@@ -138,7 +152,7 @@ export async function generateAndSaveImage(
                         }
                     }
 
-                    throw new Error("Empty image response");
+                    throw new Error("Response parts present but no image data found");
                 } catch (err: unknown) {
                     const msg = err instanceof Error ? err.message : String(err);
                     const isRateLimit = msg.includes("429") ||
@@ -147,7 +161,12 @@ export async function generateAndSaveImage(
                         msg.toLowerCase().includes("resource_exhausted") ||
                         msg.toLowerCase().includes("too many requests");
 
-                    if (isRateLimit && rateLimitAttempt < RATE_LIMIT_RETRIES) {
+                    const isEmptyResponse = msg.toLowerCase().includes("no image generated") ||
+                        msg.toLowerCase().includes("no image data found");
+
+                    const isRetryable = isRateLimit || isEmptyResponse;
+
+                    if (isRetryable && rateLimitAttempt < RATE_LIMIT_RETRIES) {
                         const backoff = Math.min(
                             RATE_LIMIT_BASE_MS * Math.pow(2, rateLimitAttempt),
                             RATE_LIMIT_MAX_MS
