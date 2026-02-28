@@ -48,6 +48,18 @@ export default function AgentPage() {
 
     useEffect(() => { load(); }, [load]);
 
+    useEffect(() => {
+        const stored = localStorage.getItem("styleset_agent_settings");
+        if (stored) {
+            try {
+                const s = JSON.parse(stored);
+                if (s.setsPerDay) setSetsPerDay(s.setsPerDay);
+                if (s.slidesPerSet) setSlidesPerSet(s.slidesPerSet);
+                if (s.pauseBetweenSets !== undefined) setPauseBetweenSets(s.pauseBetweenSets);
+            } catch (err) { }
+        }
+    }, []);
+
     // Auto-refresh if a run is active
     useEffect(() => {
         if (!status?.runs?.some((r) => r.status === "running")) return;
@@ -152,9 +164,9 @@ export default function AgentPage() {
                 </div>
             )}
 
-            {/* Config */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1.5fr", gap: 12, marginBottom: 24 }}>
-                <div className="card">
+            {/* Config Summary */}
+            <div style={{ display: "flex", gap: 16, marginBottom: 24 }}>
+                <div className="card" style={{ flex: 1 }}>
                     <div className="card-meta">Active Subject</div>
                     <div className="card-title" style={{ marginTop: 4 }}>
                         {status.defaultSubject ? (
@@ -166,47 +178,20 @@ export default function AgentPage() {
                         )}
                     </div>
                 </div>
-                <div className="card">
-                    <div className="card-meta">Sets per Day</div>
-                    <div style={{ marginTop: 4 }}>
-                        <select
-                            className="form-select"
-                            value={setsPerDay}
-                            onChange={(e) => setSetsPerDay(Number(e.target.value))}
-                            style={{ width: 80 }}
-                        >
-                            {[1, 2, 3, 4, 5, 7, 10].map((n) => (
-                                <option key={n} value={n}>{n}</option>
-                            ))}
-                        </select>
-                    </div>
-                </div>
-                <div className="card">
-                    <div className="card-meta">Slides per Set</div>
-                    <div style={{ marginTop: 4 }}>
-                        <select
-                            className="form-select"
-                            value={slidesPerSet}
-                            onChange={(e) => setSlidesPerSet(Number(e.target.value))}
-                            style={{ width: 80 }}
-                        >
-                            {[3, 4, 5, 6, 8, 10].map((n) => (
-                                <option key={n} value={n}>{n}</option>
-                            ))}
-                        </select>
-                    </div>
-                </div>
-                <div className="card">
-                    <div className="card-meta">Verification</div>
-                    <div style={{ marginTop: 8 }}>
-                        <label className="flex items-center gap-2" style={{ cursor: "pointer", fontSize: 13 }}>
-                            <input
-                                type="checkbox"
-                                checked={pauseBetweenSets}
-                                onChange={(e) => setPauseBetweenSets(e.target.checked)}
-                            />
-                            Pause between sets
-                        </label>
+                <div className="card" style={{ flex: 2 }}>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <div className="card-meta">Agent Config</div>
+                            <div className="card-title" style={{ marginTop: 4, fontSize: 14 }}>
+                                {setsPerDay} sets of {slidesPerSet} slides
+                                <span className="text-secondary" style={{ marginLeft: 6, fontWeight: 400 }}>
+                                    {pauseBetweenSets ? "(Manual verification enabled)" : "(Runs continuously)"}
+                                </span>
+                            </div>
+                        </div>
+                        <Link href="/settings" className="btn btn-secondary btn-sm">
+                            Edit Settings
+                        </Link>
                     </div>
                 </div>
             </div>
