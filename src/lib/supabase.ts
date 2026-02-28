@@ -16,7 +16,7 @@ export function getSupabase(): SupabaseClient {
 }
 
 export function getPublicUrl(bucket: string, path: string): string {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://vrxznojhymyaxvztdtpv.supabase.co";
     return `${url}/storage/v1/object/public/${bucket}/${path}`;
 }
 

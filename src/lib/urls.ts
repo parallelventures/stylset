@@ -5,7 +5,7 @@
 export function storageUrl(storagePath: string | null | undefined): string {
     if (!storagePath) return "";
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://vrxznojhymyaxvztdtpv.supabase.co";
 
     // Strip "data/" prefix if present (legacy migration)
     const cleanPath = storagePath.replace(/^data\//, "");
