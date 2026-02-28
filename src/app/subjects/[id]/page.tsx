@@ -86,7 +86,7 @@ export default function SubjectDetailPage({
                     {generating ? (
                         <><span className="spinner" /> Generating…</>
                     ) : (
-                        "⚡ Generate All Hairstyles"
+                        "⚡ Generate Sets (All Hairstyles)"
                     )}
                 </button>
             </div>
