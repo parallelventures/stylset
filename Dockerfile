@@ -1,28 +1,19 @@
-FROM node:20-alpine AS base
+FROM node:20-alpine
 
 WORKDIR /app
 
-# Install dependencies
+# Copy package files AND prisma schema (needed by postinstall)
 COPY package.json package-lock.json ./
+COPY prisma ./prisma/
+
 RUN npm ci
 
-# Copy prisma schema and generate client
-COPY prisma ./prisma
-RUN npx prisma generate
-
-# Copy source
+# Copy rest of app
 COPY . .
 
 # Build
 RUN npm run build
 
-# Create data directory
-RUN mkdir -p data/subjects data/sets
-
 EXPOSE 3000
 
-ENV NODE_ENV=production
-ENV DATABASE_URL="file:./prisma/dev.db"
-
-# Initialize DB and start
-CMD npx prisma db push --skip-generate && npm start
+CMD ["npm", "start"]
