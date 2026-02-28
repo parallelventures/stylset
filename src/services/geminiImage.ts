@@ -77,7 +77,11 @@ export async function generateAndSaveImage(
             model: GEMINI_MODEL,
             contents: [{ role: "user", parts }],
             config: {
-                responseModalities: ["image", "text"],
+                // @ts-ignore
+                responseModalities: ["image"],
+                // @ts-ignore
+                addWatermark: false,
+                outputMimeType: "image/png"
             },
         });
 
