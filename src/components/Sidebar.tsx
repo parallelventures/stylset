@@ -2,14 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
 
-const springTransition = {
-    type: "spring" as const,
-    damping: 20,
-    stiffness: 100,
-    mass: 0.8
-};
 
 const NAV_ITEMS = [
     {
@@ -107,25 +100,9 @@ export function Sidebar() {
                             key={item.href}
                             href={item.href}
                             className={`sidebar-link ${isActive ? "active" : ""}`}
-                            style={{ position: "relative" }}
                         >
-                            {isActive && (
-                                <motion.div
-                                    layoutId="sidebar-active"
-                                    style={{
-                                        position: "absolute",
-                                        inset: 0,
-                                        background: "var(--gray-100)",
-                                        borderRadius: "var(--radius-sm)",
-                                        zIndex: 0,
-                                    }}
-                                    transition={springTransition}
-                                />
-                            )}
-                            <span style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", gap: 10 }}>
-                                {item.icon}
-                                {item.label}
-                            </span>
+                            {item.icon}
+                            {item.label}
                         </Link>
                     );
                 })}

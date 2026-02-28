@@ -124,10 +124,12 @@ a {
 
 .sidebar-link:hover {
   color: var(--text);
+  background: var(--gray-50);
 }
 
 .sidebar-link.active {
   color: var(--text);
+  background: var(--gray-100);
   font-weight: 500;
 }
 
