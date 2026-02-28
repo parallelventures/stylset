@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { springAnimation } from "@/app/template";
+import { CardGridSkeleton } from "@/components/Skeleton";
 
 interface Template {
     id: string;
@@ -16,6 +17,7 @@ export default function TemplatesPage() {
     const [showModal, setShowModal] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [initialLoading, setInitialLoading] = useState(true);
 
     async function load() {
         const res = await fetch("/api/templates");
@@ -23,7 +25,7 @@ export default function TemplatesPage() {
     }
 
     useEffect(() => {
-        load();
+        load().finally(() => setInitialLoading(false));
     }, []);
 
     async function handleCreate(e: React.FormEvent<HTMLFormElement>) {
@@ -67,6 +69,8 @@ export default function TemplatesPage() {
         await fetch(`/api/templates/${id}`, { method: "DELETE" });
         load();
     }
+
+    if (initialLoading) return <CardGridSkeleton count={3} />;
 
     return (
         <>

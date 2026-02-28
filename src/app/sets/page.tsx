@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { springAnimation } from "@/app/template";
+import { TableSkeleton } from "@/components/Skeleton";
 interface Subject {
     id: string;
     name: string;
@@ -49,6 +50,7 @@ function SetsPageInner() {
     const [showModal, setShowModal] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [initialLoading, setInitialLoading] = useState(true);
 
     // Form state
     const [selectedSubject, setSelectedSubject] = useState(prefillSubjectId);
@@ -70,7 +72,7 @@ function SetsPageInner() {
     }
 
     useEffect(() => {
-        loadData();
+        loadData().finally(() => setInitialLoading(false));
     }, []);
 
     function addSlideFromPreset(preset: Preset) {
@@ -144,6 +146,8 @@ function SetsPageInner() {
             setLoading(false);
         }
     }
+
+    if (initialLoading) return <TableSkeleton columns={6} rows={5} />;
 
     return (
         <>
@@ -390,7 +394,7 @@ function SetsPageInner() {
 
 export default function SetsPage() {
     return (
-        <Suspense fallback={<div className="flex items-center gap-3" style={{ padding: 40 }}><span className="spinner" /> Loading…</div>}>
+        <Suspense fallback={<TableSkeleton columns={6} rows={5} />}>
             <SetsPageInner />
         </Suspense>
     );

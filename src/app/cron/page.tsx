@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { springAnimation } from "@/app/template";
+import { TableSkeleton } from "@/components/Skeleton";
 
 interface CronJobData {
     id: string;
@@ -23,6 +24,7 @@ export default function CronPage() {
     const [loading, setLoading] = useState(false);
     const [runningId, setRunningId] = useState<string | null>(null);
     const [error, setError] = useState("");
+    const [initialLoading, setInitialLoading] = useState(true);
 
     async function load() {
         const res = await fetch("/api/cronjobs");
@@ -30,7 +32,7 @@ export default function CronPage() {
     }
 
     useEffect(() => {
-        load();
+        load().finally(() => setInitialLoading(false));
     }, []);
 
     async function handleCreate(e: React.FormEvent<HTMLFormElement>) {
@@ -100,6 +102,8 @@ export default function CronPage() {
         await fetch(`/api/cronjobs/${id}`, { method: "DELETE" });
         load();
     }
+
+    if (initialLoading) return <TableSkeleton columns={6} rows={3} />;
 
     return (
         <>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { storageUrl } from "@/lib/urls";
+import { DashboardSkeleton } from "@/components/Skeleton";
 
 interface RecentSet {
   id: string;
@@ -23,6 +24,7 @@ export default function DashboardPage() {
   const [recentSets, setRecentSets] = useState<RecentSet[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [counts, setCounts] = useState({ presets: 0, templates: 0, cronJobs: 0 });
+  const [initialLoading, setInitialLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
@@ -41,8 +43,10 @@ export default function DashboardPage() {
         cronJobs: crons.length,
       });
     }
-    load();
+    load().finally(() => setInitialLoading(false));
   }, []);
+
+  if (initialLoading) return <DashboardSkeleton />;
 
   return (
     <>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import { AgentSkeleton } from "@/components/Skeleton";
 
 interface AgentRun {
     id: string;
@@ -110,11 +111,7 @@ export default function AgentPage() {
     }
 
     if (!status) {
-        return (
-            <div className="flex items-center gap-3" style={{ padding: 40 }}>
-                <span className="spinner" /> Loading agent status…
-            </div>
-        );
+        return <AgentSkeleton />;
     }
 
     const hasActiveRun = status.runs.some((r) => r.status === "running");

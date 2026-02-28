@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { springAnimation } from "@/app/template";
+import { CardGridSkeleton } from "@/components/Skeleton";
 
 interface Preset {
     id: string;
@@ -19,6 +20,7 @@ export default function PresetsPage() {
     const [showModal, setShowModal] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [initialLoading, setInitialLoading] = useState(true);
 
     async function loadPresets() {
         const res = await fetch("/api/presets");
@@ -26,7 +28,7 @@ export default function PresetsPage() {
     }
 
     useEffect(() => {
-        loadPresets();
+        loadPresets().finally(() => setInitialLoading(false));
     }, []);
 
     async function handleCreate(e: React.FormEvent<HTMLFormElement>) {
@@ -65,6 +67,8 @@ export default function PresetsPage() {
         await fetch(`/api/presets/${id}`, { method: "DELETE" });
         loadPresets();
     }
+
+    if (initialLoading) return <CardGridSkeleton count={4} />;
 
     return (
         <>

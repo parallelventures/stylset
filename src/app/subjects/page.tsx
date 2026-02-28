@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { storageUrl } from "@/lib/urls";
 import { motion, AnimatePresence } from "framer-motion";
 import { springAnimation } from "@/app/template";
+import { CardGridSkeleton } from "@/components/Skeleton";
 
 interface Subject {
     id: string;
@@ -22,6 +23,7 @@ export default function SubjectsPage() {
     const [loading, setLoading] = useState(false);
     const [generating, setGenerating] = useState<string | null>(null);
     const [error, setError] = useState("");
+    const [initialLoading, setInitialLoading] = useState(true);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [previews, setPreviews] = useState<string[]>([]);
     const [files, setFiles] = useState<File[]>([]);
@@ -34,7 +36,7 @@ export default function SubjectsPage() {
     }
 
     useEffect(() => {
-        loadSubjects();
+        loadSubjects().finally(() => setInitialLoading(false));
     }, []);
 
     function handleFiles(e: React.ChangeEvent<HTMLInputElement>) {
@@ -95,6 +97,8 @@ export default function SubjectsPage() {
         await fetch(`/api/subjects/${id}`, { method: "DELETE" });
         loadSubjects();
     }
+
+    if (initialLoading) return <CardGridSkeleton count={4} hasImage />;
 
     return (
         <>

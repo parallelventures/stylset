@@ -4,6 +4,7 @@ import { useEffect, useState, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { storageUrl } from "@/lib/urls";
+import { SubjectDetailSkeleton } from "@/components/Skeleton";
 
 interface Subject {
     id: string;
@@ -51,11 +52,7 @@ export default function SubjectDetailPage({
     }
 
     if (!subject) {
-        return (
-            <div className="flex items-center gap-3" style={{ padding: 40 }}>
-                <span className="spinner" /> Loading…
-            </div>
-        );
+        return <SubjectDetailSkeleton />;
     }
 
     const images: string[] = JSON.parse(subject.referenceImagePaths || "[]");

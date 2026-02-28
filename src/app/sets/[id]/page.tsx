@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, use } from "react";
 import Link from "next/link";
 import { storageUrl } from "@/lib/urls";
+import { SetDetailSkeleton } from "@/components/Skeleton";
 
 interface SlideGeneration {
     id: string;
@@ -54,11 +55,7 @@ export default function SetDetailPage({
     }, [set?.status, loadSet]);
 
     if (!set) {
-        return (
-            <div className="flex items-center gap-3" style={{ padding: 40 }}>
-                <span className="spinner" /> Loading…
-            </div>
-        );
+        return <SetDetailSkeleton />;
     }
 
     const succeeded = set.slides.filter((s) => s.status === "succeeded").length;
