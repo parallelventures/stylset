@@ -39,10 +39,10 @@ async function main() {
 
         // Short
         { name: "Pixie Cut", hairstylePrompt: "Modern pixie cut, short cropped sides and back, slightly longer textured layers on top, edgy and chic", negativeHairPrompt: "long hair, bob, extensions", tags: '["pixie","short","edgy"]' },
-        { name: "Buzz Cut Fade", hairstylePrompt: "Ultra-short buzz cut with a subtle fade on the sides, clean and minimal, showing scalp texture", negativeHairPrompt: "long hair, curly, braids", tags: '["buzz","ultrashort","minimal"]' },
-        { name: "Textured Crop", hairstylePrompt: "Textured crop top haircut, short sides, messy textured top with piece-y layers, effortless modern style", negativeHairPrompt: "long hair, slicked, braids", tags: '["crop","textured","modern"]' },
+        { name: "Soft Angled Bob", hairstylePrompt: "Soft angled bob, slightly longer in the front than the back, elegant sweep, chin-length, perfectly straight and smooth", negativeHairPrompt: "blunt cut, long hair, curly", tags: '["bob","angled","elegant"]' },
+        { name: "Long Face-Framing Layers", hairstylePrompt: "Long flowing hair with soft face-framing layers starting below the chin, voluminous blowout texture, middle part", negativeHairPrompt: "short hair, blunt cut, tight curls", tags: '["long","layers","volume"]' },
         { name: "Asymmetric Pixie", hairstylePrompt: "Asymmetric pixie with one side longer, swept across the forehead, edgy and fashion-forward", negativeHairPrompt: "symmetrical, long, curly", tags: '["pixie","asymmetric","avant-garde"]' },
-        { name: "Shaggy Mullet", hairstylePrompt: "Modern shaggy mullet, short layered top and sides, longer in the back, textured and lived-in, wispy fringe", negativeHairPrompt: "clean cut, bob, slicked", tags: '["mullet","shag","trendy"]' },
+        { name: "Voluminous Vintage Curls", hairstylePrompt: "Huge voluminous 70s disco curls, brushed out fluffy texture, extreme root volume, glamorous and big", negativeHairPrompt: "flat, straight, sleek, wet look", tags: '["curls","vintage","big"]' },
 
         // Waves & Curls
         { name: "Beach Waves", hairstylePrompt: "Loose beach waves, natural soft waves throughout, relaxed and effortless, shoulder-length, middle part", negativeHairPrompt: "tight curls, straight, updos", tags: '["waves","casual","natural"]' },
@@ -70,9 +70,10 @@ async function main() {
         { name: "Half-Up Half-Down", hairstylePrompt: "Half-up half-down style, top half pulled back and secured with the bottom half flowing freely, balanced and versatile", negativeHairPrompt: "all up, all down, bun", tags: '["half-up","versatile","classic"]' },
         { name: "Top Knot", hairstylePrompt: "Tight high top knot, all hair gathered into a firm neat knot on the very top of the head, clean and modern", negativeHairPrompt: "low bun, ponytail, loose hair", tags: '["bun","topknot","clean"]' },
         { name: "Long Center Part Straight", hairstylePrompt: "Very long pin-straight hair with a precise center part, sleek and polished, hair falling past chest, ultra smooth", negativeHairPrompt: "wavy, curly, short, bangs", tags: '["long","straight","sleek"]' },
-        { name: "Mohawk Fauxhawk", hairstylePrompt: "Faux hawk style with the sides slicked flat and the center section teased up into a voluminous ridge, edgy editorial", negativeHairPrompt: "flat, bob, curly, conventional", tags: '["fauxhawk","edgy","editorial"]' },
+        { name: "Braided Crown Updo", hairstylePrompt: "Elaborate thick braided crown updo, wrapped elegantly around the head, soft romantic tendrils framing the face", negativeHairPrompt: "down, straight, slicked back", tags: '["braids","updo","romantic"]' },
     ];
 
+    await prisma.hairstylePreset.deleteMany();
     for (const p of presets) {
         await prisma.hairstylePreset.create({ data: p });
     }
