@@ -8,14 +8,24 @@ import { uploadFile, downloadFile, bufferHash } from "@/lib/storage";
 
 export const GEMINI_MODEL = "gemini-3-pro-image-preview";
 
-let _genai: GoogleGenAI | null = null;
-function getGenAI(): GoogleGenAI {
-    if (!_genai) {
-        _genai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+let _keys: string[] = [];
+
+function getApiKeys(): string[] {
+    if (_keys.length === 0) {
+        const raw = process.env.GEMINI_API_KEY || "";
+        // Support comma-separated list
+        _keys = raw.split(",").map(k => k.trim()).filter(Boolean);
     }
-    return _genai;
+    return _keys;
 }
 
+const _genaiInstances: Record<string, GoogleGenAI> = {};
+function getGenAI(apiKey: string): GoogleGenAI {
+    if (!_genaiInstances[apiKey]) {
+        _genaiInstances[apiKey] = new GoogleGenAI({ apiKey });
+    }
+    return _genaiInstances[apiKey];
+}
 interface GenerateImageInput {
     referenceImagePaths: string[]; // Supabase storage paths (e.g. subjects/{id}/ref_0.png)
     finalPromptText: string;
@@ -35,7 +45,8 @@ export async function generateAndSaveImage(
     outputStoragePath: string,
 ): Promise<GenerateImageResult> {
     try {
-        if (!process.env.GEMINI_API_KEY) {
+        const keys = getApiKeys();
+        if (keys.length === 0) {
             throw new Error("GEMINI_API_KEY not set");
         }
 
@@ -72,38 +83,51 @@ export async function generateAndSaveImage(
 
         parts.push({ text: fullPrompt });
 
-        // Call Gemini
-        const response = await getGenAI().models.generateContent({
-            model: GEMINI_MODEL,
-            contents: [{ role: "user", parts }],
-            config: {
-                // @ts-ignore
-                responseModalities: ["image"],
-                // @ts-ignore
-                addWatermark: false,
-                outputMimeType: "image/png"
-            },
-        });
+        // Shuffle keys to distribute load, or fallback on failure
+        const shuffledKeys = [...keys].sort(() => Math.random() - 0.5);
 
-        // Extract image
-        if (!response.candidates?.[0]?.content?.parts) {
-            throw new Error("No response parts from Gemini");
-        }
+        let lastError: unknown;
+        for (const apiKey of shuffledKeys) {
+            try {
+                // Call Gemini
+                const response = await getGenAI(apiKey).models.generateContent({
+                    model: GEMINI_MODEL,
+                    contents: [{ role: "user", parts }],
+                    config: {
+                        // @ts-ignore
+                        responseModalities: ["image"],
+                        // @ts-ignore
+                        addWatermark: false,
+                        outputMimeType: "image/png"
+                    },
+                });
 
-        for (const part of response.candidates[0].content.parts) {
-            if (part.inlineData?.data) {
-                const buffer = Buffer.from(part.inlineData.data, "base64");
-                const hash = bufferHash(buffer);
+                // Extract image
+                if (!response.candidates?.[0]?.content?.parts) {
+                    throw new Error("No response parts from Gemini");
+                }
 
-                // Upload to Supabase Storage
-                const publicUrl = await uploadFile(outputStoragePath, buffer, "image/png");
+                for (const part of response.candidates[0].content.parts) {
+                    if (part.inlineData?.data) {
+                        const buffer = Buffer.from(part.inlineData.data, "base64");
+                        const hash = bufferHash(buffer);
 
-                console.log(`[Gemini] Image saved: ${outputStoragePath} (${Math.round(buffer.length / 1024)}KB)`);
-                return { success: true, publicUrl, hash };
+                        // Upload to Supabase Storage
+                        const publicUrl = await uploadFile(outputStoragePath, buffer, "image/png");
+
+                        return { success: true, publicUrl, hash };
+                    }
+                }
+
+                throw new Error("Empty image response");
+            } catch (err: unknown) {
+                const msg = err instanceof Error ? err.message : String(err);
+                console.warn(`[Gemini] Key ending in *${apiKey.slice(-4)} failed:`, msg);
+                lastError = err;
             }
         }
 
-        throw new Error("No image data in Gemini response");
+        throw new Error(lastError instanceof Error ? lastError.message : "All Gemini API keys failed");
     } catch (error: unknown) {
         const msg = error instanceof Error ? error.message : String(error);
         console.error(`[Gemini] Error:`, msg);
