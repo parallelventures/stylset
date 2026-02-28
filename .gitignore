@@ -45,3 +45,8 @@ next-env.d.ts
 prisma/dev.db
 prisma/dev.db-journal
 .env
+test_image*.png
+scripts/test*.ts
+scripts/check_*.ts
+scripts/revert_*.ts
+scripts/update_*.ts
