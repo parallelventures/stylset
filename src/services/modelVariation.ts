@@ -12,12 +12,6 @@ const ORIGINS = [
     "Turkey", "Mexico", "Denmark", "Germany", "Argentina", "Vietnam"
 ];
 
-const HAIR_COLORS = [
-    "rich chocolate brunette", "soft honey blonde", "icy platinum blonde",
-    "deep espresso black", "warm copper red", "ash brown", "chestnut",
-    "golden caramel", "strawberry blonde", "jet black"
-];
-
 export async function generateModelImage(
     referenceImagePaths: string[],
     _ignoredPrompt: string | undefined, // Keeping signature for compatibility, but ignoring
@@ -25,7 +19,6 @@ export async function generateModelImage(
 ): Promise<{ success: boolean; error?: string }> {
     // Generate random traits to ensure a "new woman" every time
     const origin = ORIGINS[Math.floor(Math.random() * ORIGINS.length)];
-    const hairColor = HAIR_COLORS[Math.floor(Math.random() * HAIR_COLORS.length)];
 
     const OUTFITS = [
         "minimalist white silk slip dress",
@@ -54,11 +47,11 @@ You have been provided a reference image.
 
 WHAT TO KEEP EXACTLY THE SAME:
 - You MUST preserve the EXACT same body posture, framing, and camera angle as the reference image. The subject must be positioned in the exact same spot within the frame.
+- You MUST preserve the exact same hair color and base hair length as the reference image. Do not change her hair color.
 
 WHAT TO CHANGE COMPLETELY:
 1. IDENTITY: Generate a completely NEW, breathtakingly beautiful face. 
    - Origin: ${origin}. 
-   - Hair Color: ${hairColor}. 
    - Age: 22-26. 
    - Look: High-end agency supermodel. Symmetrical, glowing, healthy realistic skin. It must look absolutely nothing like the person in the reference image.
 2. OUTFIT / WARDROBE: Change her clothing entirely. She is now wearing a ${outfit}.
