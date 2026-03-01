@@ -27,32 +27,52 @@ export async function generateModelImage(
     const origin = ORIGINS[Math.floor(Math.random() * ORIGINS.length)];
     const hairColor = HAIR_COLORS[Math.floor(Math.random() * HAIR_COLORS.length)];
 
-    const finalPrompt = `You are a world-class fashion photographer and digital retoucher producing imagery for a high-end agency.
+    const OUTFITS = [
+        "minimalist white silk slip dress",
+        "tailored oversized black blazer with a simple tank",
+        "casual chic beige trench coat",
+        "form-fitting ribbed knit turtleneck in charcoal",
+        "effortless denim jacket over a white tee",
+        "elegant off-the-shoulder navy gown",
+        "sleek leather jacket with a simple top",
+        "soft cashmere sweater in camel"
+    ];
+    const outfit = OUTFITS[Math.floor(Math.random() * OUTFITS.length)];
 
-Based on the attached reference image, your task is to generate a STUNNING, AGENCY-GRADE BEAUTY MODEL.
-Crucially, you must use the reference image ONLY to copy the clothing, the pose, the lighting, and the background.
-DO NOT COPY THE FACE FROM THE REFERENCE IMAGE. The face must be a COMPLETELY NEW IDENTITY.
+    const SETTINGS = [
+        "bright natural sunlight studio, pure white seamless backdrop",
+        "moody editorial studio, dramatic shadows, dark gray background",
+        "soft diffused lighting, warm beige backdrop",
+        "high-end catalog lighting, crisp white background",
+        "warm golden hour studio lighting, soft textured backdrop"
+    ];
+    const setting = SETTINGS[Math.floor(Math.random() * SETTINGS.length)];
 
---- NEW MODEL IDENTITY (MANDATORY) ---
-- Nationality/Origin: ${origin} (Ensure her facial features prominently and beautifully reflect this ethnicity)
+    const finalPrompt = `You are a world-class fashion photographer producing imagery for a high-end modeling agency.
+
+Your task is to photograph a STUNNING, AGENCY-GRADE BEAUTY MODEL. 
+This is a completely original portrait. 
+
+--- MODEL IDENTITY ---
+- Nationality/Origin: ${origin} (Her facial features should beautifully reflect this ethnicity)
 - Hair Color: ${hairColor}
 - Aesthetics: Exquisitely beautiful, striking high-fashion agency model. Symmetrical, captivating features with natural, healthy, glowing skin (realistic pores and texture, NOT plastic or heavily filtered).
 - Age: 22-26.
-- Expression: Very slight, relaxed, confident high-fashion gaze.
+- Expression: Very slight, relaxed, confident high-fashion gaze. Direct eye contact.
 
---- SCENE CLONING (MANDATORY) ---
-- Wardrobe: Keep the EXACT SAME CLOTHING, colors, and textures as the reference.
-- Setting: Keep the EXACT SAME BACKGROUND and environment.
-- Pose: Keep the EXACT SAME POSE and camera framing.
-- Lighting: Maintain the exact same studio lighting and color grading.
+--- SCENE & STYLING ---
+- Wardrobe: She is wearing a ${outfit}.
+- Setting: ${setting}.
+- Pose: Front-facing portrait (top of head to mid-chest).
+- Photography: Shot on 85mm lens, f/5.6 for sharp focus on the face. 8k UHD, ultra-photorealistic.
 
-IF YOU COPY THE FACE FROM THE REFERENCE IMAGE, YOU HAVE FAILED. You must generate a striking, gorgeous, completely new ${origin} woman wearing the reference's clothes in the reference's environment.`;
+Generate the most breathtaking, hyper-realistic fashion portrait possible.`;
 
-    const negativePrompt = "same face as reference, identical person, cloning, copied face, twin, ugly, basic, distorted, asymmetrical face, bad proportions, unnatural skin, shiny plastic skin, heavily filtered, uncanny valley, text, watermark, logos, changed background, changed clothes, weird eyes";
+    const negativePrompt = "ugly, basic, distorted, asymmetrical face, bad proportions, unnatural skin, shiny plastic skin, heavily filtered, uncanny valley, cartoon, illustration, drawing, text, watermark, logos, blurry, weird eyes, messy hair covering face";
 
     return generateAndSaveImage(
         {
-            referenceImagePaths,
+            referenceImagePaths: [], // No reference image used, pure text-to-image for a 100% new person!
             finalPromptText: finalPrompt,
             negativePrompt,
             aspectRatio: "3:4"
