@@ -7,7 +7,6 @@ import { storageUrl } from "@/lib/urls";
 import { motion, AnimatePresence } from "framer-motion";
 import { springAnimation } from "@/app/template";
 import { CardGridSkeleton } from "@/components/Skeleton";
-import { Select } from "@/components/Select";
 import { ConfirmModal } from "@/components/ConfirmModal";
 
 interface Subject {
@@ -413,129 +412,97 @@ export default function SubjectsPage() {
                             <form onSubmit={handleAutoGenerateSubject}>
                                 <div className="form-group">
                                     <label className="form-label">Ethnicity / Skin Tone</label>
-                                    <Select
-                                        name="ethnicity"
-                                        defaultValue="medium skin tone"
-                                        items={[
-                                            { value: "fair skin tone, caucasian", label: "Caucasian / Fair" },
-                                            { value: "medium skin tone, hispanic", label: "Hispanic / Latin" },
-                                            { value: "olive skin tone, middle eastern", label: "Middle Eastern / Olive" },
-                                            { value: "dark skin tone, black", label: "Black / Dark" },
-                                            { value: "light skin tone, east asian", label: "East Asian / Light" },
-                                            { value: "brown skin tone, south asian", label: "South Asian / Brown" }
-                                        ]}
-                                    />
+                                    <select name="ethnicity" className="form-select" defaultValue="medium skin tone">
+                                        <option value="fair skin tone, caucasian">Caucasian / Fair</option>
+                                        <option value="medium skin tone, hispanic">Hispanic / Latin</option>
+                                        <option value="olive skin tone, middle eastern">Middle Eastern / Olive</option>
+                                        <option value="dark skin tone, black">Black / Dark</option>
+                                        <option value="light skin tone, east asian">East Asian / Light</option>
+                                        <option value="brown skin tone, south asian">South Asian / Brown</option>
+                                    </select>
                                 </div>
 
                                 <div className="form-group">
                                     <label className="form-label">Age</label>
-                                    <Select
-                                        name="age"
-                                        defaultValue="Young"
-                                        items={[
-                                            { value: "Teenage", label: "Teenage" },
-                                            { value: "Young", label: "Young (20s)" },
-                                            { value: "Middle-aged", label: "Adult (30s-40s)" },
-                                            { value: "Mature", label: "Mature (50s+)" }
-                                        ]}
-                                    />
+                                    <select name="age" className="form-select" defaultValue="Young">
+                                        <option value="Teenage">Teenage</option>
+                                        <option value="Young">Young (20s)</option>
+                                        <option value="Middle-aged">Adult (30s-40s)</option>
+                                        <option value="Mature">Mature (50s+)</option>
+                                    </select>
                                 </div>
 
                                 <div className="form-group">
                                     <label className="form-label">Hair Color</label>
-                                    <Select
-                                        name="hairColor"
-                                        defaultValue="Dark espresso brown"
-                                        items={[
-                                            { value: "Dark espresso brown", label: "Dark Espresso Brown" },
-                                            { value: "Jet black", label: "Jet Black" },
-                                            { value: "Soft honey blonde", label: "Soft Honey Blonde" },
-                                            { value: "Icy platinum blonde", label: "Icy Platinum Blonde" },
-                                            { value: "Warm copper red", label: "Warm Copper Red" },
-                                            { value: "Ash brown", label: "Ash Brown" }
-                                        ]}
-                                    />
+                                    <select name="hairColor" className="form-select" defaultValue="Dark espresso brown">
+                                        <option value="Dark espresso brown">Dark Espresso Brown</option>
+                                        <option value="Jet black">Jet Black</option>
+                                        <option value="Soft honey blonde">Soft Honey Blonde</option>
+                                        <option value="Icy platinum blonde">Icy Platinum Blonde</option>
+                                        <option value="Warm copper red">Warm Copper Red</option>
+                                        <option value="Ash brown">Ash Brown</option>
+                                    </select>
                                 </div>
 
                                 <div className="form-group">
                                     <label className="form-label">Outfit</label>
-                                    <Select
-                                        name="outfit"
-                                        defaultValue="Simple heather grey fitted t-shirt"
-                                        items={[
-                                            { value: "Simple heather grey fitted t-shirt", label: "Heather Grey T-Shirt" },
-                                            { value: "Elegant white silk slip dress", label: "White Silk Slip Dress" },
-                                            { value: "Sleek black turtleneck sweater", label: "Black Turtleneck" },
-                                            { value: "Minimalist beige trench coat", label: "Beige Trench Coat" },
-                                            { value: "Classic denim jacket over a white tee", label: "Denim Jacket" },
-                                            { value: "Black leather moto jacket", label: "Black Leather Moto Jacket" },
-                                            { value: "Cozy oversized cream knit sweater", label: "Oversized Cream Sweater" },
-                                            { value: "Crisp white button-down shirt", label: "White Button-Down Shirt" },
-                                            { value: "Stylish tailored navy blazer", label: "Tailored Navy Blazer" },
-                                            { value: "Casual vintage graphic tee", label: "Vintage Graphic Tee" },
-                                            { value: "Bohemian floral maxi dress", label: "Floral Maxi Dress" },
-                                            { value: "Athleisure black sports bra and leggings", label: "Athleisure Sports Bra" },
-                                            { value: "Structured tweed cropped jacket", label: "Structured Tweed Jacket" },
-                                            { value: "Chic monochrome matching trousers and vest", label: "Monochrome Vest & Trousers" }
-                                        ]}
-                                    />
+                                    <select name="outfit" className="form-select" defaultValue="Simple heather grey fitted t-shirt">
+                                        <option value="Simple heather grey fitted t-shirt">Heather Grey T-Shirt</option>
+                                        <option value="Elegant white silk slip dress">White Silk Slip Dress</option>
+                                        <option value="Sleek black turtleneck sweater">Black Turtleneck</option>
+                                        <option value="Minimalist beige trench coat">Beige Trench Coat</option>
+                                        <option value="Classic denim jacket over a white tee">Denim Jacket</option>
+                                        <option value="Black leather moto jacket">Black Leather Moto Jacket</option>
+                                        <option value="Cozy oversized cream knit sweater">Oversized Cream Sweater</option>
+                                        <option value="Crisp white button-down shirt">White Button-Down Shirt</option>
+                                        <option value="Stylish tailored navy blazer">Tailored Navy Blazer</option>
+                                        <option value="Casual vintage graphic tee">Vintage Graphic Tee</option>
+                                        <option value="Bohemian floral maxi dress">Floral Maxi Dress</option>
+                                        <option value="Athleisure black sports bra and leggings">Athleisure Sports Bra</option>
+                                        <option value="Structured tweed cropped jacket">Structured Tweed Jacket</option>
+                                        <option value="Chic monochrome matching trousers and vest">Monochrome Vest & Trousers</option>
+                                    </select>
                                 </div>
 
                                 <div className="form-group">
                                     <label className="form-label">Background</label>
-                                    <Select
-                                        name="background"
-                                        defaultValue="Solid high-key PURE WHITE seamless studio backdrop"
-                                        items={[
-                                            { value: "Solid high-key PURE WHITE seamless studio backdrop", label: "Pure White Studio" },
-                                            { value: "Soft warm beige seamless backdrop", label: "Warm Beige Studio" },
-                                            { value: "Moody dark slate gray backdrop", label: "Dark Moody Studio" }
-                                        ]}
-                                    />
+                                    <select name="background" className="form-select" defaultValue="Solid high-key PURE WHITE seamless studio backdrop">
+                                        <option value="Solid high-key PURE WHITE seamless studio backdrop">Pure White Studio</option>
+                                        <option value="Soft warm beige seamless backdrop">Warm Beige Studio</option>
+                                        <option value="Moody dark slate gray backdrop">Dark Moody Studio</option>
+                                    </select>
                                 </div>
 
                                 <div className="form-group">
                                     <label className="form-label">Expression</label>
-                                    <Select
-                                        name="expression"
-                                        defaultValue="neutral expression"
-                                        items={[
-                                            { value: "neutral expression", label: "Neutral & Serene" },
-                                            { value: "soft gentle smile", label: "Soft Gentle Smile" },
-                                            { value: "fierce editorial gaze", label: "Fierce Editorial Gaze" },
-                                            { value: "playful smirk", label: "Playful Smirk" }
-                                        ]}
-                                    />
+                                    <select name="expression" className="form-select" defaultValue="neutral expression">
+                                        <option value="neutral expression">Neutral & Serene</option>
+                                        <option value="soft gentle smile">Soft Gentle Smile</option>
+                                        <option value="fierce editorial gaze">Fierce Editorial Gaze</option>
+                                        <option value="playful smirk">Playful Smirk</option>
+                                    </select>
                                 </div>
 
                                 <div className="form-group">
                                     <label className="form-label">Makeup Style</label>
-                                    <Select
-                                        name="makeup"
-                                        defaultValue="soft natural everyday makeup"
-                                        items={[
-                                            { value: "soft natural everyday makeup", label: "Soft Natural / No-Makeup Look" },
-                                            { value: "glamorous evening makeup with red lips", label: "Glamorous Red Lips" },
-                                            { value: "smokey eyes with nude lips", label: "Smokey Eyes & Nude Lips" },
-                                            { value: "dewy glowing glass skin, minimal makeup", label: "Dewy Glass Skin" },
-                                            { value: "bold dramatic editorial makeup", label: "Bold Editorial" }
-                                        ]}
-                                    />
+                                    <select name="makeup" className="form-select" defaultValue="soft natural everyday makeup">
+                                        <option value="soft natural everyday makeup">Soft Natural / No-Makeup Look</option>
+                                        <option value="glamorous evening makeup with red lips">Glamorous Red Lips</option>
+                                        <option value="smokey eyes with nude lips">Smokey Eyes & Nude Lips</option>
+                                        <option value="dewy glowing glass skin, minimal makeup">Dewy Glass Skin</option>
+                                        <option value="bold dramatic editorial makeup">Bold Editorial</option>
+                                    </select>
                                 </div>
 
                                 <div className="form-group">
                                     <label className="form-label">Lighting</label>
-                                    <Select
-                                        name="lighting"
-                                        defaultValue="Soft shadowless studio lighting"
-                                        items={[
-                                            { value: "Soft shadowless studio lighting", label: "Soft Shadowless Studio" },
-                                            { value: "Dramatic moody chiaroscuro lighting", label: "Dramatic Moody (Chiaroscuro)" },
-                                            { value: "Warm golden hour natural sunlight lighting", label: "Warm Golden Hour Sunlight" },
-                                            { value: "Hard flash editorial photography lighting", label: "Hard Flash Editorial" },
-                                            { value: "Cinematic neon rim lighting", label: "Cinematic Neon Rim Light" }
-                                        ]}
-                                    />
+                                    <select name="lighting" className="form-select" defaultValue="Soft shadowless studio lighting">
+                                        <option value="Soft shadowless studio lighting">Soft Shadowless Studio</option>
+                                        <option value="Dramatic moody chiaroscuro lighting">Dramatic Moody (Chiaroscuro)</option>
+                                        <option value="Warm golden hour natural sunlight lighting">Warm Golden Hour Sunlight</option>
+                                        <option value="Hard flash editorial photography lighting">Hard Flash Editorial</option>
+                                        <option value="Cinematic neon rim lighting">Cinematic Neon Rim Light</option>
+                                    </select>
                                 </div>
 
                                 <div className="modal-footer">

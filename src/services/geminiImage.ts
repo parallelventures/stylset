@@ -16,15 +16,10 @@ const RATE_LIMIT_MAX_MS = 60000; // max backoff cap
 
 let _lastCallTime = 0;
 
-let _keys: string[] = [];
-
 function getApiKeys(): string[] {
-    if (_keys.length === 0) {
-        const raw = process.env.GEMINI_API_KEY || "";
-        // Support comma-separated list
-        _keys = raw.split(",").map(k => k.trim()).filter(Boolean);
-    }
-    return _keys;
+    const raw = process.env.GEMINI_API_KEY || "";
+    // Support comma-separated list
+    return raw.split(",").map((k) => k.trim()).filter(Boolean);
 }
 
 const _genaiInstances: Record<string, GoogleGenAI> = {};
