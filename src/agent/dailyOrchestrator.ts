@@ -128,6 +128,12 @@ export async function runDailyAgent(configOverride?: Partial<AgentConfig>, resum
             const refPaths: string[] = JSON.parse(subject.referenceImagePaths || "[]");
 
             if (useModelVariations) {
+                const checkModelGen = await prisma.agentRun.findUnique({ where: { id: runId } });
+                if (checkModelGen?.status === "cancelled") {
+                    console.log(`[Agent] Run ${runId.slice(0, 8)} cancelled before model generation.`);
+                    return runId;
+                }
+
                 generatedModelName = getRandomModelName();
                 console.log(`[Agent] Generating new identity: ${generatedModelName}`);
 
@@ -189,6 +195,12 @@ export async function runDailyAgent(configOverride?: Partial<AgentConfig>, resum
 
             let setSlidesFailed = 0;
             for (let i = 0; i < slideIds.length; i += CONCURRENCY) {
+                const checkSlideGen = await prisma.agentRun.findUnique({ where: { id: runId } });
+                if (checkSlideGen?.status === "cancelled") {
+                    console.log(`[Agent] Run ${runId.slice(0, 8)} cancelled mid-set.`);
+                    return runId;
+                }
+
                 const batch = slideIds.slice(i, i + CONCURRENCY);
                 const results = await Promise.allSettled(
                     batch.map((slideId, batchIdx) =>
