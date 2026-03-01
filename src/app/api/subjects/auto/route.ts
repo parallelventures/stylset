@@ -7,18 +7,24 @@ import fs from "fs/promises";
 
 export const runtime = "nodejs";
 
-const AUTO_SUBJECT_PROMPT = `Generate a stunning, photorealistic high-end studio portrait with the following exact specifications:
+const AUTO_SUBJECT_PROMPT = `Generate a stunning, photorealistic high-end commercial hair catalog reference image.
 
-SUBJECT: Young female model, medium skin tone, neutral expression, soft makeup.
-HAIR COLOR: Dark espresso brown, glossy finish.
-HAIR TEXTURE: Straight to wavy, thick, smooth.
-HAIR STYLE: Long layered butterfly cut, 90s blowout style. Face-framing curtain bangs starting at chin level. Heavily layered mid-lengths to ends. Voluminous roots. Center part, layers curving inward and outward framing the face.
-ATTIRE: Simple heather grey fitted t-shirt with scoop neckline.
-COMPOSITION: Front-facing portrait, chest up.
-ENVIRONMENT: Solid high-key white studio backdrop. Soft, even professional studio lighting, shadowless.
-TECHNICAL SPECS: Commercial hair photography, catalog aesthetic. 8k resolution, photorealistic, sharp focus on hair texture.`;
+CRITICAL LAYOUT RULE: You MUST generate a VERTICAL DIPTYCH (a single image split into two stacked panels).
+- Format: Vertical collage (two stacked panels).
+- Divider: A thin, clean white gap or subtle line between the top and bottom panels.
+- Top Panel: FRONT VIEW (front-facing portrait, chest up).
+- Bottom Panel: BACK VIEW (rear view, back of head and shoulders).
 
-const AUTO_SUBJECT_NEGATIVE_PROMPT = "ugly, basic, distorted, asymmetrical face, bad proportions, unnatural skin, shiny plastic skin, heavily filtered, uncanny valley, cartoon, illustration, drawing, text, watermark, logos, blurry, weird eyes, messy hair covering face, smiling, dramatic lighting, shadows, colorful background, extravagant clothes";
+SUBJECT & STYLE:
+- Model: Young female, medium skin tone, neutral expression, soft makeup.
+- Hair: Dark espresso brown, glossy. Straight to wavy, thick, smooth. Long layered butterfly cut, 90s blowout style. Face-framing curtain bangs. Heavily layered mid-lengths to ends. Voluminous.
+- Top Panel Hair: Center part, layers curving inward and outward framing the face.
+- Bottom Panel Hair: U-shaped perimeter, cascading layers showing texture.
+- Attire: Simple heather grey fitted t-shirt with scoop neckline (identical in both panels).
+- Environment: Solid high-key PURE WHITE seamless studio backdrop. Soft shadowless lighting.
+- Specs: 8k UHD, ultra-photorealistic.`;
+
+const AUTO_SUBJECT_NEGATIVE_PROMPT = "single image, no split, wrong layout, ugly, basic, distorted, asymmetrical face, bad proportions, unnatural skin, shiny plastic skin, heavily filtered, uncanny valley, cartoon, illustration, drawing, text, watermark, logos, blurry, weird eyes, messy hair covering face, smiling, dramatic lighting, shadows, colorful background, extravagant clothes";
 
 export async function POST() {
     try {
