@@ -103,7 +103,8 @@ export default function DashboardPage() {
                         alt={s.name}
                         style={{
                           width: "100%",
-                          height: 120,
+                          height: "auto",
+                          aspectRatio: "3/4",
                           objectFit: "cover",
                           borderRadius: "var(--radius-sm)",
                           marginBottom: 10,

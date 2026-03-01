@@ -106,7 +106,8 @@ export default function SubjectDetailPage({
                                 alt={`Reference ${i + 1}`}
                                 style={{
                                     width: "100%",
-                                    aspectRatio: "1",
+                                    height: "auto",
+                                    aspectRatio: "3/4",
                                     objectFit: "cover",
                                     borderRadius: "var(--radius-sm)",
                                     border: "1px solid var(--border)",

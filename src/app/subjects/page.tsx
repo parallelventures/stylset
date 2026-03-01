@@ -195,7 +195,8 @@ export default function SubjectsPage() {
                                                     alt={`ref ${i}`}
                                                     style={{
                                                         width: images.length === 1 ? "100%" : `${100 / Math.min(images.length, 3)}%`,
-                                                        height: 140,
+                                                        height: "auto",
+                                                        aspectRatio: "3/4",
                                                         objectFit: "cover",
                                                         borderRadius: "var(--radius-sm)",
                                                     }}
