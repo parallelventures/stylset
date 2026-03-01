@@ -7,7 +7,7 @@
 import prisma from "@/lib/prisma";
 import { composePrompt } from "@/lib/prompts";
 import { generateAndSaveImage, GEMINI_MODEL } from "@/services/geminiImage";
-import { generateModelImage } from "@/services/modelVariation";
+import { generateModelImage, getRandomModelName } from "@/services/modelVariation";
 import {
     uploadJson,
     getFileUrl,
@@ -63,16 +63,9 @@ export async function runDailyAgent(configOverride?: Partial<AgentConfig>, resum
         throw new Error(`Need at least ${slidesPerSet} presets, have ${allPresets.length}`);
     }
 
-    // Load model variations pool
-    const modelVariations = await prisma.modelVariation.findMany({
-        where: { enabled: true },
-    });
-    const useModelVariations = modelVariations.length > 0;
-    if (useModelVariations) {
-        console.log(`[Agent] Model pool: ${modelVariations.length} variations loaded`);
-    } else {
-        console.log(`[Agent] No model variations — using original subject reference`);
-    }
+    // Always use automatic model generation
+    const useModelVariations = true;
+    console.log(`[Agent] Automatic model generation enabled`);
 
     let runId = resumeRunId;
     let setsCompleted = 0, setsFailed = 0, slidesOk = 0, slidesFailed = 0;
@@ -129,39 +122,38 @@ export async function runDailyAgent(configOverride?: Partial<AgentConfig>, resum
             const now = new Date();
             const setId = uuid();
 
-            // ─── Phase 1: Generate a new model (if variations exist) ───
+            // ─── Phase 1: Generate a new model automatically ───
             let modelImagePath: string | null = null;
-            let selectedModelVariation: (typeof modelVariations)[0] | null = null;
+            let generatedModelName = subject.name;
             const refPaths: string[] = JSON.parse(subject.referenceImagePaths || "[]");
 
             if (useModelVariations) {
-                // Pick a random model variation
-                selectedModelVariation = modelVariations[Math.floor(Math.random() * modelVariations.length)];
-                console.log(`[Agent] Generating model: ${selectedModelVariation.name}`);
+                generatedModelName = getRandomModelName();
+                console.log(`[Agent] Generating new identity: ${generatedModelName}`);
 
                 const modelStoragePath = setImagePath(setId, "model.png");
                 const modelResult = await generateModelImage(
                     refPaths,
-                    selectedModelVariation.prompt,
+                    undefined, // prompt is now auto-generated in the service
                     modelStoragePath,
                 );
 
                 if (modelResult.success) {
                     modelImagePath = modelStoragePath;
-                    console.log(`[Agent] Model generated ✓`);
+                    console.log(`[Agent] New identity generated ✓`);
                 } else {
-                    console.warn(`[Agent] Model generation failed: ${modelResult.error}, using original subject`);
+                    console.warn(`[Agent] Identity generation failed: ${modelResult.error}, using original subject`);
                 }
             }
 
-            const setName = `${selectedModelVariation?.name || subject.name} — Set ${setIdx + 1} — ${now.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`;
+            const setName = `${generatedModelName} — Set ${setIdx + 1} — ${now.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`;
 
             await prisma.slideshowSet.create({
                 data: {
                     id: setId,
                     subjectId: subject.id,
                     templateId: template?.id || null,
-                    modelVariationId: selectedModelVariation?.id || null,
+                    modelVariationId: null, // we don't use DB model variations anymore
                     modelImagePath,
                     name: setName,
                     status: "generating",
