@@ -34,6 +34,19 @@ model HairstylePreset {
   slideGenerations SlideGeneration[]
 }
 
+model ModelVariation {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  prompt      String   // e.g. "Beautiful Moroccan woman, olive skin, dark brown eyes, wearing a silk cream blouse, studio lighting"
+  tags        String?  // e.g. "moroccan, elegant, studio"
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  slideshowSets SlideshowSet[]
+}
+
 model SlideRequestTemplate {
   id             String   @id @default(uuid())
   name           String
@@ -68,21 +81,24 @@ model SlideGeneration {
 }
 
 model SlideshowSet {
-  id           String   @id @default(uuid())
-  subjectId    String
-  templateId   String?
-  name         String
-  description  String?
-  status       String   @default("idle")
-  outputDir    String?
-  manifestPath String?
-  zipPath      String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id               String   @id @default(uuid())
+  subjectId        String
+  templateId       String?
+  modelVariationId String?
+  name             String
+  description      String?
+  status           String   @default("idle")
+  outputDir        String?
+  manifestPath     String?
+  zipPath          String?
+  modelImagePath   String?  // generated model reference for this set
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
-  subject      Subject              @relation(fields: [subjectId], references: [id], onDelete: Cascade)
-  template     SlideRequestTemplate? @relation(fields: [templateId], references: [id])
-  slides       SlideGeneration[]
+  subject        Subject              @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  template       SlideRequestTemplate? @relation(fields: [templateId], references: [id])
+  modelVariation ModelVariation?      @relation(fields: [modelVariationId], references: [id])
+  slides         SlideGeneration[]
 }
 
 model CronJob {

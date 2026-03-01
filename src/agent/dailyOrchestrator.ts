@@ -7,6 +7,7 @@
 import prisma from "@/lib/prisma";
 import { composePrompt } from "@/lib/prompts";
 import { generateAndSaveImage, GEMINI_MODEL } from "@/services/geminiImage";
+import { generateModelImage } from "@/services/modelVariation";
 import {
     uploadJson,
     getFileUrl,
@@ -60,6 +61,17 @@ export async function runDailyAgent(configOverride?: Partial<AgentConfig>, resum
     const allPresets = await prisma.hairstylePreset.findMany({ orderBy: { createdAt: "asc" } });
     if (allPresets.length < slidesPerSet) {
         throw new Error(`Need at least ${slidesPerSet} presets, have ${allPresets.length}`);
+    }
+
+    // Load model variations pool
+    const modelVariations = await prisma.modelVariation.findMany({
+        where: { enabled: true },
+    });
+    const useModelVariations = modelVariations.length > 0;
+    if (useModelVariations) {
+        console.log(`[Agent] Model pool: ${modelVariations.length} variations loaded`);
+    } else {
+        console.log(`[Agent] No model variations — using original subject reference`);
     }
 
     let runId = resumeRunId;
@@ -116,13 +128,41 @@ export async function runDailyAgent(configOverride?: Partial<AgentConfig>, resum
 
             const now = new Date();
             const setId = uuid();
-            const setName = `${subject.name} — Set ${setIdx + 1} — ${now.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`;
+
+            // ─── Phase 1: Generate a new model (if variations exist) ───
+            let modelImagePath: string | null = null;
+            let selectedModelVariation: (typeof modelVariations)[0] | null = null;
+            const refPaths: string[] = JSON.parse(subject.referenceImagePaths || "[]");
+
+            if (useModelVariations) {
+                // Pick a random model variation
+                selectedModelVariation = modelVariations[Math.floor(Math.random() * modelVariations.length)];
+                console.log(`[Agent] Generating model: ${selectedModelVariation.name}`);
+
+                const modelStoragePath = setImagePath(setId, "model.png");
+                const modelResult = await generateModelImage(
+                    refPaths,
+                    selectedModelVariation.prompt,
+                    modelStoragePath,
+                );
+
+                if (modelResult.success) {
+                    modelImagePath = modelStoragePath;
+                    console.log(`[Agent] Model generated ✓`);
+                } else {
+                    console.warn(`[Agent] Model generation failed: ${modelResult.error}, using original subject`);
+                }
+            }
+
+            const setName = `${selectedModelVariation?.name || subject.name} — Set ${setIdx + 1} — ${now.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`;
 
             await prisma.slideshowSet.create({
                 data: {
                     id: setId,
                     subjectId: subject.id,
                     templateId: template?.id || null,
+                    modelVariationId: selectedModelVariation?.id || null,
+                    modelImagePath,
                     name: setName,
                     status: "generating",
                     outputDir: `sets/${setId}`,
@@ -161,7 +201,7 @@ export async function runDailyAgent(configOverride?: Partial<AgentConfig>, resum
                 const results = await Promise.allSettled(
                     batch.map((slideId, batchIdx) =>
                         generateSlideWithRetry(
-                            slideId, subject, template, selectedPresets[i + batchIdx], setId, i + batchIdx,
+                            slideId, subject, template, selectedPresets[i + batchIdx], setId, i + batchIdx, modelImagePath,
                         )
                     )
                 );
@@ -291,9 +331,12 @@ async function generateSlideWithRetry(
     preset: { id: string; name: string; hairstylePrompt: string; negativeHairPrompt: string | null },
     setId: string,
     orderIndex: number,
+    modelImagePath?: string | null,
 ): Promise<boolean> {
-    // Parse subject data
-    const refPaths: string[] = JSON.parse(subject.referenceImagePaths || "[]");
+    // Use generated model image if available, otherwise use subject's original references
+    const refPaths: string[] = modelImagePath
+        ? [modelImagePath]
+        : JSON.parse(subject.referenceImagePaths || "[]");
     const lockedAttributes = JSON.parse(subject.lockedAttributesJson || "{}");
     const basePrompt = template ? JSON.parse(template.basePromptJson) : {};
 

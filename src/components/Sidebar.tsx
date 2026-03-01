@@ -36,6 +36,17 @@ const NAV_ITEMS = [
         ),
     },
     {
+        href: "/models",
+        label: "Models",
+        tooltip: "Model variation pool",
+        icon: (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 3l1.5 4.5H18l-3.5 2.5L16 15l-4-3-4 3 1.5-5L6 7.5h4.5z" />
+                <circle cx="5" cy="19" r="2" /><circle cx="19" cy="19" r="2" />
+            </svg>
+        ),
+    },
+    {
         href: "/presets",
         label: "Presets",
         tooltip: "Hairstyle prompt library",
