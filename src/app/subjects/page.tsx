@@ -236,10 +236,12 @@ export default function SubjectsPage() {
                                         View
                                     </Link>
                                     <button
-                                        className="btn btn-danger btn-sm"
+                                        className="btn btn-danger btn-sm btn-icon"
                                         onClick={() => handleDelete(s.id)}
+                                        title="Delete Subject"
+                                        style={{ flexShrink: 0 }}
                                     >
-                                        ×
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                                     </button>
                                 </div>
                             </div>
@@ -270,8 +272,9 @@ export default function SubjectsPage() {
                                 <button
                                     className="btn btn-icon btn-secondary"
                                     onClick={() => setShowModal(false)}
+                                    title="Close"
                                 >
-                                    ✕
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                                 </button>
                             </div>
 
@@ -356,6 +359,7 @@ export default function SubjectsPage() {
                                         className="btn btn-secondary"
                                         onClick={() => setShowModal(false)}
                                     >
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 4 }}><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                                         Cancel
                                     </button>
                                     <button
@@ -395,15 +399,16 @@ export default function SubjectsPage() {
                                     className="btn btn-icon btn-secondary"
                                     onClick={() => setShowAutoModal(false)}
                                     disabled={generatingSubject}
+                                    title="Close"
                                 >
-                                    ✕
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                                 </button>
                             </div>
 
                             <form onSubmit={handleAutoGenerateSubject}>
                                 <div className="form-group">
                                     <label className="form-label">Ethnicity / Skin Tone</label>
-                                    <select name="ethnicity" className="form-input" defaultValue="medium skin tone">
+                                    <select name="ethnicity" className="form-select" defaultValue="medium skin tone">
                                         <option value="fair skin tone, caucasian">Caucasian / Fair</option>
                                         <option value="medium skin tone, hispanic">Hispanic / Latin</option>
                                         <option value="olive skin tone, middle eastern">Middle Eastern / Olive</option>
@@ -415,7 +420,7 @@ export default function SubjectsPage() {
 
                                 <div className="form-group">
                                     <label className="form-label">Age</label>
-                                    <select name="age" className="form-input" defaultValue="Young">
+                                    <select name="age" className="form-select" defaultValue="Young">
                                         <option value="Teenage">Teenage</option>
                                         <option value="Young">Young (20s)</option>
                                         <option value="Middle-aged">Adult (30s-40s)</option>
@@ -425,7 +430,7 @@ export default function SubjectsPage() {
 
                                 <div className="form-group">
                                     <label className="form-label">Hair Color</label>
-                                    <select name="hairColor" className="form-input" defaultValue="Dark espresso brown">
+                                    <select name="hairColor" className="form-select" defaultValue="Dark espresso brown">
                                         <option value="Dark espresso brown">Dark Espresso Brown</option>
                                         <option value="Jet black">Jet Black</option>
                                         <option value="Soft honey blonde">Soft Honey Blonde</option>
@@ -437,7 +442,7 @@ export default function SubjectsPage() {
 
                                 <div className="form-group">
                                     <label className="form-label">Outfit</label>
-                                    <select name="outfit" className="form-input" defaultValue="Simple heather grey fitted t-shirt">
+                                    <select name="outfit" className="form-select" defaultValue="Simple heather grey fitted t-shirt">
                                         <option value="Simple heather grey fitted t-shirt">Heather Grey T-Shirt</option>
                                         <option value="Elegant white silk slip dress">White Silk Slip Dress</option>
                                         <option value="Sleek black turtleneck sweater">Black Turtleneck</option>
@@ -457,7 +462,7 @@ export default function SubjectsPage() {
 
                                 <div className="form-group">
                                     <label className="form-label">Background</label>
-                                    <select name="background" className="form-input" defaultValue="Solid high-key PURE WHITE seamless studio backdrop">
+                                    <select name="background" className="form-select" defaultValue="Solid high-key PURE WHITE seamless studio backdrop">
                                         <option value="Solid high-key PURE WHITE seamless studio backdrop">Pure White Studio</option>
                                         <option value="Soft warm beige seamless backdrop">Warm Beige Studio</option>
                                         <option value="Moody dark slate gray backdrop">Dark Moody Studio</option>
@@ -466,7 +471,7 @@ export default function SubjectsPage() {
 
                                 <div className="form-group">
                                     <label className="form-label">Expression</label>
-                                    <select name="expression" className="form-input" defaultValue="neutral expression">
+                                    <select name="expression" className="form-select" defaultValue="neutral expression">
                                         <option value="neutral expression">Neutral & Serene</option>
                                         <option value="soft gentle smile">Soft Gentle Smile</option>
                                         <option value="fierce editorial gaze">Fierce Editorial Gaze</option>
@@ -476,7 +481,7 @@ export default function SubjectsPage() {
 
                                 <div className="form-group">
                                     <label className="form-label">Makeup Style</label>
-                                    <select name="makeup" className="form-input" defaultValue="soft natural everyday makeup">
+                                    <select name="makeup" className="form-select" defaultValue="soft natural everyday makeup">
                                         <option value="soft natural everyday makeup">Soft Natural / No-Makeup Look</option>
                                         <option value="glamorous evening makeup with red lips">Glamorous Red Lips</option>
                                         <option value="smokey eyes with nude lips">Smokey Eyes & Nude Lips</option>
@@ -487,7 +492,7 @@ export default function SubjectsPage() {
 
                                 <div className="form-group">
                                     <label className="form-label">Lighting</label>
-                                    <select name="lighting" className="form-input" defaultValue="Soft shadowless studio lighting">
+                                    <select name="lighting" className="form-select" defaultValue="Soft shadowless studio lighting">
                                         <option value="Soft shadowless studio lighting">Soft Shadowless Studio</option>
                                         <option value="Dramatic moody chiaroscuro lighting">Dramatic Moody (Chiaroscuro)</option>
                                         <option value="Warm golden hour natural sunlight lighting">Warm Golden Hour Sunlight</option>
@@ -503,6 +508,7 @@ export default function SubjectsPage() {
                                         onClick={() => setShowAutoModal(false)}
                                         disabled={generatingSubject}
                                     >
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 4 }}><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                                         Cancel
                                     </button>
                                     <button

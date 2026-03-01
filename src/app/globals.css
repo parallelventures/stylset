@@ -264,8 +264,8 @@ a {
 }
 
 .btn:active {
-  transform: scale(0.96);
-  filter: blur(0.5px);
+  transform: scale(0.97);
+  opacity: 0.9;
 }
 
 .btn-primary {
@@ -320,9 +320,19 @@ a {
 }
 
 .btn-icon {
-  padding: 7px;
-  min-width: 32px;
-  min-height: 32px;
+  padding: 6px;
+  min-width: 30px;
+  min-height: 30px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+}
+
+.btn-icon:hover {
+  background: var(--gray-200);
+  color: var(--text);
 }
 
 /* ─── Forms ─── */
@@ -381,10 +391,16 @@ a {
 
 .form-select {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23737373' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23737373' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 12px center;
-  padding-right: 32px;
+  background-position: right 14px center;
+  padding-right: 36px;
+  cursor: pointer;
+  background-color: var(--bg);
+}
+
+.form-select:hover {
+  border-color: var(--gray-400);
 }
 
 /* ─── Badges / Capsules ─── */
