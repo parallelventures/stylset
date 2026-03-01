@@ -71,6 +71,18 @@ async function main() {
         { name: "Top Knot", hairstylePrompt: "Tight high top knot, all hair gathered into a firm neat knot on the very top of the head, clean and modern", negativeHairPrompt: "low bun, ponytail, loose hair", tags: '["bun","topknot","clean"]' },
         { name: "Long Center Part Straight", hairstylePrompt: "Very long pin-straight hair with a precise center part, sleek and polished, hair falling past chest, ultra smooth", negativeHairPrompt: "wavy, curly, short, bangs", tags: '["long","straight","sleek"]' },
         { name: "Braided Crown Updo", hairstylePrompt: "Elaborate thick braided crown updo, wrapped elegantly around the head, soft romantic tendrils framing the face", negativeHairPrompt: "down, straight, slicked back", tags: '["braids","updo","romantic"]' },
+
+        // Trendy & Modern
+        { name: "Italian Bob", hairstylePrompt: "Chic Italian Bob, thick and voluminous chin-length bob, chunky ends, slightly flipped out, glamorous effortless volume", negativeHairPrompt: "flat, thin, long, pixie", tags: '["bob","italian","trendy","volume"]' },
+        { name: "Butterfly Cut", hairstylePrompt: "Voluminous butterfly cut, heavy cascading face-framing layers sloping away from the face, feathery and bouncy blowout, 90s supermodel volume", negativeHairPrompt: "flat, straight cut, blunt, pixie", tags: '["layers","butterfly","blowout","trendy"]' },
+        { name: "Wolf Cut", hairstylePrompt: "Edgy wolf cut, heavy shaggy layers with short voluminous top and longer back, messy textured rockstar aesthetic with curtain bangs", negativeHairPrompt: "blunt, sleek, perfectly neat, updo", tags: '["shag","wolf-cut","edgy","texture"]' },
+        { name: "Bixie Cut", hairstylePrompt: "Bixie cut (bob-pixie hybrid), short layered crop with slightly longer textured pieces around the face and nape, soft and feminine", negativeHairPrompt: "long hair, blunt bob, shaved head", tags: '["bixie","pixie","bob","short"]' },
+        { name: "Shag with Bangs", hairstylePrompt: "Modern 70s shag haircut, heavily layered with lots of crown volume, choppy textured ends, paired with thick soft fringe bangs", negativeHairPrompt: "sleek, straight one-length, formal", tags: '["shag","70s","layers","bangs"]' },
+        { name: "Choppy Lob", hairstylePrompt: "Choppy textured lob (long bob), hitting just below the collarbone, jagged disconnected layers, beachy unstructured wave", negativeHairPrompt: "perfectly straight, blunt, short bob", tags: '["lob","choppy","texture"]' },
+        { name: "Fluffy 90s Blowout", hairstylePrompt: "Fluffy 90s layered blowout, massive bouncy round-brush volume, softly curled inwards at the ends, ultra glamorous", negativeHairPrompt: "flat, wet look, messy, straight", tags: '["90s","blowout","volume","glamorous"]' },
+        { name: "Mermaid Waves", hairstylePrompt: "Elongated mermaid waves, very long flowing waist-length hair with loose uniform deep S-waves, soft and ethereal", negativeHairPrompt: "short, tight curls, straight", tags: '["long","waves","mermaid"]' },
+        { name: "Claw Clip Twist", hairstylePrompt: "Casual 90s claw clip twist updo, hair twisted and secured at the back with a large acetate claw clip, spiky feathered ends pointing up, soft face framing pieces left out", negativeHairPrompt: "slicked tight, low bun, braided", tags: '["updo","casual","90s","clip"]' },
+        { name: "Modern Mullet", hairstylePrompt: "Soft modern mullet, short choppy bangs and sides, long textured back falling past the shoulders, edgy punk-chic vibe", negativeHairPrompt: "classic bob, perfectly even length", tags: '["mullet","edgy","punk"]' },
     ];
 
     await prisma.hairstylePreset.deleteMany();
