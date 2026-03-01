@@ -24,13 +24,15 @@ interface ComposeOutput {
 const IDENTITY_LOCK = `CRITICAL RULES — MUST FOLLOW:
 You are looking at the SAME PERSON shown in the reference image(s).
 Generate a new image of this EXACT SAME PERSON with ONLY the hairstyle changed.
+
 You MUST preserve ALL of the following EXACTLY as they appear in the reference:
+- IMAGE LAYOUT AND FORMAT (CRITICAL: If the reference is a stacked vertical diptych with a top panel and bottom panel, you MUST generate a stacked vertical diptych with a top panel and bottom panel)
 - Face (every facial feature, shape, symmetry)
 - Skin tone and texture
 - Body type, build, proportions
 - Age and expression
 - Pose and posture
-- Framing and camera angle
+- Framing, camera angle, and cropping
 - Wardrobe / clothing
 - Background and environment
 - Lighting and color grading
@@ -40,6 +42,10 @@ The ONLY thing that changes is the HAIRSTYLE described below.
 Do NOT alter ANYTHING else. The person MUST be recognizably the same individual.`;
 
 const BASE_NEGATIVE = [
+    "single image",
+    "missing panels",
+    "merged image",
+    "different layout",
     "different person",
     "different identity",
     "face change",
