@@ -43,6 +43,7 @@
     transform-origin: top center;
     animation: SelectContentFadeIn 180ms ease-out;
     min-width: 220px;
+    z-index: 99999;
 }
 
 .CustomSelectViewport {
