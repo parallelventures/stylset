@@ -27,28 +27,46 @@ export async function generateModelImage(
     const origin = ORIGINS[Math.floor(Math.random() * ORIGINS.length)];
     const hairColor = HAIR_COLORS[Math.floor(Math.random() * HAIR_COLORS.length)];
 
-    const finalPrompt = `CRITICAL TASK: DIGITAL FACE REPLACEMENT (FACE SWAP)
-You are an expert digital retoucher and fashion photographer.
+    const OUTFITS = [
+        "minimalist white silk slip dress",
+        "tailored oversized black blazer with a simple tank",
+        "casual chic beige trench coat",
+        "form-fitting ribbed knit turtleneck in charcoal",
+        "effortless denim jacket over a white tee",
+        "elegant off-the-shoulder navy gown",
+        "sleek leather jacket with a simple top",
+        "soft cashmere sweater in camel"
+    ];
+    const outfit = OUTFITS[Math.floor(Math.random() * OUTFITS.length)];
 
-You MUST recreate the attached reference image EXACTLY as it is, BUT you must completely SWAP the woman's face. 
+    const SETTINGS = [
+        "bright natural sunlight studio, pure white seamless backdrop",
+        "moody editorial studio, dramatic shadows, dark gray background",
+        "soft diffused lighting, warm beige backdrop",
+        "high-end catalog lighting, crisp white background",
+        "warm golden hour studio lighting, soft textured backdrop"
+    ];
+    const setting = SETTINGS[Math.floor(Math.random() * SETTINGS.length)];
 
-MANDATORY RULES FOR PRESERVATION (DO NOT CHANGE THESE):
-- EXACT same wardrobe, clothing color, and fabric.
-- EXACT same background, studio lighting, and shadows.
-- EXACT same body posture, framing, and camera angle.
+    const finalPrompt = `CRITICAL INSTRUCTIONS:
+You are an expert digital retoucher and high-end fashion photographer.
+You have been provided a reference image.
 
-MANDATORY RULES FOR THE NEW FACE:
-- Generate a completely NEW, breathtakingly beautiful face.
-- Origin: ${origin}.
-- Hair Color: ${hairColor}.
-- Aesthetics: High-end agency supermodel. Captivating, symmetrical features, glowing, healthy realistic skin (no plastic filters).
-- Age: 22-26.
-- The new face MUST look absolutely nothing like the person in the reference image. You are replacing her face entirely with a new, gorgeous ${origin} model.
+WHAT TO KEEP EXACTLY THE SAME:
+- You MUST preserve the EXACT same body posture, framing, and camera angle as the reference image. The subject must be positioned in the exact same spot within the frame.
 
-If you change the clothes or background, you fail.
-If you simply copy the original face, you fail.`;
+WHAT TO CHANGE COMPLETELY:
+1. IDENTITY: Generate a completely NEW, breathtakingly beautiful face. 
+   - Origin: ${origin}. 
+   - Hair Color: ${hairColor}. 
+   - Age: 22-26. 
+   - Look: High-end agency supermodel. Symmetrical, glowing, healthy realistic skin. It must look absolutely nothing like the person in the reference image.
+2. OUTFIT / WARDROBE: Change her clothing entirely. She is now wearing a ${outfit}.
+3. SETTING / STUDIO: Change the environment entirely. The background and lighting are now: ${setting}.
 
-    const negativePrompt = "same face as reference, original model face, exact same person, cloning, copied face, lookalike, twin, changed background, changed clothes, altered wardrobe, altered lighting, ugly, basic, asymmetrical face, unnatural skin, shiny plastic skin, cartoon, blurry";
+Do not copy the original face, the original clothes, or the original background. Just map the new beautiful ${origin} model wearing a ${outfit} into the exact same pose and framing as the reference.`;
+
+    const negativePrompt = "same face as reference, original model face, exact same person, cloning, copied face, lookalike, twin, original clothes, old clothes, original background, ugly, basic, asymmetrical face, unnatural skin, shiny plastic skin, cartoon, blurry";
 
     return generateAndSaveImage(
         {
