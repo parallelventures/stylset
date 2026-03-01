@@ -27,52 +27,32 @@ export async function generateModelImage(
     const origin = ORIGINS[Math.floor(Math.random() * ORIGINS.length)];
     const hairColor = HAIR_COLORS[Math.floor(Math.random() * HAIR_COLORS.length)];
 
-    const OUTFITS = [
-        "minimalist white silk slip dress",
-        "tailored oversized black blazer with a simple tank",
-        "casual chic beige trench coat",
-        "form-fitting ribbed knit turtleneck in charcoal",
-        "effortless denim jacket over a white tee",
-        "elegant off-the-shoulder navy gown",
-        "sleek leather jacket with a simple top",
-        "soft cashmere sweater in camel"
-    ];
-    const outfit = OUTFITS[Math.floor(Math.random() * OUTFITS.length)];
+    const finalPrompt = `CRITICAL TASK: DIGITAL FACE REPLACEMENT (FACE SWAP)
+You are an expert digital retoucher and fashion photographer.
 
-    const SETTINGS = [
-        "bright natural sunlight studio, pure white seamless backdrop",
-        "moody editorial studio, dramatic shadows, dark gray background",
-        "soft diffused lighting, warm beige backdrop",
-        "high-end catalog lighting, crisp white background",
-        "warm golden hour studio lighting, soft textured backdrop"
-    ];
-    const setting = SETTINGS[Math.floor(Math.random() * SETTINGS.length)];
+You MUST recreate the attached reference image EXACTLY as it is, BUT you must completely SWAP the woman's face. 
 
-    const finalPrompt = `You are a world-class fashion photographer producing imagery for a high-end modeling agency.
+MANDATORY RULES FOR PRESERVATION (DO NOT CHANGE THESE):
+- EXACT same wardrobe, clothing color, and fabric.
+- EXACT same background, studio lighting, and shadows.
+- EXACT same body posture, framing, and camera angle.
 
-Your task is to photograph a STUNNING, AGENCY-GRADE BEAUTY MODEL. 
-This is a completely original portrait. 
-
---- MODEL IDENTITY ---
-- Nationality/Origin: ${origin} (Her facial features should beautifully reflect this ethnicity)
-- Hair Color: ${hairColor}
-- Aesthetics: Exquisitely beautiful, striking high-fashion agency model. Symmetrical, captivating features with natural, healthy, glowing skin (realistic pores and texture, NOT plastic or heavily filtered).
+MANDATORY RULES FOR THE NEW FACE:
+- Generate a completely NEW, breathtakingly beautiful face.
+- Origin: ${origin}.
+- Hair Color: ${hairColor}.
+- Aesthetics: High-end agency supermodel. Captivating, symmetrical features, glowing, healthy realistic skin (no plastic filters).
 - Age: 22-26.
-- Expression: Very slight, relaxed, confident high-fashion gaze. Direct eye contact.
+- The new face MUST look absolutely nothing like the person in the reference image. You are replacing her face entirely with a new, gorgeous ${origin} model.
 
---- SCENE & STYLING ---
-- Wardrobe: She is wearing a ${outfit}.
-- Setting: ${setting}.
-- Pose: Front-facing portrait (top of head to mid-chest).
-- Photography: Shot on 85mm lens, f/5.6 for sharp focus on the face. 8k UHD, ultra-photorealistic.
+If you change the clothes or background, you fail.
+If you simply copy the original face, you fail.`;
 
-Generate the most breathtaking, hyper-realistic fashion portrait possible.`;
-
-    const negativePrompt = "ugly, basic, distorted, asymmetrical face, bad proportions, unnatural skin, shiny plastic skin, heavily filtered, uncanny valley, cartoon, illustration, drawing, text, watermark, logos, blurry, weird eyes, messy hair covering face";
+    const negativePrompt = "same face as reference, original model face, exact same person, cloning, copied face, lookalike, twin, changed background, changed clothes, altered wardrobe, altered lighting, ugly, basic, asymmetrical face, unnatural skin, shiny plastic skin, cartoon, blurry";
 
     return generateAndSaveImage(
         {
-            referenceImagePaths: [], // No reference image used, pure text-to-image for a 100% new person!
+            referenceImagePaths, // Restore using the subject reference image!
             finalPromptText: finalPrompt,
             negativePrompt,
             aspectRatio: "3:4"
