@@ -62,7 +62,8 @@ export async function generateSet(setId: string): Promise<void> {
                         negativeHairPrompt: negativeHairPrompt || undefined,
                     });
 
-                    const outputFileName = `${String(slide.orderIndex).padStart(3, "0")}.png`;
+                    const cleanName = (slide.preset?.name || "").toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                    const outputFileName = cleanName ? `${String(slide.orderIndex).padStart(3, "0")}_${cleanName}.png` : `${String(slide.orderIndex).padStart(3, "0")}.png`;
                     const storagePath = setImagePath(setId, outputFileName);
 
                     const result = await generateAndSaveImage(
@@ -131,10 +132,14 @@ export async function generateSet(setId: string): Promise<void> {
     let zipStoragePath: string | null = null;
     const slidesToZip = slides
         .filter((s) => s.status === "succeeded" && !!s.outputImagePath)
-        .map((s) => ({
-            filename: `${String(s.orderIndex).padStart(3, "0")}.png`,
-            storagePath: s.outputImagePath as string,
-        }));
+        .map((s) => {
+            const cleanName = (s.preset?.name || "").toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+            const fname = cleanName ? `${String(s.orderIndex).padStart(3, "0")}_${cleanName}.png` : `${String(s.orderIndex).padStart(3, "0")}.png`;
+            return {
+                filename: fname,
+                storagePath: s.outputImagePath as string,
+            };
+        });
 
     if (slidesToZip.length > 0) {
         zipStoragePath = setZipPath(setId);

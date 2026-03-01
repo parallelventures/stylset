@@ -237,8 +237,11 @@ export async function runDailyAgent(configOverride?: Partial<AgentConfig>, resum
                     .filter((s) => s.status === "succeeded" && !!s.storagePath)
                     .map((s) => {
                         const idx = String(s.orderIndex).padStart(3, "0");
+                        const cleanName = (s.hairstyle?.presetName || "").toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                        const fname = cleanName ? `${idx}_${cleanName}.png` : `${idx}.png`;
+
                         return {
-                            filename: `${idx}.png`,
+                            filename: fname,
                             storagePath: s.storagePath as string, // Checked above
                         };
                     });
@@ -385,7 +388,8 @@ async function generateSlideWithRetry(
                 await sleep(delay);
             }
 
-            const outputFileName = `${String(orderIndex).padStart(3, "0")}.png`;
+            const cleanName = preset.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+            const outputFileName = `${String(orderIndex).padStart(3, "0")}_${cleanName}.png`;
             const outputStoragePath = setImagePath(setId, outputFileName);
 
             const result = await generateAndSaveImage(
