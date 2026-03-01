@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { AgentSkeleton } from "@/components/Skeleton";
+import { ConfirmModal } from "@/components/ConfirmModal";
 
 interface AgentRun {
     id: string;
@@ -40,6 +41,7 @@ export default function AgentPage() {
     const [setsPerDay, setSetsPerDay] = useState(5);
     const [slidesPerSet, setSlidesPerSet] = useState(6);
     const [pauseBetweenSets, setPauseBetweenSets] = useState(false);
+    const [runToCancel, setRunToCancel] = useState<string | null>(null);
 
     const load = useCallback(() => {
         fetch("/api/agent")
@@ -91,11 +93,12 @@ export default function AgentPage() {
         }
     }
 
-    async function handleCancel(id: string) {
-        if (!confirm("Cancel this run?")) return;
+    async function handleCancelConfirmed() {
+        if (!runToCancel) return;
         try {
-            await fetch(`/api/agent/${id}/cancel`, { method: "POST" });
+            await fetch(`/api/agent/${runToCancel}/cancel`, { method: "POST" });
             load();
+            setRunToCancel(null);
         } catch (err: unknown) {
             alert(err instanceof Error ? err.message : "Failed to cancel");
         }
@@ -290,7 +293,7 @@ export default function AgentPage() {
                                                         </button>
                                                     )}
                                                     {(run.status === "running" || run.status === "paused") && (
-                                                        <button className="btn btn-danger btn-sm" onClick={() => handleCancel(run.id)}>
+                                                        <button className="btn btn-danger btn-sm" onClick={() => setRunToCancel(run.id)}>
                                                             Cancel
                                                         </button>
                                                     )}
@@ -304,6 +307,15 @@ export default function AgentPage() {
                     </div>
                 )}
             </div>
+
+            <ConfirmModal
+                isOpen={!!runToCancel}
+                title="Cancel Agent Run?"
+                description="This will interrupt the current generation batch. Partially generated data might be incomplete."
+                onConfirm={handleCancelConfirmed}
+                onCancel={() => setRunToCancel(null)}
+                confirmText="Cancel Run"
+            />
         </>
     );
 }

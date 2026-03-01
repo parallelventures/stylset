@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { springAnimation } from "@/app/template";
 import { CardGridSkeleton } from "@/components/Skeleton";
+import { ConfirmModal } from "@/components/ConfirmModal";
 
 interface ModelVariation {
     id: string;
@@ -22,6 +23,7 @@ export default function ModelsPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [initialLoading, setInitialLoading] = useState(true);
+    const [modelToDelete, setModelToDelete] = useState<string | null>(null);
 
     async function loadModels() {
         const res = await fetch("/api/models");
@@ -62,10 +64,12 @@ export default function ModelsPage() {
         }
     }
 
-    async function handleDelete(id: string) {
-        if (!confirm("Delete this model variation?")) return;
+    async function handleDeleteConfirmed() {
+        if (!modelToDelete) return;
+        const id = modelToDelete;
         await fetch(`/api/models/${id}`, { method: "DELETE" });
         loadModels();
+        setModelToDelete(null);
     }
 
     async function handleToggle(id: string, enabled: boolean) {
@@ -183,10 +187,11 @@ export default function ModelsPage() {
                                     {model.enabled ? "Disable" : "Enable"}
                                 </button>
                                 <button
-                                    className="btn btn-danger btn-sm"
-                                    onClick={() => handleDelete(model.id)}
+                                    className="btn btn-danger btn-sm btn-icon"
+                                    onClick={() => setModelToDelete(model.id)}
+                                    title="Delete Model Variation"
                                 >
-                                    ✕
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                                 </button>
                             </div>
                         </motion.div>
@@ -214,7 +219,9 @@ export default function ModelsPage() {
                         >
                             <div className="modal-header">
                                 <h3>New Model Variation</h3>
-                                <button className="btn btn-icon btn-secondary" onClick={() => setShowModal(false)}>✕</button>
+                                <button className="btn btn-icon btn-secondary" onClick={() => setShowModal(false)} title="Close">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                </button>
                             </div>
 
                             <form onSubmit={handleCreate}>
@@ -251,6 +258,7 @@ export default function ModelsPage() {
 
                                 <div className="modal-footer">
                                     <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 4 }}><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                                         Cancel
                                     </button>
                                     <button type="submit" className="btn btn-primary" disabled={loading}>
@@ -262,6 +270,15 @@ export default function ModelsPage() {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            <ConfirmModal
+                isOpen={!!modelToDelete}
+                title="Delete Model Variation?"
+                description="This will permanently delete this model variation. It will no longer be available when generating future subject sets."
+                onConfirm={handleDeleteConfirmed}
+                onCancel={() => setModelToDelete(null)}
+                confirmText="Delete Model"
+            />
         </>
     );
 }
