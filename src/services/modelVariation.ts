@@ -8,8 +8,8 @@ import { generateAndSaveImage } from "@/services/geminiImage";
 
 const ORIGINS = [
     "France", "Italy", "Spain", "Brazil", "Morocco", "Japan", "South Korea",
-    "Sweden", "Nigeria", "Colombia", "Russia", "India", "Lebanon", "Greece",
-    "Ethiopia", "Mexico", "Thailand", "Germany", "Argentina", "Vietnam"
+    "Sweden", "Poland", "Colombia", "Russia", "India", "Lebanon", "Greece",
+    "Turkey", "Mexico", "Thailand", "Germany", "Argentina", "Vietnam"
 ];
 
 const HAIR_COLORS = [
@@ -27,23 +27,28 @@ export async function generateModelImage(
     const origin = ORIGINS[Math.floor(Math.random() * ORIGINS.length)];
     const hairColor = HAIR_COLORS[Math.floor(Math.random() * HAIR_COLORS.length)];
 
-    const finalPrompt = `You are a world-class fashion photographer and digital retoucher.
-Your task is to recreate the attached reference image EXACTLY in terms of clothing, background, lighting, and pose, BUT YOU MUST REPLACE THE MODEL WITH A COMPLETELY NEW PERSON.
+    const finalPrompt = `You are a world-class fashion photographer and digital retoucher producing imagery for a high-end agency.
 
-NEW MODEL IDENTITY (MUST USE THESE TRAITS):
-- Nationality/Origin: ${origin}
+Based on the attached reference image, your task is to generate a STUNNING, AGENCY-GRADE BEAUTY MODEL.
+Crucially, you must use the reference image ONLY to copy the clothing, the pose, the lighting, and the background.
+DO NOT COPY THE FACE FROM THE REFERENCE IMAGE. The face must be a COMPLETELY NEW IDENTITY.
+
+--- NEW MODEL IDENTITY (MANDATORY) ---
+- Nationality/Origin: ${origin} (Ensure her facial features prominently and beautifully reflect this ethnicity)
 - Hair Color: ${hairColor}
-- Unique Features: Distinctive ${origin} facial structure, completely different eye shape, different nose, and different jawline from the reference image.
-- Age: 22-28, natural, agency-grade commercial beauty model.
+- Aesthetics: Exquisitely beautiful, striking high-fashion agency model. Symmetrical, captivating features with natural, healthy, glowing skin (realistic pores and texture, NOT plastic or heavily filtered).
+- Age: 22-26.
+- Expression: Very slight, relaxed, confident high-fashion gaze.
 
-MANDATORY RULES:
-1. SCENE PRESERVATION: The new image MUST have the EXACT same clothes, colors, background, lighting, and camera angle as the reference image.
-2. IDENTITY SWAP: The woman's face and identity MUST be completely swapped to the new ${origin} identity described above. DO NOT copy the face from the reference image.
-3. QUALITY: High-end studio portrait, 8k UHD, ultra-photorealistic, clean casting beauty.
+--- SCENE CLONING (MANDATORY) ---
+- Wardrobe: Keep the EXACT SAME CLOTHING, colors, and textures as the reference.
+- Setting: Keep the EXACT SAME BACKGROUND and environment.
+- Pose: Keep the EXACT SAME POSE and camera framing.
+- Lighting: Maintain the exact same studio lighting and color grading.
 
-Failure to change the woman's face will result in rejection. The person must look strikingly different while wearing the exact same outfit in the exact same setting.`;
+IF YOU COPY THE FACE FROM THE REFERENCE IMAGE, YOU HAVE FAILED. You must generate a striking, gorgeous, completely new ${origin} woman wearing the reference's clothes in the reference's environment.`;
 
-    const negativePrompt = "same face as reference, identical person, cloning, copied face, original model's face, twin, uncanny valley, ugly, distorted, heavily filtered, text, watermark, logos, changed background, changed clothes";
+    const negativePrompt = "same face as reference, identical person, cloning, copied face, twin, ugly, basic, distorted, asymmetrical face, bad proportions, unnatural skin, shiny plastic skin, heavily filtered, uncanny valley, text, watermark, logos, changed background, changed clothes, weird eyes";
 
     return generateAndSaveImage(
         {
