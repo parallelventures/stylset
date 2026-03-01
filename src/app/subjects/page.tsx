@@ -92,6 +92,9 @@ export default function SubjectsPage() {
                 hairColor: (form.elements.namedItem("hairColor") as HTMLSelectElement).value,
                 outfit: (form.elements.namedItem("outfit") as HTMLSelectElement).value,
                 background: (form.elements.namedItem("background") as HTMLSelectElement).value,
+                makeup: (form.elements.namedItem("makeup") as HTMLSelectElement).value,
+                expression: (form.elements.namedItem("expression") as HTMLSelectElement).value,
+                lighting: (form.elements.namedItem("lighting") as HTMLSelectElement).value,
             };
 
             const res = await fetch("/api/subjects/auto", {
@@ -440,6 +443,15 @@ export default function SubjectsPage() {
                                         <option value="Sleek black turtleneck sweater">Black Turtleneck</option>
                                         <option value="Minimalist beige trench coat">Beige Trench Coat</option>
                                         <option value="Classic denim jacket over a white tee">Denim Jacket</option>
+                                        <option value="Black leather moto jacket">Black Leather Moto Jacket</option>
+                                        <option value="Cozy oversized cream knit sweater">Oversized Cream Sweater</option>
+                                        <option value="Crisp white button-down shirt">White Button-Down Shirt</option>
+                                        <option value="Stylish tailored navy blazer">Tailored Navy Blazer</option>
+                                        <option value="Casual vintage graphic tee">Vintage Graphic Tee</option>
+                                        <option value="Bohemian floral maxi dress">Floral Maxi Dress</option>
+                                        <option value="Athleisure black sports bra and leggings">Athleisure Sports Bra</option>
+                                        <option value="Structured tweed cropped jacket">Structured Tweed Jacket</option>
+                                        <option value="Chic monochrome matching trousers and vest">Monochrome Vest & Trousers</option>
                                     </select>
                                 </div>
 
@@ -449,6 +461,38 @@ export default function SubjectsPage() {
                                         <option value="Solid high-key PURE WHITE seamless studio backdrop">Pure White Studio</option>
                                         <option value="Soft warm beige seamless backdrop">Warm Beige Studio</option>
                                         <option value="Moody dark slate gray backdrop">Dark Moody Studio</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Expression</label>
+                                    <select name="expression" className="form-input" defaultValue="neutral expression">
+                                        <option value="neutral expression">Neutral & Serene</option>
+                                        <option value="soft gentle smile">Soft Gentle Smile</option>
+                                        <option value="fierce editorial gaze">Fierce Editorial Gaze</option>
+                                        <option value="playful smirk">Playful Smirk</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Makeup Style</label>
+                                    <select name="makeup" className="form-input" defaultValue="soft natural everyday makeup">
+                                        <option value="soft natural everyday makeup">Soft Natural / No-Makeup Look</option>
+                                        <option value="glamorous evening makeup with red lips">Glamorous Red Lips</option>
+                                        <option value="smokey eyes with nude lips">Smokey Eyes & Nude Lips</option>
+                                        <option value="dewy glowing glass skin, minimal makeup">Dewy Glass Skin</option>
+                                        <option value="bold dramatic editorial makeup">Bold Editorial</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Lighting</label>
+                                    <select name="lighting" className="form-input" defaultValue="Soft shadowless studio lighting">
+                                        <option value="Soft shadowless studio lighting">Soft Shadowless Studio</option>
+                                        <option value="Dramatic moody chiaroscuro lighting">Dramatic Moody (Chiaroscuro)</option>
+                                        <option value="Warm golden hour natural sunlight lighting">Warm Golden Hour Sunlight</option>
+                                        <option value="Hard flash editorial photography lighting">Hard Flash Editorial</option>
+                                        <option value="Cinematic neon rim lighting">Cinematic Neon Rim Light</option>
                                     </select>
                                 </div>
 

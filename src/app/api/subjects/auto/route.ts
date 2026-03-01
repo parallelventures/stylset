@@ -17,6 +17,10 @@ export async function POST(req: Request) {
         const outfit = body.outfit || "Simple heather grey fitted t-shirt";
         const background = body.background || "Solid high-key PURE WHITE seamless studio backdrop";
 
+        const makeup = body.makeup || "soft makeup";
+        const expression = body.expression || "neutral expression";
+        const lighting = body.lighting || "Soft shadowless lighting";
+
         const AUTO_SUBJECT_PROMPT = `Generate a stunning, photorealistic high-end commercial hair catalog reference image.
 
 CRITICAL LAYOUT RULE: You MUST generate a VERTICAL DIPTYCH (a single image split into two stacked panels).
@@ -26,12 +30,12 @@ CRITICAL LAYOUT RULE: You MUST generate a VERTICAL DIPTYCH (a single image split
 - Bottom Panel: BACK VIEW (rear view, back of head and shoulders).
 
 SUBJECT & STYLE:
-- Model: ${age} female, ${ethnicity}, neutral expression, soft makeup.
+- Model: ${age} female, ${ethnicity}, ${expression}, ${makeup}.
 - Hair: ${hairColor}, glossy. Straight to wavy, thick, smooth. Long layered butterfly cut, 90s blowout style. Face-framing curtain bangs. Heavily layered mid-lengths to ends. Voluminous.
 - Top Panel Hair: Center part, layers curving inward and outward framing the face.
 - Bottom Panel Hair: U-shaped perimeter, cascading layers showing texture.
 - Attire: ${outfit} with scoop neckline (identical in both panels).
-- Environment: ${background}. Soft shadowless lighting.
+- Environment: ${background}. ${lighting}.
 - Specs: 8k UHD, ultra-photorealistic.`;
 
         const AUTO_SUBJECT_NEGATIVE_PROMPT = "single image, no split, wrong layout, ugly, basic, distorted, asymmetrical face, bad proportions, unnatural skin, shiny plastic skin, heavily filtered, uncanny valley, cartoon, illustration, drawing, text, watermark, logos, blurry, weird eyes, messy hair covering face, smiling, dramatic lighting, shadows, colorful background, extravagant clothes";
