@@ -27,6 +27,7 @@ export default function SubjectsPage() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [previews, setPreviews] = useState<string[]>([]);
     const [files, setFiles] = useState<File[]>([]);
+    const [generatingSubject, setGeneratingSubject] = useState(false);
     const router = useRouter();
 
     async function loadSubjects() {
@@ -78,6 +79,20 @@ export default function SubjectsPage() {
         }
     }
 
+    async function handleAutoGenerateSubject() {
+        setGeneratingSubject(true);
+        try {
+            const res = await fetch("/api/subjects/auto", { method: "POST" });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error);
+            loadSubjects();
+        } catch (err: unknown) {
+            alert(err instanceof Error ? err.message : "Failed to auto-generate subject");
+        } finally {
+            setGeneratingSubject(false);
+        }
+    }
+
     async function handleQuickGenerate(subjectId: string) {
         setGenerating(subjectId);
         try {
@@ -107,22 +122,39 @@ export default function SubjectsPage() {
                     <h2>Subjects</h2>
                     <p>Upload a reference photo, then generate all hairstyles automatically</p>
                 </div>
-                <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-                    + New Subject
-                </button>
+                <div style={{ display: "flex", gap: "8px" }}>
+                    <button
+                        className="btn btn-secondary"
+                        onClick={handleAutoGenerateSubject}
+                        disabled={generatingSubject}
+                    >
+                        {generatingSubject ? <><span className="spinner" /> Generating...</> : "✨ Auto-Generate Subject"}
+                    </button>
+                    <button className="btn btn-primary" onClick={() => setShowModal(true)}>
+                        + Upload Subject
+                    </button>
+                </div>
             </div>
 
             {subjects.length === 0 ? (
                 <div className="empty-state">
                     <h3>No subjects yet</h3>
                     <p>Upload a reference image to get started</p>
-                    <button
-                        className="btn btn-primary"
-                        style={{ marginTop: 16 }}
-                        onClick={() => setShowModal(true)}
-                    >
-                        Upload Subject
-                    </button>
+                    <div style={{ display: "flex", gap: "8px", marginTop: 16 }}>
+                        <button
+                            className="btn btn-primary"
+                            onClick={() => setShowModal(true)}
+                        >
+                            Upload Subject
+                        </button>
+                        <button
+                            className="btn btn-secondary"
+                            onClick={handleAutoGenerateSubject}
+                            disabled={generatingSubject}
+                        >
+                            {generatingSubject ? <><span className="spinner" /> Generating...</> : "✨ Auto-Generate Subject"}
+                        </button>
+                    </div>
                 </div>
             ) : (
                 <div className="card-grid">
