@@ -27,29 +27,23 @@ export async function generateModelImage(
     const origin = ORIGINS[Math.floor(Math.random() * ORIGINS.length)];
     const hairColor = HAIR_COLORS[Math.floor(Math.random() * HAIR_COLORS.length)];
 
-    const finalPrompt = `CRITICAL RULES — MUST FOLLOW:
-You are a world-class fashion photographer and retoucher.
-Generate a new image where the EXACT SAME SCENE, POSE, AND WARDROBE are preserved from the reference image, but the PERSON is COMPLETELY DIFFERENT.
+    const finalPrompt = `You are a world-class fashion photographer and digital retoucher.
+Your task is to recreate the attached reference image EXACTLY in terms of clothing, background, lighting, and pose, BUT YOU MUST REPLACE THE MODEL WITH A COMPLETELY NEW PERSON.
 
-You MUST preserve ALL of the following EXACTLY as they appear in the reference:
-- Pose and posture
-- Framing and camera angle
-- Wardrobe / clothing (must be the exact same clothes with the same colors and textures)
-- Background and environment (must be the exact same setting)
-- Lighting and color grading
-- Camera lens and depth of field
-- Overall image aesthetic and body type
+NEW MODEL IDENTITY (MUST USE THESE TRAITS):
+- Nationality/Origin: ${origin}
+- Hair Color: ${hairColor}
+- Unique Features: Distinctive ${origin} facial structure, completely different eye shape, different nose, and different jawline from the reference image.
+- Age: 22-28, natural, agency-grade commercial beauty model.
 
-The ONLY thing that changes is the IDENTITY of the person's face.
-NEW IDENTITY: A completely different woman. No resemblance to the original person.
-Origin: ${origin}.
-Age: 22-28.
-Model profile: Agency-grade commercial beauty model, clean casting beauty, very photogenic, healthy luxury skin.
-Hair: ${hairColor} (clean and simple).
+MANDATORY RULES:
+1. SCENE PRESERVATION: The new image MUST have the EXACT same clothes, colors, background, lighting, and camera angle as the reference image.
+2. IDENTITY SWAP: The woman's face and identity MUST be completely swapped to the new ${origin} identity described above. DO NOT copy the face from the reference image.
+3. QUALITY: High-end studio portrait, 8k UHD, ultra-photorealistic, clean casting beauty.
 
-Do NOT alter the wardrobe, background, or pose. The newly generated woman MUST be wearing the exact same clothes in the exact same setting as the reference image.`;
+Failure to change the woman's face will result in rejection. The person must look strikingly different while wearing the exact same outfit in the exact same setting.`;
 
-    const negativePrompt = "no phone, no mirror, no props, no text overlays, no watermark, no logos, no colored background, no gradients, no background texture, no studio elements visible, no heavy beauty filter, no uncanny valley, no distorted face, no extra limbs, no harsh shadows, no frizz, no flyaways, no hair covering eyes";
+    const negativePrompt = "same face as reference, identical person, cloning, copied face, original model's face, twin, uncanny valley, ugly, distorted, heavily filtered, text, watermark, logos, changed background, changed clothes";
 
     return generateAndSaveImage(
         {
