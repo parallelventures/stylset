@@ -7,7 +7,17 @@ import fs from "fs/promises";
 
 export const runtime = "nodejs";
 
-const AUTO_SUBJECT_PROMPT = `Generate a stunning, photorealistic high-end commercial hair catalog reference image.
+export async function POST(req: Request) {
+    try {
+        const body = await req.json().catch(() => ({}));
+
+        const ethnicity = body.ethnicity || "medium skin tone";
+        const age = body.age || "Young";
+        const hairColor = body.hairColor || "Dark espresso brown";
+        const outfit = body.outfit || "Simple heather grey fitted t-shirt";
+        const background = body.background || "Solid high-key PURE WHITE seamless studio backdrop";
+
+        const AUTO_SUBJECT_PROMPT = `Generate a stunning, photorealistic high-end commercial hair catalog reference image.
 
 CRITICAL LAYOUT RULE: You MUST generate a VERTICAL DIPTYCH (a single image split into two stacked panels).
 - Format: Vertical collage (two stacked panels).
@@ -16,18 +26,15 @@ CRITICAL LAYOUT RULE: You MUST generate a VERTICAL DIPTYCH (a single image split
 - Bottom Panel: BACK VIEW (rear view, back of head and shoulders).
 
 SUBJECT & STYLE:
-- Model: Young female, medium skin tone, neutral expression, soft makeup.
-- Hair: Dark espresso brown, glossy. Straight to wavy, thick, smooth. Long layered butterfly cut, 90s blowout style. Face-framing curtain bangs. Heavily layered mid-lengths to ends. Voluminous.
+- Model: ${age} female, ${ethnicity}, neutral expression, soft makeup.
+- Hair: ${hairColor}, glossy. Straight to wavy, thick, smooth. Long layered butterfly cut, 90s blowout style. Face-framing curtain bangs. Heavily layered mid-lengths to ends. Voluminous.
 - Top Panel Hair: Center part, layers curving inward and outward framing the face.
 - Bottom Panel Hair: U-shaped perimeter, cascading layers showing texture.
-- Attire: Simple heather grey fitted t-shirt with scoop neckline (identical in both panels).
-- Environment: Solid high-key PURE WHITE seamless studio backdrop. Soft shadowless lighting.
+- Attire: ${outfit} with scoop neckline (identical in both panels).
+- Environment: ${background}. Soft shadowless lighting.
 - Specs: 8k UHD, ultra-photorealistic.`;
 
-const AUTO_SUBJECT_NEGATIVE_PROMPT = "single image, no split, wrong layout, ugly, basic, distorted, asymmetrical face, bad proportions, unnatural skin, shiny plastic skin, heavily filtered, uncanny valley, cartoon, illustration, drawing, text, watermark, logos, blurry, weird eyes, messy hair covering face, smiling, dramatic lighting, shadows, colorful background, extravagant clothes";
-
-export async function POST() {
-    try {
+        const AUTO_SUBJECT_NEGATIVE_PROMPT = "single image, no split, wrong layout, ugly, basic, distorted, asymmetrical face, bad proportions, unnatural skin, shiny plastic skin, heavily filtered, uncanny valley, cartoon, illustration, drawing, text, watermark, logos, blurry, weird eyes, messy hair covering face, smiling, dramatic lighting, shadows, colorful background, extravagant clothes";
         console.log("[Auto-Subject] Generating automatic subject image...");
         const id = uuid();
         const filename = "ref_0.png";

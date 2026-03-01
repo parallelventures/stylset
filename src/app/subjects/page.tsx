@@ -20,6 +20,7 @@ interface Subject {
 export default function SubjectsPage() {
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [showModal, setShowModal] = useState(false);
+    const [showAutoModal, setShowAutoModal] = useState(false);
     const [loading, setLoading] = useState(false);
     const [generating, setGenerating] = useState<string | null>(null);
     const [error, setError] = useState("");
@@ -79,12 +80,28 @@ export default function SubjectsPage() {
         }
     }
 
-    async function handleAutoGenerateSubject() {
+    async function handleAutoGenerateSubject(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
         setGeneratingSubject(true);
+        const form = e.currentTarget;
+
         try {
-            const res = await fetch("/api/subjects/auto", { method: "POST" });
+            const body = {
+                ethnicity: (form.elements.namedItem("ethnicity") as HTMLSelectElement).value,
+                age: (form.elements.namedItem("age") as HTMLSelectElement).value,
+                hairColor: (form.elements.namedItem("hairColor") as HTMLSelectElement).value,
+                outfit: (form.elements.namedItem("outfit") as HTMLSelectElement).value,
+                background: (form.elements.namedItem("background") as HTMLSelectElement).value,
+            };
+
+            const res = await fetch("/api/subjects/auto", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+            });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error);
+            setShowAutoModal(false);
             loadSubjects();
         } catch (err: unknown) {
             alert(err instanceof Error ? err.message : "Failed to auto-generate subject");
@@ -125,7 +142,7 @@ export default function SubjectsPage() {
                 <div style={{ display: "flex", gap: "8px" }}>
                     <button
                         className="btn btn-secondary"
-                        onClick={handleAutoGenerateSubject}
+                        onClick={() => setShowAutoModal(true)}
                         disabled={generatingSubject}
                     >
                         {generatingSubject ? <><span className="spinner" /> Generating...</> : "✨ Auto-Generate Subject"}
@@ -149,7 +166,7 @@ export default function SubjectsPage() {
                         </button>
                         <button
                             className="btn btn-secondary"
-                            onClick={handleAutoGenerateSubject}
+                            onClick={() => setShowAutoModal(true)}
                             disabled={generatingSubject}
                         >
                             {generatingSubject ? <><span className="spinner" /> Generating...</> : "✨ Auto-Generate Subject"}
@@ -343,6 +360,112 @@ export default function SubjectsPage() {
                                         disabled={loading || files.length === 0}
                                     >
                                         {loading ? <span className="spinner" /> : "Create Subject"}
+                                    </button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            <AnimatePresence>
+                {showAutoModal && (
+                    <motion.div
+                        className="modal-overlay"
+                        onClick={() => !generatingSubject && setShowAutoModal(false)}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                    >
+                        <motion.div
+                            className="modal"
+                            onClick={(e) => e.stopPropagation()}
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            transition={springAnimation}
+                        >
+                            <div className="modal-header">
+                                <h3>✨ Auto-Generate Subject</h3>
+                                <button
+                                    className="btn btn-icon btn-secondary"
+                                    onClick={() => setShowAutoModal(false)}
+                                    disabled={generatingSubject}
+                                >
+                                    ✕
+                                </button>
+                            </div>
+
+                            <form onSubmit={handleAutoGenerateSubject}>
+                                <div className="form-group">
+                                    <label className="form-label">Ethnicity / Skin Tone</label>
+                                    <select name="ethnicity" className="form-input" defaultValue="medium skin tone">
+                                        <option value="fair skin tone, caucasian">Caucasian / Fair</option>
+                                        <option value="medium skin tone, hispanic">Hispanic / Latin</option>
+                                        <option value="olive skin tone, middle eastern">Middle Eastern / Olive</option>
+                                        <option value="dark skin tone, black">Black / Dark</option>
+                                        <option value="light skin tone, east asian">East Asian / Light</option>
+                                        <option value="brown skin tone, south asian">South Asian / Brown</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Age</label>
+                                    <select name="age" className="form-input" defaultValue="Young">
+                                        <option value="Teenage">Teenage</option>
+                                        <option value="Young">Young (20s)</option>
+                                        <option value="Middle-aged">Adult (30s-40s)</option>
+                                        <option value="Mature">Mature (50s+)</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Hair Color</label>
+                                    <select name="hairColor" className="form-input" defaultValue="Dark espresso brown">
+                                        <option value="Dark espresso brown">Dark Espresso Brown</option>
+                                        <option value="Jet black">Jet Black</option>
+                                        <option value="Soft honey blonde">Soft Honey Blonde</option>
+                                        <option value="Icy platinum blonde">Icy Platinum Blonde</option>
+                                        <option value="Warm copper red">Warm Copper Red</option>
+                                        <option value="Ash brown">Ash Brown</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Outfit</label>
+                                    <select name="outfit" className="form-input" defaultValue="Simple heather grey fitted t-shirt">
+                                        <option value="Simple heather grey fitted t-shirt">Heather Grey T-Shirt</option>
+                                        <option value="Elegant white silk slip dress">White Silk Slip Dress</option>
+                                        <option value="Sleek black turtleneck sweater">Black Turtleneck</option>
+                                        <option value="Minimalist beige trench coat">Beige Trench Coat</option>
+                                        <option value="Classic denim jacket over a white tee">Denim Jacket</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Background</label>
+                                    <select name="background" className="form-input" defaultValue="Solid high-key PURE WHITE seamless studio backdrop">
+                                        <option value="Solid high-key PURE WHITE seamless studio backdrop">Pure White Studio</option>
+                                        <option value="Soft warm beige seamless backdrop">Warm Beige Studio</option>
+                                        <option value="Moody dark slate gray backdrop">Dark Moody Studio</option>
+                                    </select>
+                                </div>
+
+                                <div className="modal-footer">
+                                    <button
+                                        type="button"
+                                        className="btn btn-secondary"
+                                        onClick={() => setShowAutoModal(false)}
+                                        disabled={generatingSubject}
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="btn btn-primary"
+                                        disabled={generatingSubject}
+                                    >
+                                        {generatingSubject ? <span className="spinner" /> : "Generate ✨"}
                                     </button>
                                 </div>
                             </form>
