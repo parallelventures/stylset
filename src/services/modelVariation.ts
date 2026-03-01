@@ -8,8 +8,8 @@ import { generateAndSaveImage } from "@/services/geminiImage";
 
 const ORIGINS = [
     "France", "Italy", "Spain", "Brazil", "Morocco", "Japan", "South Korea",
-    "Sweden", "Poland", "Colombia", "Russia", "India", "Lebanon", "Greece",
-    "Turkey", "Mexico", "Thailand", "Germany", "Argentina", "Vietnam"
+    "Sweden", "Poland", "Colombia", "Russia", "Netherlands", "Lebanon", "Greece",
+    "Turkey", "Mexico", "Denmark", "Germany", "Argentina", "Vietnam"
 ];
 
 const HAIR_COLORS = [
