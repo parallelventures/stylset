@@ -25,7 +25,7 @@ export async function POST(req: Request) {
 
 CRITICAL LAYOUT RULE: You MUST generate a VERTICAL DIPTYCH (a single image split into two stacked panels).
 - Format: Vertical collage (two stacked panels).
-- Divider: A thin, clean white gap or subtle line between the top and bottom panels.
+- Divider: Keep the separation but without any visible line, gap, or white stripe between the top and bottom panels.
 - Top Panel: FRONT VIEW (front-facing portrait, chest up).
 - Bottom Panel: BACK VIEW (rear view, back of head and shoulders).
 

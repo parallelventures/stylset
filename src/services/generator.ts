@@ -60,6 +60,7 @@ export async function generateSet(setId: string): Promise<void> {
                         basePrompt,
                         hairstylePrompt,
                         negativeHairPrompt: negativeHairPrompt || undefined,
+                        hairstyleTitle: slide.preset?.name || undefined,
                     });
 
                     const cleanName = (slide.preset?.name || "").toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');

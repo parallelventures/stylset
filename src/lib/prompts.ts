@@ -13,6 +13,7 @@ interface ComposeInput {
     basePrompt: Record<string, string>;
     hairstylePrompt: string;
     negativeHairPrompt?: string;
+    hairstyleTitle?: string;
 }
 
 interface ComposeOutput {
@@ -86,6 +87,10 @@ export function composePrompt(input: ComposeInput): ComposeOutput {
 
     // 4. Hairstyle
     parts.push(`\nHAIRSTYLE (the ONLY change): ${input.hairstylePrompt}`);
+
+    if (input.hairstyleTitle) {
+        parts.push(`\nTEXT OVERLAY: You MUST perfectly render the exact text "${input.hairstyleTitle}" in the middle of the image, placed cleanly on the separation between the top and bottom panels. The text should be stylish, high-contrast, and perfectly clear.`);
+    }
 
     // Build negative
     const negParts: string[] = [BASE_NEGATIVE];
