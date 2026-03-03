@@ -31,6 +31,7 @@ export default function SubjectsPage() {
     const [files, setFiles] = useState<File[]>([]);
     const [generatingSubject, setGeneratingSubject] = useState(false);
     const [subjectToDelete, setSubjectToDelete] = useState<string | null>(null);
+    const [editingSubject, setEditingSubject] = useState<{ id: string; name: string } | null>(null);
     const router = useRouter();
 
     async function loadSubjects() {
@@ -137,6 +138,28 @@ export default function SubjectsPage() {
         setSubjectToDelete(null);
     }
 
+    async function handleUpdateSubjectName(id: string, newName: string) {
+        if (!newName.trim()) {
+            setEditingSubject(null);
+            return;
+        }
+
+        try {
+            const res = await fetch(`/api/subjects/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: newName.trim() })
+            });
+            if (res.ok) {
+                setSubjects(subjects.map(s => s.id === id ? { ...s, name: newName.trim() } : s));
+            }
+        } catch (err) {
+            console.error("Failed to update subject name", err);
+        } finally {
+            setEditingSubject(null);
+        }
+    }
+
     if (initialLoading) return <CardGridSkeleton count={4} hasImage />;
 
     return (
@@ -213,7 +236,28 @@ export default function SubjectsPage() {
                                     </div>
                                 )}
 
-                                <div className="card-title">{s.name}</div>
+                                {editingSubject?.id === s.id ? (
+                                    <input
+                                        autoFocus
+                                        className="form-input text-sm"
+                                        style={{ padding: "4px 8px", height: "auto", margin: "-4px -8px" }}
+                                        value={editingSubject.name}
+                                        onChange={(e) => setEditingSubject({ ...editingSubject, name: e.target.value })}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") handleUpdateSubjectName(s.id, editingSubject.name);
+                                            if (e.key === "Escape") setEditingSubject(null);
+                                        }}
+                                        onBlur={() => handleUpdateSubjectName(s.id, editingSubject.name)}
+                                    />
+                                ) : (
+                                    <div
+                                        className="card-title cursor-pointer hover:opacity-70 transition-opacity"
+                                        onClick={() => setEditingSubject({ id: s.id, name: s.name })}
+                                        title="Click to rename"
+                                    >
+                                        {s.name}
+                                    </div>
+                                )}
                                 {s.description && (
                                     <div className="text-sm text-secondary" style={{ marginTop: 2 }}>
                                         {s.description}
