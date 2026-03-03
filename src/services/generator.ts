@@ -3,7 +3,7 @@
  * Uses Supabase Storage.
  */
 import prisma from "@/lib/prisma";
-import { composePrompt } from "@/lib/prompts";
+import { composePrompt, composeSelfiePrompt } from "@/lib/prompts";
 import { generateAndSaveImage } from "@/services/geminiImage";
 import { uploadJson, setImagePath, setManifestPath, setZipPath, getFileUrl } from "@/lib/storage";
 import { createAndUploadZip } from "@/lib/zip";
@@ -47,20 +47,36 @@ export async function generateSet(setId: string): Promise<void> {
 
                     let hairstylePrompt = "";
                     let negativeHairPrompt = "";
+                    let isSelfieMode = false;
+                    let selfieInput: any = {};
+
                     try {
                         const input = JSON.parse(slide.inputJson || "{}");
-                        hairstylePrompt = input.hairstylePrompt || slide.preset?.hairstylePrompt || "";
-                        negativeHairPrompt = input.negativeHairPrompt || slide.preset?.negativeHairPrompt || "";
+                        isSelfieMode = input.mode === "selfie";
+
+                        if (isSelfieMode) {
+                            selfieInput = input;
+                        } else {
+                            hairstylePrompt = input.hairstylePrompt || slide.preset?.hairstylePrompt || "";
+                            negativeHairPrompt = input.negativeHairPrompt || slide.preset?.negativeHairPrompt || "";
+                        }
                     } catch {
                         hairstylePrompt = slide.preset?.hairstylePrompt || "";
                     }
 
-                    const composed = composePrompt({
-                        lockedAttributes: lockedAttrs,
-                        basePrompt,
-                        hairstylePrompt,
-                        negativeHairPrompt: negativeHairPrompt || undefined,
-                    });
+                    const composed = isSelfieMode
+                        ? composeSelfiePrompt({
+                            location: selfieInput.location,
+                            outfit: selfieInput.outfit,
+                            hair: selfieInput.hair,
+                            style: basePrompt.prompt
+                        })
+                        : composePrompt({
+                            lockedAttributes: lockedAttrs,
+                            basePrompt,
+                            hairstylePrompt,
+                            negativeHairPrompt: negativeHairPrompt || undefined,
+                        });
 
                     const cleanName = (slide.preset?.name || "").toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
                     const outputFileName = cleanName ? `${String(slide.orderIndex).padStart(3, "0")}_${cleanName}.png` : `${String(slide.orderIndex).padStart(3, "0")}.png`;
