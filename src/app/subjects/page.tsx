@@ -210,6 +210,22 @@ export default function SubjectsPage() {
         }
     }
 
+    async function handleGenerateSelfies(subjectId: string) {
+        setGenerating(subjectId + "_selfies");
+        try {
+            const res = await fetch(`/api/subjects/${subjectId}/generate-selfies`, {
+                method: "POST",
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error);
+            // Navigate to the new set
+            router.push(`/sets/${data.setId}`);
+        } catch (err: unknown) {
+            alert(err instanceof Error ? err.message : "Selfie generation failed");
+            setGenerating(null);
+        }
+    }
+
     async function handleDeleteConfirmed() {
         if (!subjectToDelete) return;
         const id = subjectToDelete;
@@ -309,6 +325,7 @@ export default function SubjectsPage() {
                     {subjects.map((s) => {
                         const images: string[] = JSON.parse(s.referenceImagePaths || "[]");
                         const isGenerating = generating === s.id;
+                        const isGeneratingSelfies = generating === s.id + "_selfies";
                         return (
                             <div key={s.id} className="card">
                                 {images.length > 0 && (
@@ -372,16 +389,31 @@ export default function SubjectsPage() {
                                     <button
                                         className="btn btn-primary btn-sm"
                                         onClick={() => handleQuickGenerate(s.id)}
-                                        disabled={isGenerating}
+                                        disabled={isGenerating || isGeneratingSelfies}
                                         style={{ flex: 1 }}
                                     >
                                         {isGenerating ? (
                                             <><span className="spinner" /> Generating…</>
                                         ) : (
-                                            "⚡ Generate All Hairstyles"
+                                            "⚡ All Hairstyles"
                                         )}
                                     </button>
-                                    <Link href={`/subjects/${s.id}`} className="btn btn-secondary btn-sm">
+                                    <button
+                                        className="btn btn-secondary btn-sm"
+                                        onClick={() => handleGenerateSelfies(s.id)}
+                                        disabled={isGenerating || isGeneratingSelfies}
+                                        style={{ flex: 1 }}
+                                    >
+                                        {isGeneratingSelfies ? (
+                                            <><span className="spinner" /> Generating…</>
+                                        ) : (
+                                            "📸 Selfies"
+                                        )}
+                                    </button>
+                                </div>
+
+                                <div className="flex gap-2" style={{ marginTop: 8 }}>
+                                    <Link href={`/subjects/${s.id}`} className="btn btn-secondary btn-sm" style={{ flex: 1, textAlign: "center", justifyContent: "center" }}>
                                         View
                                     </Link>
                                     <a
