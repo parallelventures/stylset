@@ -25,7 +25,7 @@ export async function POST(req: Request) {
         const hairstyleName = body.hairstyleName || "Blowout";
         const includeTextOverlay = body.includeTextOverlay ?? true;
 
-        const AUTO_SUBJECT_PROMPT = `Generate a raw, ultra-realistic, authentic portrait photography reference image.
+        const AUTO_SUBJECT_PROMPT = `Generate a stunning, high-end editorial fashion photography reference image.
 
 CRITICAL LAYOUT RULE: You MUST generate a VERTICAL DIPTYCH (a single image split into two stacked panels).
 - Format: Vertical collage (two stacked panels).
@@ -34,18 +34,18 @@ CRITICAL LAYOUT RULE: You MUST generate a VERTICAL DIPTYCH (a single image split
 - Bottom Panel: BACK VIEW (rear view, back of head and shoulders).
 
 SUBJECT & STYLE:
-- Model: ${age} female, skinny and beautiful, ${ethnicity}, ${expression}, ${makeup}. VERY IMPORTANT: The model MUST have a skinny, beautiful, fit body shape but with prominent, large natural breasts.
+- Model: ${age} female, beautifully striking, gorgeous model features, ${ethnicity}, ${expression}, ${makeup}. VERY IMPORTANT: The model MUST have a skinny, beautiful, fit body shape but with prominent, large natural breasts.
 - Hair: ${hairColor}, ${hairstylePrompt}
 - Attire & Aesthetic: ${outfit} with scoop neckline (identical in both panels, complementing the bust). Overall style aesthetic: ${inputAesthetic}.
 - Environment: ${background}. ${lighting}.
-- Specs: Shot on 35mm film, highly detailed real human skin texture, visible pores, peach fuzz, unedited, candid, raw photography, natural imperfections, authentic realism.
+- Specs: High-end commercial fashion photography, gorgeous flawless retouching but keeping realistic natural skin texture, masterpiece, 8k resolution, elegant, magazine cover quality.
 ${includeTextOverlay && hairstyleName ? `
 TEXT OVERLAY RULE:
 You MUST precisely render the exact text "${hairstyleName}" directly in the exact middle of the entire image, perfectly overlaying the intersection between the top and bottom panels.
 The text must be of MEDIUM size, clearly legible but still elegant.
 EXTREMELY IMPORTANT FONT RULE: You MUST use a classic, elegant serif font that matches the EXACT SAME TEXT FONT style as seen in previous generations or reference images.` : ""}`;
 
-        const AUTO_SUBJECT_NEGATIVE_PROMPT = "AI generated, synthetic, plastic skin, overly smooth, airbrushed, CGI, render, 3d, doll-like, fake, overly perfect, white line, white stripe, white gap, visible border, separator line, separation line, divider line, single image, no split, wrong layout, ugly, basic, distorted, asymmetrical face, bad proportions, unnatural skin, shiny plastic skin, heavily filtered, uncanny valley, cartoon, illustration, drawing, text, watermark, logos, blurry, weird eyes, messy hair covering face, smiling, dramatic lighting, shadows, colorful background, extravagant clothes";
+        const AUTO_SUBJECT_NEGATIVE_PROMPT = "AI generated, synthetic, plastic skin, overly smooth, CGI, render, 3d, doll-like, fake, overly perfect, unnatural skin, shiny plastic skin, uncanny valley, cartoon, illustration, drawing, text, watermark, logos, blurry, bad proportions, distorted, asymmetrical face, messy hair covering face, smiling, dramatic lighting, shadows, colorful background, extravagant clothes, white line, visible border, separator line";
         console.log("[Auto-Subject] Generating automatic subject image...");
         const id = uuid();
         const filename = "ref_0.png";
