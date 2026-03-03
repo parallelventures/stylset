@@ -20,6 +20,8 @@ export async function POST(req: Request) {
         const makeup = body.makeup || "soft makeup";
         const expression = body.expression || "neutral expression";
         const lighting = body.lighting || "Soft shadowless lighting";
+        const hairstylePrompt = body.hairstylePrompt || "glossy. Straight to wavy, thick, smooth. Long layered butterfly cut, 90s blowout style. Face-framing curtain bangs. Heavily layered mid-lengths to ends. Voluminous.";
+        const hairstyleName = body.hairstyleName || "";
 
         const AUTO_SUBJECT_PROMPT = `Generate a stunning, photorealistic high-end commercial hair catalog reference image.
 
@@ -31,12 +33,11 @@ CRITICAL LAYOUT RULE: You MUST generate a VERTICAL DIPTYCH (a single image split
 
 SUBJECT & STYLE:
 - Model: ${age} female, ${ethnicity}, ${expression}, ${makeup}.
-- Hair: ${hairColor}, glossy. Straight to wavy, thick, smooth. Long layered butterfly cut, 90s blowout style. Face-framing curtain bangs. Heavily layered mid-lengths to ends. Voluminous.
-- Top Panel Hair: Center part, layers curving inward and outward framing the face.
-- Bottom Panel Hair: U-shaped perimeter, cascading layers showing texture.
+- Hair: ${hairColor}, ${hairstylePrompt}
 - Attire: ${outfit} with scoop neckline (identical in both panels).
 - Environment: ${background}. ${lighting}.
-- Specs: 8k UHD, ultra-photorealistic.`;
+- Specs: 8k UHD, ultra-photorealistic.
+${hairstyleName ? `\nTEXT OVERLAY: You MUST perfectly render the exact text "${hairstyleName}" in the middle of the image, placed cleanly on the separation between the top and bottom panels. The text should be stylish, high-contrast, perfectly clear, and MUST use the EXACT SAME TEXT FONT as "nano banana".` : ""}`;
 
         const AUTO_SUBJECT_NEGATIVE_PROMPT = "white line, white stripe, white gap, visible border, separator line, separation line, divider line, single image, no split, wrong layout, ugly, basic, distorted, asymmetrical face, bad proportions, unnatural skin, shiny plastic skin, heavily filtered, uncanny valley, cartoon, illustration, drawing, text, watermark, logos, blurry, weird eyes, messy hair covering face, smiling, dramatic lighting, shadows, colorful background, extravagant clothes";
         console.log("[Auto-Subject] Generating automatic subject image...");

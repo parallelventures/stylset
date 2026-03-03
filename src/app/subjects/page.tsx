@@ -20,6 +20,7 @@ interface Subject {
 
 export default function SubjectsPage() {
     const [subjects, setSubjects] = useState<Subject[]>([]);
+    const [presets, setPresets] = useState<any[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [showAutoModal, setShowAutoModal] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -40,8 +41,14 @@ export default function SubjectsPage() {
         setSubjects(data);
     }
 
+    async function loadPresets() {
+        const res = await fetch("/api/presets");
+        const data = await res.json();
+        setPresets(data);
+    }
+
     useEffect(() => {
-        loadSubjects().finally(() => setInitialLoading(false));
+        Promise.all([loadSubjects(), loadPresets()]).finally(() => setInitialLoading(false));
     }, []);
 
     function handleFiles(e: React.ChangeEvent<HTMLInputElement>) {
@@ -89,6 +96,9 @@ export default function SubjectsPage() {
         const form = e.currentTarget;
 
         try {
+            const presetId = (form.elements.namedItem("presetId") as HTMLSelectElement).value;
+            const preset = presets.find(p => p.id === presetId);
+
             const body = {
                 ethnicity: (form.elements.namedItem("ethnicity") as HTMLSelectElement).value,
                 age: (form.elements.namedItem("age") as HTMLSelectElement).value,
@@ -98,6 +108,8 @@ export default function SubjectsPage() {
                 makeup: (form.elements.namedItem("makeup") as HTMLSelectElement).value,
                 expression: (form.elements.namedItem("expression") as HTMLSelectElement).value,
                 lighting: (form.elements.namedItem("lighting") as HTMLSelectElement).value,
+                hairstylePrompt: preset ? preset.hairstylePrompt : undefined,
+                hairstyleName: preset ? preset.name : undefined,
             };
 
             const res = await fetch("/api/subjects/auto", {
@@ -136,6 +148,27 @@ export default function SubjectsPage() {
         await fetch(`/api/subjects/${id}`, { method: "DELETE" });
         loadSubjects();
         setSubjectToDelete(null);
+    }
+
+    async function handleDownloadSubject(s: Subject) {
+        try {
+            const images: string[] = JSON.parse(s.referenceImagePaths || "[]");
+            for (let i = 0; i < images.length; i++) {
+                const url = storageUrl(images[i]);
+                const res = await fetch(url);
+                const blob = await res.blob();
+                const objectUrl = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = objectUrl;
+                a.download = `${s.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_ref${i > 0 ? i : ''}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(objectUrl);
+            }
+        } catch (err) {
+            console.error("Failed to download", err);
+        }
     }
 
     async function handleUpdateSubjectName(id: string, newName: string) {
@@ -283,6 +316,14 @@ export default function SubjectsPage() {
                                     <Link href={`/subjects/${s.id}`} className="btn btn-secondary btn-sm">
                                         View
                                     </Link>
+                                    <button
+                                        className="btn btn-secondary btn-sm btn-icon"
+                                        onClick={() => handleDownloadSubject(s)}
+                                        title="Download Reference"
+                                        style={{ flexShrink: 0 }}
+                                    >
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                    </button>
                                     <button
                                         className="btn btn-danger btn-sm btn-icon"
                                         onClick={() => setSubjectToDelete(s.id)}
@@ -454,6 +495,16 @@ export default function SubjectsPage() {
                             </div>
 
                             <form onSubmit={handleAutoGenerateSubject}>
+                                <div className="form-group">
+                                    <label className="form-label">Hairstyle Preset (Optional)</label>
+                                    <select name="presetId" className="form-select" defaultValue="">
+                                        <option value="">Default Commercial Blowout</option>
+                                        {presets.map(p => (
+                                            <option key={p.id} value={p.id}>{p.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
                                 <div className="form-group">
                                     <label className="form-label">Ethnicity / Skin Tone</label>
                                     <select name="ethnicity" className="form-select" defaultValue="medium skin tone">

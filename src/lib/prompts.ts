@@ -96,7 +96,7 @@ export function composePrompt(input: ComposeInput): ComposeOutput {
     parts.push(`\nHAIRSTYLE (the ONLY change): ${input.hairstylePrompt}`);
 
     if (input.hairstyleTitle) {
-        parts.push(`\nTEXT OVERLAY: You MUST perfectly render the exact text "${input.hairstyleTitle}" in the middle of the image, placed cleanly on the separation between the top and bottom panels. The text should be stylish, high-contrast, and perfectly clear.`);
+        parts.push(`\nTEXT OVERLAY: You MUST perfectly render the exact text "${input.hairstyleTitle}" in the middle of the image, placed cleanly on the separation between the top and bottom panels. The text should be stylish, high-contrast, perfectly clear, and MUST use the EXACT SAME TEXT FONT as "nano banana".`);
     }
 
     // Build negative
