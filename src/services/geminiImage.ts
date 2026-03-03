@@ -112,6 +112,8 @@ export async function generateAndSaveImage(
                             responseModalities: ["image"],
                             // @ts-ignore
                             addWatermark: false,
+                            // @ts-ignore
+                            aspectRatio: input.aspectRatio || "3:4",
                             outputMimeType: "image/png"
                         },
                     });

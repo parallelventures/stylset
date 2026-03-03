@@ -102,3 +102,71 @@ export function composePrompt(input: ComposeInput): ComposeOutput {
         },
     };
 }
+
+export interface ComposeSelfieInput {
+    location: string;
+    outfit: string;
+    hair: string;
+    style?: string;
+}
+
+const SELFIE_IDENTITY_LOCK = `CRITICAL RULES — MUST FOLLOW:
+You are looking at the SAME PERSON shown in the reference image(s).
+Generate a new image of this EXACT SAME PERSON but taking a selfie.
+
+You MUST preserve ALL of the following EXACTLY as they appear in the reference:
+- Face (every facial feature, shape, symmetry)
+- Skin tone and texture
+- Body proportions and bust size
+- Age
+
+WHAT WILL CHANGE:
+- Hairstyle
+- Outfit / Attire
+- Environment / Background
+- Pose (taking a mirror selfie or front-facing phone selfie)
+
+The person MUST be recognizably the same individual.`;
+
+const SELFIE_NEGATIVE = [
+    "different person",
+    "different identity",
+    "face change",
+    "altered face",
+    "different skin tone",
+    "altered body proportions",
+    "different age",
+    "professional photoshoot",
+    "studio lighting",
+    "photographer visible",
+    "outside",
+    "outdoors",
+].join(", ");
+
+export function composeSelfiePrompt(input: ComposeSelfieInput): ComposeOutput {
+    const parts: string[] = [];
+
+    parts.push(SELFIE_IDENTITY_LOCK);
+
+    parts.push(`
+IMAGE TO GENERATE:
+A beautiful, casual 4:5 aspect ratio selfie taken indoors.
+
+SCENE DETAILS:
+- Location / Background: ${input.location} (INDOORS ONLY)
+- Outfit: ${input.outfit}
+- Hairstyle: ${input.hair}
+- Pose: Casual selfie pose (front-facing phone selfie or mirror selfie)
+- Style: ${input.style || "photorealistic, high quality, casual everyday photography"}`);
+
+    return {
+        finalPrompt: parts.join("\n"),
+        finalNegativePrompt: SELFIE_NEGATIVE,
+        metadata: {
+            style: "photorealistic selfie",
+            aspect_ratio: "4:5", // 4:5 selfie aspect ratio requested
+            lighting: "indoor ambient",
+            background: input.location,
+        }
+    };
+}
