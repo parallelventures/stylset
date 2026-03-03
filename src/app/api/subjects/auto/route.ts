@@ -32,7 +32,7 @@ CRITICAL LAYOUT RULE: You MUST generate a VERTICAL DIPTYCH (a single image split
 - Bottom Panel: BACK VIEW (rear view, back of head and shoulders).
 
 SUBJECT & STYLE:
-- Model: ${age} female, ${ethnicity}, ${expression}, ${makeup}.
+- Model: ${age} female, ${ethnicity}, ${expression}, ${makeup}, voluminous natural breasts.
 - Hair: ${hairColor}, ${hairstylePrompt}
 - Attire: ${outfit} with scoop neckline (identical in both panels).
 - Environment: ${background}. ${lighting}.
