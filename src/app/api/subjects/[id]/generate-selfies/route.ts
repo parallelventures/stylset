@@ -25,38 +25,38 @@ export async function POST(
 
     const SELFIE_SCENARIOS = [
         {
-            name: "Bathroom mirror",
-            location: "chic luxurious bathroom mirror",
+            name: "Luxurious bathroom",
+            location: "chic luxurious bathroom with bright lighting",
             outfit: "elegant casual black tank top, gold necklace",
             hair: "messy bun",
         },
         {
             name: "Hotel room window",
-            location: "high-rise modern hotel room window selfie, indoors, city view in background",
+            location: "high-rise modern luxury hotel room indoors, city skyline in background",
             outfit: "stylish strapless textured dark top",
             hair: "down, elegant blowout",
         },
         {
             name: "Aesthetic bedroom",
-            location: "aesthetic dim lit bedroom mirror",
+            location: "aesthetic dim lit bedroom, cozy ambiance",
             outfit: "oversized cozy sweater off one shoulder",
             hair: "half up half down",
         },
         {
             name: "Luxury lounge",
-            location: "luxury lounge interior chic mirror selfie",
+            location: "luxury lounge interior chic upscale hotel",
             outfit: "elegant dark minimalist slip dress",
             hair: "sleek straight",
         },
         {
-            name: "Dressing room",
-            location: "luxurious walk-in closet dressing room mirror",
+            name: "Walk-in closet",
+            location: "luxurious walk-in closet dressing room",
             outfit: "casual stylish denim and white crop top",
             hair: "loose waves",
         },
         {
-            name: "Elevator mirror",
-            location: "modern sleek elevator mirror",
+            name: "Modern hallway",
+            location: "modern sleek wealthy hallway",
             outfit: "trendy blazer over a chic top",
             hair: "casual ponytail",
         }

@@ -124,7 +124,7 @@ WHAT WILL CHANGE:
 - Hairstyle
 - Outfit / Attire
 - Environment / Background
-- Pose (taking a mirror selfie or front-facing phone selfie)
+- Pose (front-facing selfie, holding camera out of frame)
 
 The person MUST be recognizably the same individual.`;
 
@@ -141,6 +141,12 @@ const SELFIE_NEGATIVE = [
     "photographer visible",
     "outside",
     "outdoors",
+    "phone visible",
+    "holding phone",
+    "mirror",
+    "mirror selfie",
+    "smartphone",
+    "camera visible"
 ].join(", ");
 
 export function composeSelfiePrompt(input: ComposeSelfieInput): ComposeOutput {
@@ -156,7 +162,7 @@ SCENE DETAILS:
 - Location / Background: ${input.location} (INDOORS ONLY)
 - Outfit: ${input.outfit}
 - Hairstyle: ${input.hair}
-- Pose: Casual selfie pose (front-facing phone selfie or mirror selfie)
+- Pose: Front-facing point-of-view selfie pose. One arm extended out of frame holding the (invisible) camera. DO NOT show any phone or camera in the image. No mirror selfies.
 - Style: ${input.style || "photorealistic, high quality, casual everyday photography"}`);
 
     return {
