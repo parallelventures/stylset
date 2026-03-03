@@ -34,6 +34,8 @@ export default function SubjectsPage() {
     const [subjectToDelete, setSubjectToDelete] = useState<string | null>(null);
     const [editingSubject, setEditingSubject] = useState<{ id: string; name: string } | null>(null);
     const [includeTextOverlay, setIncludeTextOverlay] = useState(true);
+    const [aesthetic, setAesthetic] = useState("trendy casual chic");
+    const [outfit, setOutfit] = useState("Simple heather grey fitted t-shirt");
     const router = useRouter();
 
     async function loadSubjects() {
@@ -56,6 +58,19 @@ export default function SubjectsPage() {
         const selected = Array.from(e.target.files || []);
         setFiles(selected);
         setPreviews(selected.map((f) => URL.createObjectURL(f)));
+    }
+
+    function handleAestheticChange(e: React.ChangeEvent<HTMLSelectElement>) {
+        const val = e.target.value;
+        setAesthetic(val);
+        if (val.includes("goth")) setOutfit("Black leather moto jacket");
+        else if (val.includes("Y2K")) setOutfit("Casual vintage graphic tee");
+        else if (val.includes("old money")) setOutfit("Stylish tailored navy blazer");
+        else if (val.includes("grunge")) setOutfit("Classic denim jacket over a white tee");
+        else if (val.includes("coquette")) setOutfit("Elegant white silk slip dress");
+        else if (val.includes("cyberpunk")) setOutfit("Sleek black turtleneck sweater");
+        else if (val.includes("boho")) setOutfit("Bohemian floral maxi dress");
+        else setOutfit("Simple heather grey fitted t-shirt");
     }
 
     async function handleCreate(e: React.FormEvent<HTMLFormElement>) {
@@ -526,7 +541,7 @@ export default function SubjectsPage() {
 
                                 <div className="form-group">
                                     <label className="form-label">Aesthetic / Style</label>
-                                    <select name="aesthetic" className="form-select" defaultValue="trendy casual chic">
+                                    <select name="aesthetic" className="form-select" value={aesthetic} onChange={handleAestheticChange}>
                                         <option value="trendy casual chic">Trendy Casual Chic</option>
                                         <option value="goth, dark aesthetic, alternative">Goth / Alternative</option>
                                         <option value="Y2K aesthetic, 2000s fashion, nostalgic">Y2K / 2000s Nostalgia</option>
@@ -574,7 +589,7 @@ export default function SubjectsPage() {
 
                                 <div className="form-group">
                                     <label className="form-label">Outfit</label>
-                                    <select name="outfit" className="form-select" defaultValue="Simple heather grey fitted t-shirt">
+                                    <select name="outfit" className="form-select" value={outfit} onChange={(e) => setOutfit(e.target.value)}>
                                         <option value="Simple heather grey fitted t-shirt">Heather Grey T-Shirt</option>
                                         <option value="Elegant white silk slip dress">White Silk Slip Dress</option>
                                         <option value="Sleek black turtleneck sweater">Black Turtleneck</option>
