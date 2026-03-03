@@ -37,7 +37,7 @@ SUBJECT & STYLE:
 - Attire: ${outfit} with scoop neckline (identical in both panels).
 - Environment: ${background}. ${lighting}.
 - Specs: 8k UHD, ultra-photorealistic.
-${hairstyleName ? `\nTEXT OVERLAY: You MUST perfectly render the exact text "${hairstyleName}" in the middle of the image, placed cleanly on the separation between the top and bottom panels. The text should be stylish, high-contrast, perfectly clear, and MUST use the EXACT SAME TEXT FONT as "nano banana".` : ""}`;
+${hairstyleName ? `\nTEXT OVERLAY: You MUST perfectly render the exact text "${hairstyleName}" in the middle of the image, placed cleanly on the separation between the top and bottom panels. The text should be stylish, high-contrast, perfectly clear, and MUST match the EXACT SAME TEXT FONT style as seen in previous generations or reference images.` : ""}`;
 
         const AUTO_SUBJECT_NEGATIVE_PROMPT = "white line, white stripe, white gap, visible border, separator line, separation line, divider line, single image, no split, wrong layout, ugly, basic, distorted, asymmetrical face, bad proportions, unnatural skin, shiny plastic skin, heavily filtered, uncanny valley, cartoon, illustration, drawing, text, watermark, logos, blurry, weird eyes, messy hair covering face, smiling, dramatic lighting, shadows, colorful background, extravagant clothes";
         console.log("[Auto-Subject] Generating automatic subject image...");
