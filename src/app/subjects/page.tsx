@@ -18,6 +18,57 @@ interface Subject {
     createdAt: string;
 }
 
+const AESTHETIC_OUTFITS: Record<string, { value: string, label: string }[]> = {
+    "trendy casual chic": [
+        { value: "Simple heather grey fitted t-shirt", label: "Heather Grey T-Shirt" },
+        { value: "Crisp white button-down shirt", label: "White Button-Down Shirt" },
+        { value: "Cozy oversized cream knit sweater", label: "Oversized Cream Sweater" },
+        { value: "Minimalist beige trench coat", label: "Beige Trench Coat" },
+    ],
+    "goth, dark aesthetic, alternative": [
+        { value: "Black leather moto jacket with silver hardware", label: "Black Moto Jacket" },
+        { value: "Lace trimmed velvet corset top", label: "Velvet Corset Top" },
+        { value: "Fishnet long sleeve top under a black band tee", label: "Fishnet & Band Tee" },
+        { value: "Dark romantic ruffled black blouse", label: "Ruffled Black Blouse" },
+    ],
+    "Y2K aesthetic, 2000s fashion, nostalgic": [
+        { value: "Casual vintage graphic tee", label: "Vintage Graphic Tee" },
+        { value: "Velour tracksuit jacket with rhinestone details", label: "Rhinestone Velour Tracksuit" },
+        { value: "Cropped baby tee with a butterfly graphic", label: "Butterfly Baby Tee" },
+        { value: "Denim halter top", label: "Denim Halter Top" },
+    ],
+    "old money, quiet luxury, elegant": [
+        { value: "Stylish tailored navy blazer", label: "Tailored Navy Blazer" },
+        { value: "Cashmere turtleneck sweater in camel", label: "Camel Cashmere Turtleneck" },
+        { value: "Elegant white silk button-down blouse", label: "White Silk Blouse" },
+        { value: "Classic tweed cropped jacket", label: "Classic Tweed Jacket" },
+    ],
+    "grunge, edgy, effortless": [
+        { value: "Classic denim jacket over a white tee", label: "Denim Jacket Over Tee" },
+        { value: "Distressed oversized flannel shirt", label: "Oversized Flannel" },
+        { value: "Washed out vintage band tee", label: "Vintage Band Tee" },
+        { value: "Chunky distressed knit sweater", label: "Distressed Knit Sweater" },
+    ],
+    "coquette, soft girl, hyper-feminine": [
+        { value: "Elegant white silk slip dress", label: "White Silk Slip Dress" },
+        { value: "Pastel pink cardigan with pearl buttons", label: "Pink Pearl Cardigan" },
+        { value: "White lace camisole with ribbon bows", label: "Lace Bow Camisole" },
+        { value: "Floral puff sleeve milkmaid dress", label: "Floral Milkmaid Dress" },
+    ],
+    "cyberpunk, futuristic streetwear": [
+        { value: "Sleek black turtleneck sweater", label: "Black Turtleneck" },
+        { value: "Sleek black turtleneck with tactical vest", label: "Turtleneck & Tactical Vest" },
+        { value: "Asymmetrical zip-up techwear jacket", label: "Techwear Jacket" },
+        { value: "Neon accented windbreaker", label: "Neon Windbreaker" },
+    ],
+    "boho chic, bohemian, earthy": [
+        { value: "Bohemian floral maxi dress", label: "Floral Maxi Dress" },
+        { value: "Embroidered peasant blouse with bell sleeves", label: "Embroidered Peasant Blouse" },
+        { value: "Crochet cream vest over a flowy tunic", label: "Crochet Vest" },
+        { value: "Fringed faux suede jacket", label: "Fringed Suede Jacket" },
+    ]
+};
+
 export default function SubjectsPage() {
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [presets, setPresets] = useState<any[]>([]);
@@ -63,14 +114,8 @@ export default function SubjectsPage() {
     function handleAestheticChange(e: React.ChangeEvent<HTMLSelectElement>) {
         const val = e.target.value;
         setAesthetic(val);
-        if (val.includes("goth")) setOutfit("Black leather moto jacket");
-        else if (val.includes("Y2K")) setOutfit("Casual vintage graphic tee");
-        else if (val.includes("old money")) setOutfit("Stylish tailored navy blazer");
-        else if (val.includes("grunge")) setOutfit("Classic denim jacket over a white tee");
-        else if (val.includes("coquette")) setOutfit("Elegant white silk slip dress");
-        else if (val.includes("cyberpunk")) setOutfit("Sleek black turtleneck sweater");
-        else if (val.includes("boho")) setOutfit("Bohemian floral maxi dress");
-        else setOutfit("Simple heather grey fitted t-shirt");
+        const options = AESTHETIC_OUTFITS[val] || AESTHETIC_OUTFITS["trendy casual chic"];
+        setOutfit(options[0].value);
     }
 
     async function handleCreate(e: React.FormEvent<HTMLFormElement>) {
@@ -590,20 +635,9 @@ export default function SubjectsPage() {
                                 <div className="form-group">
                                     <label className="form-label">Outfit</label>
                                     <select name="outfit" className="form-select" value={outfit} onChange={(e) => setOutfit(e.target.value)}>
-                                        <option value="Simple heather grey fitted t-shirt">Heather Grey T-Shirt</option>
-                                        <option value="Elegant white silk slip dress">White Silk Slip Dress</option>
-                                        <option value="Sleek black turtleneck sweater">Black Turtleneck</option>
-                                        <option value="Minimalist beige trench coat">Beige Trench Coat</option>
-                                        <option value="Classic denim jacket over a white tee">Denim Jacket</option>
-                                        <option value="Black leather moto jacket">Black Leather Moto Jacket</option>
-                                        <option value="Cozy oversized cream knit sweater">Oversized Cream Sweater</option>
-                                        <option value="Crisp white button-down shirt">White Button-Down Shirt</option>
-                                        <option value="Stylish tailored navy blazer">Tailored Navy Blazer</option>
-                                        <option value="Casual vintage graphic tee">Vintage Graphic Tee</option>
-                                        <option value="Bohemian floral maxi dress">Floral Maxi Dress</option>
-                                        <option value="Athleisure black sports bra and leggings">Athleisure Sports Bra</option>
-                                        <option value="Structured tweed cropped jacket">Structured Tweed Jacket</option>
-                                        <option value="Chic monochrome matching trousers and vest">Monochrome Vest & Trousers</option>
+                                        {(AESTHETIC_OUTFITS[aesthetic] || AESTHETIC_OUTFITS["trendy casual chic"]).map((opt, i) => (
+                                            <option key={i} value={opt.value}>{opt.label}</option>
+                                        ))}
                                     </select>
                                 </div>
 
