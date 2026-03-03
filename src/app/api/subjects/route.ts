@@ -78,6 +78,21 @@ WHAT TO KEEP EXACTLY THE SAME:
             }
         }
 
+        let parsedLockedAttrs = JSON.parse(lockedAttributesJson);
+
+        const fontImage = formData.get("fontImage");
+        if (fontImage instanceof File && fontImage.size > 0) {
+            const buffer = Buffer.from(await fontImage.arrayBuffer());
+            const ext = path.extname(fontImage.name) || ".png";
+            const filename = `ref_font${ext}`;
+            const storagePath = subjectPath(id, filename);
+
+            const mimeType = ext === ".png" ? "image/png" : ext === ".webp" ? "image/webp" : "image/jpeg";
+            await uploadFile(storagePath, buffer, mimeType);
+
+            parsedLockedAttrs.textReferenceImagePath = storagePath;
+        }
+
         if (storagePaths.length === 0) {
             return NextResponse.json({ error: "At least one reference image is required" }, { status: 400 });
         }
@@ -88,7 +103,7 @@ WHAT TO KEEP EXACTLY THE SAME:
                 name,
                 description,
                 referenceImagePaths: JSON.stringify(storagePaths),
-                lockedAttributesJson,
+                lockedAttributesJson: JSON.stringify(parsedLockedAttrs),
             },
         });
 

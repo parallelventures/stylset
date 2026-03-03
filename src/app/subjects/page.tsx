@@ -79,8 +79,10 @@ export default function SubjectsPage() {
     const [error, setError] = useState("");
     const [initialLoading, setInitialLoading] = useState(true);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const fontInputRef = useRef<HTMLInputElement>(null);
     const [previews, setPreviews] = useState<string[]>([]);
     const [files, setFiles] = useState<File[]>([]);
+    const [fontFile, setFontFile] = useState<File | null>(null);
     const [generatingSubject, setGeneratingSubject] = useState(false);
     const [subjectToDelete, setSubjectToDelete] = useState<string | null>(null);
     const [editingSubject, setEditingSubject] = useState<{ id: string; name: string } | null>(null);
@@ -112,6 +114,15 @@ export default function SubjectsPage() {
         setPreviews(selected.map((f) => URL.createObjectURL(f)));
     }
 
+    function handleFontFile(e: React.ChangeEvent<HTMLInputElement>) {
+        const selected = e.target.files?.[0];
+        if (selected) {
+            setFontFile(selected);
+        } else {
+            setFontFile(null);
+        }
+    }
+
     function handleAestheticChange(e: React.ChangeEvent<HTMLSelectElement>) {
         const val = e.target.value;
         setAesthetic(val);
@@ -138,6 +149,10 @@ export default function SubjectsPage() {
             fd.append("images", f);
         }
 
+        if (fontFile) {
+            fd.append("fontImage", fontFile);
+        }
+
         try {
             const res = await fetch("/api/subjects", { method: "POST", body: fd });
             const data = await res.json();
@@ -145,6 +160,7 @@ export default function SubjectsPage() {
             setShowModal(false);
             setFiles([]);
             setPreviews([]);
+            setFontFile(null);
             loadSubjects();
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : "Failed to create subject");
@@ -162,29 +178,35 @@ export default function SubjectsPage() {
             const presetId = (form.elements.namedItem("presetId") as HTMLSelectElement).value;
             const preset = presets.find(p => p.id === presetId);
 
-            const body = {
-                aesthetic: (form.elements.namedItem("aesthetic") as HTMLSelectElement).value,
-                ethnicity: (form.elements.namedItem("ethnicity") as HTMLSelectElement).value,
-                age: (form.elements.namedItem("age") as HTMLSelectElement).value,
-                hairColor: (form.elements.namedItem("hairColor") as HTMLSelectElement).value,
-                outfit: (form.elements.namedItem("outfit") as HTMLSelectElement).value,
-                background: (form.elements.namedItem("background") as HTMLSelectElement).value,
-                makeup: (form.elements.namedItem("makeup") as HTMLSelectElement).value,
-                expression: (form.elements.namedItem("expression") as HTMLSelectElement).value,
-                lighting: (form.elements.namedItem("lighting") as HTMLSelectElement).value,
-                hairstylePrompt: preset ? preset.hairstylePrompt : undefined,
-                hairstyleName: preset ? preset.name : undefined,
-                includeTextOverlay,
-            };
+            const fd = new FormData();
+            fd.set("aesthetic", (form.elements.namedItem("aesthetic") as HTMLSelectElement).value);
+            fd.set("ethnicity", (form.elements.namedItem("ethnicity") as HTMLSelectElement).value);
+            fd.set("age", (form.elements.namedItem("age") as HTMLSelectElement).value);
+            fd.set("hairColor", (form.elements.namedItem("hairColor") as HTMLSelectElement).value);
+            fd.set("outfit", (form.elements.namedItem("outfit") as HTMLSelectElement).value);
+            fd.set("background", (form.elements.namedItem("background") as HTMLSelectElement).value);
+            fd.set("makeup", (form.elements.namedItem("makeup") as HTMLSelectElement).value);
+            fd.set("expression", (form.elements.namedItem("expression") as HTMLSelectElement).value);
+            fd.set("lighting", (form.elements.namedItem("lighting") as HTMLSelectElement).value);
+
+            if (preset) {
+                fd.set("hairstylePrompt", preset.hairstylePrompt);
+                fd.set("hairstyleName", preset.name);
+            }
+            fd.set("includeTextOverlay", includeTextOverlay.toString());
+
+            if (fontFile) {
+                fd.append("fontImage", fontFile);
+            }
 
             const res = await fetch("/api/subjects/auto", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(body),
+                body: fd,
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error);
             setShowAutoModal(false);
+            setFontFile(null);
             loadSubjects();
         } catch (err: unknown) {
             alert(err instanceof Error ? err.message : "Failed to auto-generate subject");
@@ -508,6 +530,12 @@ export default function SubjectsPage() {
                                 </div>
 
                                 <div className="form-group">
+                                    <label className="form-label">Text/Font Reference Image (Optional)</label>
+                                    <input type="file" ref={fontInputRef} accept="image/*" onChange={handleFontFile} className="form-input" />
+                                    {fontFile && <p className="text-xs text-muted" style={{ marginTop: 4 }}>{fontFile.name}</p>}
+                                </div>
+
+                                <div className="form-group">
                                     <label className="form-label">Scene attributes (JSON)</label>
                                     <textarea
                                         name="lockedAttributesJson"
@@ -653,6 +681,12 @@ export default function SubjectsPage() {
                                             <option key={i} value={opt.value}>{opt.label}</option>
                                         ))}
                                     </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Text/Font Reference Image (Optional)</label>
+                                    <input type="file" ref={fontInputRef} accept="image/*" onChange={handleFontFile} className="form-input" />
+                                    {fontFile && <p className="text-xs text-muted" style={{ marginTop: 4 }}>{fontFile.name}</p>}
                                 </div>
 
                                 <div className="form-group">

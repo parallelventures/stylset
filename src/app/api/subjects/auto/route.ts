@@ -1,15 +1,29 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { generateAndSaveImage } from "@/services/geminiImage";
-import { subjectPath } from "@/lib/storage";
+import { subjectPath, uploadFile } from "@/lib/storage";
 import { v4 as uuid } from "uuid";
-import fs from "fs/promises";
+import path from "path";
 
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
     try {
-        const body = await req.json().catch(() => ({}));
+        let body: any = {};
+        let fontImagePath: string | undefined = undefined;
+        let fontImageFile: File | null = null;
+        try {
+            const formData = await req.formData();
+            for (const [key, value] of formData.entries()) {
+                if (key === "fontImage" && value instanceof File) {
+                    fontImageFile = value;
+                } else {
+                    body[key] = value;
+                }
+            }
+        } catch {
+            body = await req.json().catch(() => ({}));
+        }
 
         const inputAesthetic = body.aesthetic || "trendy casual chic";
         const ethnicity = body.ethnicity || "medium skin tone";
@@ -23,7 +37,7 @@ export async function POST(req: Request) {
         const lighting = body.lighting || "Soft shadowless lighting";
         const hairstylePrompt = body.hairstylePrompt || "glossy. Straight to wavy, thick, smooth. Long layered butterfly cut, 90s blowout style. Face-framing curtain bangs. Heavily layered mid-lengths to ends. Voluminous.";
         const hairstyleName = body.hairstyleName || "Blowout";
-        const includeTextOverlay = body.includeTextOverlay ?? true;
+        const includeTextOverlay = body.includeTextOverlay !== "false" && body.includeTextOverlay !== false;
 
         const AUTO_SUBJECT_PROMPT = `Generate a stunning, high-end editorial fashion photography reference image.
 
@@ -51,9 +65,19 @@ EXTREMELY IMPORTANT FONT RULE: You MUST use a classic, elegant serif font that m
         const filename = "ref_0.png";
         const storagePath = subjectPath(id, filename);
 
+        if (fontImageFile && fontImageFile.size > 0) {
+            const buffer = Buffer.from(await fontImageFile.arrayBuffer());
+            const ext = path.extname(fontImageFile.name) || ".png";
+            fontImagePath = subjectPath(id, `ref_font${ext}`);
+            const mimeType = ext === ".png" ? "image/png" : ext === ".webp" ? "image/webp" : "image/jpeg";
+            await uploadFile(fontImagePath, buffer, mimeType);
+        }
+
+        const refPaths = fontImagePath ? [fontImagePath] : [];
+
         const result = await generateAndSaveImage(
             {
-                referenceImagePaths: [],
+                referenceImagePaths: refPaths,
                 finalPromptText: AUTO_SUBJECT_PROMPT,
                 negativePrompt: AUTO_SUBJECT_NEGATIVE_PROMPT,
                 aspectRatio: "3:4"
@@ -72,7 +96,8 @@ EXTREMELY IMPORTANT FONT RULE: You MUST use a classic, elegant serif font that m
             wardrobe: "current outfit in reference",
             background: "same as reference",
             lighting: "same as reference",
-            camera: "same framing as reference"
+            camera: "same framing as reference",
+            textReferenceImagePath: fontImagePath || undefined
         });
 
         const subject = await prisma.subject.create({

@@ -31,6 +31,9 @@ export async function generateSet(setId: string): Promise<void> {
         ? [set.modelImagePath]
         : JSON.parse(set.subject.referenceImagePaths || "[]");
     const lockedAttrs = JSON.parse(set.subject.lockedAttributesJson || "{}");
+    if (lockedAttrs.textReferenceImagePath) {
+        refPaths.push(lockedAttrs.textReferenceImagePath);
+    }
     const basePrompt = set.template ? JSON.parse(set.template.basePromptJson) : {};
 
     let failCount = 0;
