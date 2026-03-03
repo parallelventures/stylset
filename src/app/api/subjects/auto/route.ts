@@ -40,8 +40,8 @@ SUBJECT & STYLE:
 
 TEXT OVERLAY RULE:
 You MUST precisely render the exact text "${hairstyleName}" directly in the exact middle of the entire image, perfectly overlaying the intersection between the top and bottom panels.
-The text must be highly visible, stylish, and high-contrast.
-EXTREMELY IMPORTANT FONT RULE: You MUST match the EXACT SAME TEXT FONT style "nano banana" or your closest equivalent stylish, modern font thick typography.`;
+The text must be SMALL, subtle, and elegantly placed.
+EXTREMELY IMPORTANT FONT RULE: You MUST use a SMALL, classic, elegant serif font that matches the EXACT SAME TEXT FONT style as seen in previous generations or reference images. Do not make the text large or thick.`;
 
         const AUTO_SUBJECT_NEGATIVE_PROMPT = "white line, white stripe, white gap, visible border, separator line, separation line, divider line, single image, no split, wrong layout, ugly, basic, distorted, asymmetrical face, bad proportions, unnatural skin, shiny plastic skin, heavily filtered, uncanny valley, cartoon, illustration, drawing, text, watermark, logos, blurry, weird eyes, messy hair covering face, smiling, dramatic lighting, shadows, colorful background, extravagant clothes";
         console.log("[Auto-Subject] Generating automatic subject image...");

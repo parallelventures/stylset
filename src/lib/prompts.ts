@@ -96,7 +96,7 @@ export function composePrompt(input: ComposeInput): ComposeOutput {
     parts.push(`\nHAIRSTYLE (the ONLY change): ${input.hairstylePrompt}`);
 
     if (input.hairstyleTitle) {
-        parts.push(`\nTEXT OVERLAY: You MUST perfectly render the exact text "${input.hairstyleTitle}" in the middle of the image, placed cleanly on the separation between the top and bottom panels. The text should be stylish, high-contrast, perfectly clear, and MUST use the EXACT SAME TEXT FONT as the text in the subject reference image.`);
+        parts.push(`\nTEXT OVERLAY: You MUST precisely render the exact text "${input.hairstyleTitle}" directly in the exact middle of the entire image, perfectly overlaying the intersection between the top and bottom panels. The text must be SMALL, subtle, and elegant. You MUST use a classic, elegant serif font, exactly matching the text font in the subject reference image.`);
     }
 
     // Build negative
