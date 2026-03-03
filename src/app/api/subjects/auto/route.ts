@@ -32,16 +32,16 @@ CRITICAL LAYOUT RULE: You MUST generate a VERTICAL DIPTYCH (a single image split
 - Bottom Panel: BACK VIEW (rear view, back of head and shoulders).
 
 SUBJECT & STYLE:
-- Model: ${age} female, ${ethnicity}, ${expression}, ${makeup}. VERY IMPORTANT: The model MUST have prominent, extremely voluminous natural breasts (heavy bust weight, large cleavage, voluptuous figure).
+- Model: ${age} female, skinny and beautiful, ${ethnicity}, ${expression}, ${makeup}. VERY IMPORTANT: The model MUST have a skinny, beautiful, fit body shape but with prominent, large natural breasts.
 - Hair: ${hairColor}, ${hairstylePrompt}
-- Attire: ${outfit} with scoop neckline (identical in both panels, emphasizing the voluminous bust).
+- Attire: ${outfit} with scoop neckline (identical in both panels, complementing the bust).
 - Environment: ${background}. ${lighting}.
 - Specs: 8k UHD, ultra-photorealistic.
 
 TEXT OVERLAY RULE:
 You MUST precisely render the exact text "${hairstyleName}" directly in the exact middle of the entire image, perfectly overlaying the intersection between the top and bottom panels.
-The text must be SMALL, subtle, and elegantly placed.
-EXTREMELY IMPORTANT FONT RULE: You MUST use a SMALL, classic, elegant serif font that matches the EXACT SAME TEXT FONT style as seen in previous generations or reference images. Do not make the text large or thick.`;
+The text must be of MEDIUM size, clearly legible but still elegant.
+EXTREMELY IMPORTANT FONT RULE: You MUST use a classic, elegant serif font that matches the EXACT SAME TEXT FONT style as seen in previous generations or reference images.`;
 
         const AUTO_SUBJECT_NEGATIVE_PROMPT = "white line, white stripe, white gap, visible border, separator line, separation line, divider line, single image, no split, wrong layout, ugly, basic, distorted, asymmetrical face, bad proportions, unnatural skin, shiny plastic skin, heavily filtered, uncanny valley, cartoon, illustration, drawing, text, watermark, logos, blurry, weird eyes, messy hair covering face, smiling, dramatic lighting, shadows, colorful background, extravagant clothes";
         console.log("[Auto-Subject] Generating automatic subject image...");
