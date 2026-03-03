@@ -26,7 +26,6 @@ You are looking at the SAME PERSON shown in the reference image(s).
 Generate a new image of this EXACT SAME PERSON with ONLY the hairstyle changed.
 
 You MUST preserve ALL of the following EXACTLY as they appear in the reference:
-- IMAGE LAYOUT AND FORMAT (CRITICAL: If the reference is a stacked vertical diptych with a top panel and bottom panel, you MUST generate a stacked vertical diptych with a top panel and bottom panel)
 - Face (every facial feature, shape, symmetry)
 - Skin tone and texture
 - Body type, build, proportions
@@ -42,17 +41,6 @@ The ONLY thing that changes is the HAIRSTYLE described below.
 Do NOT alter ANYTHING else. The person MUST be recognizably the same individual.`;
 
 const BASE_NEGATIVE = [
-    "single image",
-    "missing panels",
-    "merged image",
-    "different layout",
-    "white line",
-    "white stripe",
-    "white gap",
-    "visible border",
-    "separator line",
-    "separation line",
-    "divider line",
     "different person",
     "different identity",
     "face change",

@@ -33,20 +33,14 @@ export async function POST(req: Request) {
 
         const AUTO_SUBJECT_PROMPT = `Generate a stunning, high-end editorial fashion photography reference image.
 
-CRITICAL LAYOUT RULE: You MUST generate a VERTICAL DIPTYCH (a single image split into two stacked panels).
-- Format: Vertical collage (two stacked panels).
-- Divider: The top panel and bottom panel MUST merge perfectly together with NO visual separation. DO NOT draw a line, gap, stripe, border, or whitespace between them.
-- Top Panel: FRONT VIEW (front-facing portrait, chest up).
-- Bottom Panel: BACK VIEW (rear view, back of head and shoulders).
-
 SUBJECT & STYLE:
 - Model: ${age} female, beautifully striking, gorgeous model features, ${ethnicity}, ${expression}, ${makeup}. VERY IMPORTANT: The model MUST have a skinny, beautiful, fit body shape but with prominent, large natural breasts.
 - Hair: ${hairColor}, ${hairstylePrompt}
-- Attire & Aesthetic: ${outfit} with scoop neckline (identical in both panels, complementing the bust). Overall style aesthetic: ${inputAesthetic}.
+- Attire & Aesthetic: ${outfit} with scoop neckline. Overall style aesthetic: ${inputAesthetic}.
 - Environment: ${background}. ${lighting}.
 - Specs: High-end commercial fashion photography, gorgeous flawless retouching but keeping realistic natural skin texture, masterpiece, 8k resolution, elegant, magazine cover quality.`;
 
-        const AUTO_SUBJECT_NEGATIVE_PROMPT = "AI generated, synthetic, plastic skin, overly smooth, CGI, render, 3d, doll-like, fake, overly perfect, unnatural skin, shiny plastic skin, uncanny valley, cartoon, illustration, drawing, text, watermark, logos, blurry, bad proportions, distorted, asymmetrical face, messy hair covering face, smiling, dramatic lighting, shadows, colorful background, extravagant clothes, white line, visible border, separator line";
+        const AUTO_SUBJECT_NEGATIVE_PROMPT = "AI generated, synthetic, plastic skin, overly smooth, CGI, render, 3d, doll-like, fake, overly perfect, unnatural skin, shiny plastic skin, uncanny valley, cartoon, illustration, drawing, text, watermark, logos, blurry, bad proportions, distorted, asymmetrical face, messy hair covering face, smiling, dramatic lighting, shadows, colorful background, extravagant clothes";
         console.log("[Auto-Subject] Generating automatic subject image...");
         const id = uuid();
         const filename = "ref_0.png";
