@@ -25,7 +25,7 @@ export async function POST(req: Request) {
 
 CRITICAL LAYOUT RULE: You MUST generate a VERTICAL DIPTYCH (a single image split into two stacked panels).
 - Format: Vertical collage (two stacked panels).
-- Divider: Keep the separation but without any visible line, gap, or white stripe between the top and bottom panels.
+- Divider: The top and bottom panels MUST connect seamlessly with ZERO gap, NO white line, NO border, and NO separator stripe between them.
 - Top Panel: FRONT VIEW (front-facing portrait, chest up).
 - Bottom Panel: BACK VIEW (rear view, back of head and shoulders).
 
@@ -38,7 +38,7 @@ SUBJECT & STYLE:
 - Environment: ${background}. ${lighting}.
 - Specs: 8k UHD, ultra-photorealistic.`;
 
-        const AUTO_SUBJECT_NEGATIVE_PROMPT = "single image, no split, wrong layout, ugly, basic, distorted, asymmetrical face, bad proportions, unnatural skin, shiny plastic skin, heavily filtered, uncanny valley, cartoon, illustration, drawing, text, watermark, logos, blurry, weird eyes, messy hair covering face, smiling, dramatic lighting, shadows, colorful background, extravagant clothes";
+        const AUTO_SUBJECT_NEGATIVE_PROMPT = "white line, white stripe, white gap, visible border, separator line, separation line, divider line, single image, no split, wrong layout, ugly, basic, distorted, asymmetrical face, bad proportions, unnatural skin, shiny plastic skin, heavily filtered, uncanny valley, cartoon, illustration, drawing, text, watermark, logos, blurry, weird eyes, messy hair covering face, smiling, dramatic lighting, shadows, colorful background, extravagant clothes";
         console.log("[Auto-Subject] Generating automatic subject image...");
         const id = uuid();
         const filename = "ref_0.png";
