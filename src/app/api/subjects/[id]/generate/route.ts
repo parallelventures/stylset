@@ -15,7 +15,6 @@ export async function POST(
 
     try {
         const body = await _req.json().catch(() => ({}));
-        const includeTextOverlay = body.includeTextOverlay ?? true;
 
         // Verify subject
         const subject = await prisma.subject.findUnique({ where: { id } });
@@ -74,7 +73,6 @@ export async function POST(
                         inputJson: JSON.stringify({
                             hairstylePrompt: preset.hairstylePrompt,
                             negativeHairPrompt: preset.negativeHairPrompt || "",
-                            includeTextOverlay,
                         }),
                         status: "queued",
                     },

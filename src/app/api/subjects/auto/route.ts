@@ -10,16 +10,10 @@ export const runtime = "nodejs";
 export async function POST(req: Request) {
     try {
         let body: any = {};
-        let fontImagePath: string | undefined = undefined;
-        let fontImageFile: File | null = null;
         try {
             const formData = await req.formData();
             for (const [key, value] of formData.entries()) {
-                if (key === "fontImage" && value instanceof File) {
-                    fontImageFile = value;
-                } else {
-                    body[key] = value;
-                }
+                body[key] = value;
             }
         } catch {
             body = await req.json().catch(() => ({}));
@@ -36,8 +30,6 @@ export async function POST(req: Request) {
         const expression = body.expression || "neutral expression";
         const lighting = body.lighting || "Soft shadowless lighting";
         const hairstylePrompt = body.hairstylePrompt || "glossy. Straight to wavy, thick, smooth. Long layered butterfly cut, 90s blowout style. Face-framing curtain bangs. Heavily layered mid-lengths to ends. Voluminous.";
-        const hairstyleName = body.hairstyleName || "Blowout";
-        const includeTextOverlay = body.includeTextOverlay !== "false" && body.includeTextOverlay !== false;
 
         const AUTO_SUBJECT_PROMPT = `Generate a stunning, high-end editorial fashion photography reference image.
 
@@ -52,12 +44,7 @@ SUBJECT & STYLE:
 - Hair: ${hairColor}, ${hairstylePrompt}
 - Attire & Aesthetic: ${outfit} with scoop neckline (identical in both panels, complementing the bust). Overall style aesthetic: ${inputAesthetic}.
 - Environment: ${background}. ${lighting}.
-- Specs: High-end commercial fashion photography, gorgeous flawless retouching but keeping realistic natural skin texture, masterpiece, 8k resolution, elegant, magazine cover quality.
-${includeTextOverlay && hairstyleName ? `
-TEXT OVERLAY RULE:
-You MUST precisely render the exact text "${hairstyleName}" directly in the exact middle of the entire image, perfectly overlaying the intersection between the top and bottom panels.
-The text must be of MEDIUM size, clearly legible but still elegant.
-EXTREMELY IMPORTANT FONT RULE: You MUST use a classic, elegant serif font that matches the EXACT SAME TEXT FONT style as seen in previous generations or reference images.` : ""}`;
+- Specs: High-end commercial fashion photography, gorgeous flawless retouching but keeping realistic natural skin texture, masterpiece, 8k resolution, elegant, magazine cover quality.`;
 
         const AUTO_SUBJECT_NEGATIVE_PROMPT = "AI generated, synthetic, plastic skin, overly smooth, CGI, render, 3d, doll-like, fake, overly perfect, unnatural skin, shiny plastic skin, uncanny valley, cartoon, illustration, drawing, text, watermark, logos, blurry, bad proportions, distorted, asymmetrical face, messy hair covering face, smiling, dramatic lighting, shadows, colorful background, extravagant clothes, white line, visible border, separator line";
         console.log("[Auto-Subject] Generating automatic subject image...");
@@ -65,19 +52,9 @@ EXTREMELY IMPORTANT FONT RULE: You MUST use a classic, elegant serif font that m
         const filename = "ref_0.png";
         const storagePath = subjectPath(id, filename);
 
-        if (fontImageFile && fontImageFile.size > 0) {
-            const buffer = Buffer.from(await fontImageFile.arrayBuffer());
-            const ext = path.extname(fontImageFile.name) || ".png";
-            fontImagePath = subjectPath(id, `ref_font${ext}`);
-            const mimeType = ext === ".png" ? "image/png" : ext === ".webp" ? "image/webp" : "image/jpeg";
-            await uploadFile(fontImagePath, buffer, mimeType);
-        }
-
-        const refPaths = fontImagePath ? [fontImagePath] : [];
-
         const result = await generateAndSaveImage(
             {
-                referenceImagePaths: refPaths,
+                referenceImagePaths: [],
                 finalPromptText: AUTO_SUBJECT_PROMPT,
                 negativePrompt: AUTO_SUBJECT_NEGATIVE_PROMPT,
                 aspectRatio: "3:4"
@@ -96,8 +73,7 @@ EXTREMELY IMPORTANT FONT RULE: You MUST use a classic, elegant serif font that m
             wardrobe: "current outfit in reference",
             background: "same as reference",
             lighting: "same as reference",
-            camera: "same framing as reference",
-            textReferenceImagePath: fontImagePath || undefined
+            camera: "same framing as reference"
         });
 
         const subject = await prisma.subject.create({

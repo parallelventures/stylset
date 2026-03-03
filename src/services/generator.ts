@@ -31,9 +31,6 @@ export async function generateSet(setId: string): Promise<void> {
         ? [set.modelImagePath]
         : JSON.parse(set.subject.referenceImagePaths || "[]");
     const lockedAttrs = JSON.parse(set.subject.lockedAttributesJson || "{}");
-    if (lockedAttrs.textReferenceImagePath) {
-        refPaths.push(lockedAttrs.textReferenceImagePath);
-    }
     const basePrompt = set.template ? JSON.parse(set.template.basePromptJson) : {};
 
     let failCount = 0;
@@ -50,12 +47,10 @@ export async function generateSet(setId: string): Promise<void> {
 
                     let hairstylePrompt = "";
                     let negativeHairPrompt = "";
-                    let includeTextOverlay = true;
                     try {
                         const input = JSON.parse(slide.inputJson || "{}");
                         hairstylePrompt = input.hairstylePrompt || slide.preset?.hairstylePrompt || "";
                         negativeHairPrompt = input.negativeHairPrompt || slide.preset?.negativeHairPrompt || "";
-                        includeTextOverlay = input.includeTextOverlay ?? true;
                     } catch {
                         hairstylePrompt = slide.preset?.hairstylePrompt || "";
                     }
@@ -65,7 +60,6 @@ export async function generateSet(setId: string): Promise<void> {
                         basePrompt,
                         hairstylePrompt,
                         negativeHairPrompt: negativeHairPrompt || undefined,
-                        hairstyleTitle: includeTextOverlay ? (slide.preset?.name || undefined) : undefined,
                     });
 
                     const cleanName = (slide.preset?.name || "").toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
