@@ -87,6 +87,7 @@ export default function SubjectsPage() {
     const [includeTextOverlay, setIncludeTextOverlay] = useState(true);
     const [aesthetic, setAesthetic] = useState("trendy casual chic");
     const [outfit, setOutfit] = useState("Simple heather grey fitted t-shirt");
+    const [enhanceQuality, setEnhanceQuality] = useState(false);
     const router = useRouter();
 
     async function loadSubjects() {
@@ -131,6 +132,7 @@ export default function SubjectsPage() {
             "lockedAttributesJson",
             (form.elements.namedItem("lockedAttributesJson") as HTMLTextAreaElement).value || "{}"
         );
+        fd.set("enhanceQuality", enhanceQuality.toString());
 
         for (const f of files) {
             fd.append("images", f);
@@ -491,6 +493,18 @@ export default function SubjectsPage() {
                                             ))}
                                         </div>
                                     )}
+                                </div>
+
+                                <div className="form-group" style={{ marginTop: "-12px", marginBottom: "16px" }}>
+                                    <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", cursor: "pointer", color: "var(--text-secondary)" }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={enhanceQuality}
+                                            onChange={(e) => setEnhanceQuality(e.target.checked)}
+                                            style={{ accentColor: "var(--primary)" }}
+                                        />
+                                        ✨ Enhance quality and resolution with AI
+                                    </label>
                                 </div>
 
                                 <div className="form-group">
