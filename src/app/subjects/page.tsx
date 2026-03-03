@@ -33,6 +33,7 @@ export default function SubjectsPage() {
     const [generatingSubject, setGeneratingSubject] = useState(false);
     const [subjectToDelete, setSubjectToDelete] = useState<string | null>(null);
     const [editingSubject, setEditingSubject] = useState<{ id: string; name: string } | null>(null);
+    const [includeTextOverlay, setIncludeTextOverlay] = useState(true);
     const router = useRouter();
 
     async function loadSubjects() {
@@ -110,6 +111,7 @@ export default function SubjectsPage() {
                 lighting: (form.elements.namedItem("lighting") as HTMLSelectElement).value,
                 hairstylePrompt: preset ? preset.hairstylePrompt : undefined,
                 hairstyleName: preset ? preset.name : undefined,
+                includeTextOverlay,
             };
 
             const res = await fetch("/api/subjects/auto", {
@@ -131,7 +133,11 @@ export default function SubjectsPage() {
     async function handleQuickGenerate(subjectId: string) {
         setGenerating(subjectId);
         try {
-            const res = await fetch(`/api/subjects/${subjectId}/generate`, { method: "POST" });
+            const res = await fetch(`/api/subjects/${subjectId}/generate`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ includeTextOverlay })
+            });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error);
             // Navigate to the new set
@@ -214,6 +220,18 @@ export default function SubjectsPage() {
                         + Upload Subject
                     </button>
                 </div>
+            </div>
+
+            <div style={{ padding: "0 24px 16px", display: "flex", justifyContent: "flex-end", marginTop: "-12px" }}>
+                <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", cursor: "pointer", color: "var(--text-secondary)" }}>
+                    <input
+                        type="checkbox"
+                        checked={includeTextOverlay}
+                        onChange={(e) => setIncludeTextOverlay(e.target.checked)}
+                        style={{ accentColor: "var(--primary)" }}
+                    />
+                    Include hairstyle name in generation
+                </label>
             </div>
 
             {subjects.length === 0 ? (

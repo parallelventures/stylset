@@ -22,6 +22,7 @@ export async function POST(req: Request) {
         const lighting = body.lighting || "Soft shadowless lighting";
         const hairstylePrompt = body.hairstylePrompt || "glossy. Straight to wavy, thick, smooth. Long layered butterfly cut, 90s blowout style. Face-framing curtain bangs. Heavily layered mid-lengths to ends. Voluminous.";
         const hairstyleName = body.hairstyleName || "Blowout";
+        const includeTextOverlay = body.includeTextOverlay ?? true;
 
         const AUTO_SUBJECT_PROMPT = `Generate a stunning, photorealistic high-end commercial hair catalog reference image.
 
@@ -37,11 +38,11 @@ SUBJECT & STYLE:
 - Attire: ${outfit} with scoop neckline (identical in both panels, complementing the bust).
 - Environment: ${background}. ${lighting}.
 - Specs: 8k UHD, ultra-photorealistic.
-
+${includeTextOverlay && hairstyleName ? `
 TEXT OVERLAY RULE:
 You MUST precisely render the exact text "${hairstyleName}" directly in the exact middle of the entire image, perfectly overlaying the intersection between the top and bottom panels.
 The text must be of MEDIUM size, clearly legible but still elegant.
-EXTREMELY IMPORTANT FONT RULE: You MUST use a classic, elegant serif font that matches the EXACT SAME TEXT FONT style as seen in previous generations or reference images.`;
+EXTREMELY IMPORTANT FONT RULE: You MUST use a classic, elegant serif font that matches the EXACT SAME TEXT FONT style as seen in previous generations or reference images.` : ""}`;
 
         const AUTO_SUBJECT_NEGATIVE_PROMPT = "white line, white stripe, white gap, visible border, separator line, separation line, divider line, single image, no split, wrong layout, ugly, basic, distorted, asymmetrical face, bad proportions, unnatural skin, shiny plastic skin, heavily filtered, uncanny valley, cartoon, illustration, drawing, text, watermark, logos, blurry, weird eyes, messy hair covering face, smiling, dramatic lighting, shadows, colorful background, extravagant clothes";
         console.log("[Auto-Subject] Generating automatic subject image...");
