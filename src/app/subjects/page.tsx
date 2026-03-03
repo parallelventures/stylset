@@ -498,7 +498,7 @@ export default function SubjectsPage() {
                                 <div className="form-group">
                                     <label className="form-label">Hairstyle Preset (Optional)</label>
                                     <select name="presetId" className="form-select" defaultValue="">
-                                        <option value="">Default Commercial Blowout</option>
+                                        <option value="">Default Blowout</option>
                                         {presets.map(p => (
                                             <option key={p.id} value={p.id}>{p.name}</option>
                                         ))}

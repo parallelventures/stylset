@@ -21,23 +21,27 @@ export async function POST(req: Request) {
         const expression = body.expression || "neutral expression";
         const lighting = body.lighting || "Soft shadowless lighting";
         const hairstylePrompt = body.hairstylePrompt || "glossy. Straight to wavy, thick, smooth. Long layered butterfly cut, 90s blowout style. Face-framing curtain bangs. Heavily layered mid-lengths to ends. Voluminous.";
-        const hairstyleName = body.hairstyleName || "";
+        const hairstyleName = body.hairstyleName || "Blowout";
 
         const AUTO_SUBJECT_PROMPT = `Generate a stunning, photorealistic high-end commercial hair catalog reference image.
 
 CRITICAL LAYOUT RULE: You MUST generate a VERTICAL DIPTYCH (a single image split into two stacked panels).
 - Format: Vertical collage (two stacked panels).
-- Divider: The top and bottom panels MUST connect seamlessly with ZERO gap, NO white line, NO border, and NO separator stripe between them.
+- Divider: The top panel and bottom panel MUST merge perfectly together with NO visual separation. DO NOT draw a line, gap, stripe, border, or whitespace between them.
 - Top Panel: FRONT VIEW (front-facing portrait, chest up).
 - Bottom Panel: BACK VIEW (rear view, back of head and shoulders).
 
 SUBJECT & STYLE:
-- Model: ${age} female, ${ethnicity}, ${expression}, ${makeup}, voluminous natural breasts.
+- Model: ${age} female, ${ethnicity}, ${expression}, ${makeup}. VERY IMPORTANT: The model MUST have prominent, extremely voluminous natural breasts (heavy bust weight, large cleavage, voluptuous figure).
 - Hair: ${hairColor}, ${hairstylePrompt}
-- Attire: ${outfit} with scoop neckline (identical in both panels).
+- Attire: ${outfit} with scoop neckline (identical in both panels, emphasizing the voluminous bust).
 - Environment: ${background}. ${lighting}.
 - Specs: 8k UHD, ultra-photorealistic.
-${hairstyleName ? `\nTEXT OVERLAY: You MUST perfectly render the exact text "${hairstyleName}" in the middle of the image, placed cleanly on the separation between the top and bottom panels. The text should be stylish, high-contrast, perfectly clear, and MUST match the EXACT SAME TEXT FONT style as seen in previous generations or reference images.` : ""}`;
+
+TEXT OVERLAY RULE:
+You MUST precisely render the exact text "${hairstyleName}" directly in the exact middle of the entire image, perfectly overlaying the intersection between the top and bottom panels.
+The text must be highly visible, stylish, and high-contrast.
+EXTREMELY IMPORTANT FONT RULE: You MUST match the EXACT SAME TEXT FONT style "nano banana" or your closest equivalent stylish, modern font thick typography.`;
 
         const AUTO_SUBJECT_NEGATIVE_PROMPT = "white line, white stripe, white gap, visible border, separator line, separation line, divider line, single image, no split, wrong layout, ugly, basic, distorted, asymmetrical face, bad proportions, unnatural skin, shiny plastic skin, heavily filtered, uncanny valley, cartoon, illustration, drawing, text, watermark, logos, blurry, weird eyes, messy hair covering face, smiling, dramatic lighting, shadows, colorful background, extravagant clothes";
         console.log("[Auto-Subject] Generating automatic subject image...");
