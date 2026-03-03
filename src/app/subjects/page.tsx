@@ -101,6 +101,7 @@ export default function SubjectsPage() {
             const preset = presets.find(p => p.id === presetId);
 
             const body = {
+                aesthetic: (form.elements.namedItem("aesthetic") as HTMLSelectElement).value,
                 ethnicity: (form.elements.namedItem("ethnicity") as HTMLSelectElement).value,
                 age: (form.elements.namedItem("age") as HTMLSelectElement).value,
                 hairColor: (form.elements.namedItem("hairColor") as HTMLSelectElement).value,
@@ -520,6 +521,20 @@ export default function SubjectsPage() {
                                         {presets.map(p => (
                                             <option key={p.id} value={p.id}>{p.name}</option>
                                         ))}
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Aesthetic / Style</label>
+                                    <select name="aesthetic" className="form-select" defaultValue="trendy casual chic">
+                                        <option value="trendy casual chic">Trendy Casual Chic</option>
+                                        <option value="goth, dark aesthetic, alternative">Goth / Alternative</option>
+                                        <option value="Y2K aesthetic, 2000s fashion, nostalgic">Y2K / 2000s Nostalgia</option>
+                                        <option value="old money, quiet luxury, elegant">Quiet Luxury / Old Money</option>
+                                        <option value="grunge, edgy, effortless">Grunge / Edgy</option>
+                                        <option value="coquette, soft girl, hyper-feminine">Coquette / Soft Girl</option>
+                                        <option value="cyberpunk, futuristic streetwear">Cyberpunk / Techwear</option>
+                                        <option value="boho chic, bohemian, earthy">Boho Chic</option>
                                     </select>
                                 </div>
 
