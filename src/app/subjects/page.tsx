@@ -19,53 +19,41 @@ interface Subject {
 }
 
 const AESTHETIC_OUTFITS: Record<string, { value: string, label: string }[]> = {
-    "trendy casual chic": [
-        { value: "Simple heather grey fitted t-shirt", label: "Heather Grey T-Shirt" },
-        { value: "Crisp white button-down shirt", label: "White Button-Down Shirt" },
-        { value: "Cozy oversized cream knit sweater", label: "Oversized Cream Sweater" },
-        { value: "Minimalist beige trench coat", label: "Beige Trench Coat" },
+    "classic": [
+        { value: "structured corset-style top, matte premium crepe, clean lines (white)", label: "White Corset Top" },
+        { value: "elegant minimalist slip dress", label: "Minimalist Slip Dress" },
+        { value: "crisp white button-down shirt, slightly unbuttoned", label: "White Button-Down" },
+        { value: "simple high-quality fitted t-shirt", label: "Fitted T-Shirt" },
     ],
-    "goth, dark aesthetic, alternative": [
-        { value: "Black leather moto jacket with silver hardware", label: "Black Moto Jacket" },
-        { value: "Lace trimmed velvet corset top", label: "Velvet Corset Top" },
-        { value: "Fishnet long sleeve top under a black band tee", label: "Fishnet & Band Tee" },
-        { value: "Dark romantic ruffled black blouse", label: "Ruffled Black Blouse" },
+    "clean tiktok girl": [
+        { value: "casual stylish denim and white crop top", label: "Denim & Crop Top" },
+        { value: "cozy oversized ribbed sweater off one shoulder", label: "Off-Shoulder Sweater" },
+        { value: "trendy matching athleisure set", label: "Athleisure Set" },
+        { value: "simple sleek bodysuit", label: "Sleek Bodysuit" },
     ],
-    "Y2K aesthetic, 2000s fashion, nostalgic": [
-        { value: "Casual vintage graphic tee", label: "Vintage Graphic Tee" },
-        { value: "Velour tracksuit jacket with rhinestone details", label: "Rhinestone Velour Tracksuit" },
-        { value: "Cropped baby tee with a butterfly graphic", label: "Butterfly Baby Tee" },
-        { value: "Denim halter top", label: "Denim Halter Top" },
+    "y2k": [
+        { value: "velour tracksuit jacket with rhinestone details", label: "Velour Tracksuit" },
+        { value: "cropped baby tee with a cute graphic", label: "Graphic Baby Tee" },
+        { value: "denim halter top", label: "Denim Halter" },
+        { value: "metallic tube top", label: "Metallic Tube Top" },
     ],
-    "old money, quiet luxury, elegant": [
-        { value: "Stylish tailored navy blazer", label: "Tailored Navy Blazer" },
-        { value: "Cashmere turtleneck sweater in camel", label: "Camel Cashmere Turtleneck" },
-        { value: "Elegant white silk button-down blouse", label: "White Silk Blouse" },
-        { value: "Classic tweed cropped jacket", label: "Classic Tweed Jacket" },
+    "goth": [
+        { value: "black lace-trimmed corset top", label: "Lace Corset" },
+        { value: "fishnet long sleeve under a vintage black band tee", label: "Fishnet & Band Tee" },
+        { value: "dark romantic ruffled black blouse", label: "Ruffled Blouse" },
+        { value: "structured leather bustier", label: "Leather Bustier" },
     ],
-    "grunge, edgy, effortless": [
-        { value: "Classic denim jacket over a white tee", label: "Denim Jacket Over Tee" },
-        { value: "Distressed oversized flannel shirt", label: "Oversized Flannel" },
-        { value: "Washed out vintage band tee", label: "Vintage Band Tee" },
-        { value: "Chunky distressed knit sweater", label: "Distressed Knit Sweater" },
+    "old money": [
+        { value: "cashmere turtleneck sweater in camel", label: "Camel Turtleneck" },
+        { value: "stylish tailored navy blazer over white top", label: "Navy Blazer" },
+        { value: "elegant pearl button cardigan", label: "Pearl Cardigan" },
+        { value: "classic tweed cropped jacket", label: "Tweed Jacket" },
     ],
-    "coquette, soft girl, hyper-feminine": [
-        { value: "Elegant white silk slip dress", label: "White Silk Slip Dress" },
-        { value: "Pastel pink cardigan with pearl buttons", label: "Pink Pearl Cardigan" },
-        { value: "White lace camisole with ribbon bows", label: "Lace Bow Camisole" },
-        { value: "Floral puff sleeve milkmaid dress", label: "Floral Milkmaid Dress" },
-    ],
-    "cyberpunk, futuristic streetwear": [
-        { value: "Sleek black turtleneck sweater", label: "Black Turtleneck" },
-        { value: "Sleek black turtleneck with tactical vest", label: "Turtleneck & Tactical Vest" },
-        { value: "Asymmetrical zip-up techwear jacket", label: "Techwear Jacket" },
-        { value: "Neon accented windbreaker", label: "Neon Windbreaker" },
-    ],
-    "boho chic, bohemian, earthy": [
-        { value: "Bohemian floral maxi dress", label: "Floral Maxi Dress" },
-        { value: "Embroidered peasant blouse with bell sleeves", label: "Embroidered Peasant Blouse" },
-        { value: "Crochet cream vest over a flowy tunic", label: "Crochet Vest" },
-        { value: "Fringed faux suede jacket", label: "Fringed Suede Jacket" },
+    "parisian girl": [
+        { value: "structured black bustier top, fashion not lingerie", label: "Black Bustier" },
+        { value: "classic breton striped long sleeve top", label: "Striped Top" },
+        { value: "effortless oversized button-down shirt tucked in", label: "Oversized Shirt" },
+        { value: "chic vintage silk camisole", label: "Silk Camisole" },
     ]
 };
 
@@ -84,8 +72,8 @@ export default function SubjectsPage() {
     const [generatingSubject, setGeneratingSubject] = useState(false);
     const [subjectToDelete, setSubjectToDelete] = useState<string | null>(null);
     const [editingSubject, setEditingSubject] = useState<{ id: string; name: string } | null>(null);
-    const [aesthetic, setAesthetic] = useState("trendy casual chic");
-    const [outfit, setOutfit] = useState("Simple heather grey fitted t-shirt");
+    const [aesthetic, setAesthetic] = useState("classic");
+    const [outfit, setOutfit] = useState("structured corset-style top, matte premium crepe, clean lines (white)");
     const [enhanceQuality, setEnhanceQuality] = useState(false);
     const router = useRouter();
 
@@ -114,7 +102,7 @@ export default function SubjectsPage() {
     function handleAestheticChange(e: React.ChangeEvent<HTMLSelectElement>) {
         const val = e.target.value;
         setAesthetic(val);
-        const options = AESTHETIC_OUTFITS[val] || AESTHETIC_OUTFITS["trendy casual chic"];
+        const options = AESTHETIC_OUTFITS[val] || AESTHETIC_OUTFITS["classic"];
         setOutfit(options[0].value);
     }
 
@@ -632,14 +620,12 @@ export default function SubjectsPage() {
                                 <div className="form-group">
                                     <label className="form-label">Aesthetic / Style</label>
                                     <select name="aesthetic" className="form-select" value={aesthetic} onChange={handleAestheticChange}>
-                                        <option value="trendy casual chic">Trendy Casual Chic</option>
-                                        <option value="goth, dark aesthetic, alternative">Goth / Alternative</option>
-                                        <option value="Y2K aesthetic, 2000s fashion, nostalgic">Y2K / 2000s Nostalgia</option>
-                                        <option value="old money, quiet luxury, elegant">Quiet Luxury / Old Money</option>
-                                        <option value="grunge, edgy, effortless">Grunge / Edgy</option>
-                                        <option value="coquette, soft girl, hyper-feminine">Coquette / Soft Girl</option>
-                                        <option value="cyberpunk, futuristic streetwear">Cyberpunk / Techwear</option>
-                                        <option value="boho chic, bohemian, earthy">Boho Chic</option>
+                                        <option value="classic">Classic Beauty</option>
+                                        <option value="clean tiktok girl">Clean TikTok Girl</option>
+                                        <option value="y2k">Y2K Nostalgia</option>
+                                        <option value="goth">Goth / Alternative</option>
+                                        <option value="old money">Quiet Luxury / Old Money</option>
+                                        <option value="parisian girl">Parisian Girl / Effortless</option>
                                     </select>
                                 </div>
 
@@ -680,20 +666,22 @@ export default function SubjectsPage() {
                                 <div className="form-group">
                                     <label className="form-label">Outfit</label>
                                     <select name="outfit" className="form-select" value={outfit} onChange={(e) => setOutfit(e.target.value)}>
-                                        {(AESTHETIC_OUTFITS[aesthetic] || AESTHETIC_OUTFITS["trendy casual chic"]).map((opt, i) => (
+                                        {(AESTHETIC_OUTFITS[aesthetic] || AESTHETIC_OUTFITS["classic"]).map((opt, i) => (
                                             <option key={i} value={opt.value}>{opt.label}</option>
                                         ))}
                                     </select>
                                 </div>
 
                                 <div className="form-group">
-                                    <label className="form-label">Background</label>
-                                    <select name="background" className="form-select" defaultValue="Solid high-key PURE WHITE seamless studio backdrop">
-                                        <option value="Solid high-key PURE WHITE seamless studio backdrop">Pure White Studio</option>
-                                        <option value="Soft warm beige seamless backdrop">Warm Beige Studio</option>
-                                        <option value="Moody dark slate gray backdrop">Dark Moody Studio</option>
+                                    <label className="form-label">Pose</label>
+                                    <select name="pose" className="form-select" defaultValue="standing tall, shoulders relaxed, arms down and fully out of frame">
+                                        <option value="standing tall, shoulders relaxed, arms down and fully out of frame">Standing Tall (Arms out of frame)</option>
+                                        <option value="subtle contrapposto, hands on hips (cropped out of frame)">Subtle Contrapposto</option>
+                                        <option value="sitting slightly angled, looking over shoulder">Looking Over Shoulder</option>
+                                        <option value="close up portrait, head tilted slightly">Close-Up Portrait</option>
                                     </select>
                                 </div>
+
 
                                 <div className="form-group">
                                     <label className="form-label">Expression</label>
@@ -716,16 +704,6 @@ export default function SubjectsPage() {
                                     </select>
                                 </div>
 
-                                <div className="form-group">
-                                    <label className="form-label">Lighting</label>
-                                    <select name="lighting" className="form-select" defaultValue="Soft shadowless studio lighting">
-                                        <option value="Soft shadowless studio lighting">Soft Shadowless Studio</option>
-                                        <option value="Dramatic moody chiaroscuro lighting">Dramatic Moody (Chiaroscuro)</option>
-                                        <option value="Warm golden hour natural sunlight lighting">Warm Golden Hour Sunlight</option>
-                                        <option value="Hard flash editorial photography lighting">Hard Flash Editorial</option>
-                                        <option value="Cinematic neon rim lighting">Cinematic Neon Rim Light</option>
-                                    </select>
-                                </div>
 
                                 <div className="modal-footer">
                                     <button

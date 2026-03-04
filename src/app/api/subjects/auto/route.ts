@@ -19,28 +19,97 @@ export async function POST(req: Request) {
             body = await req.json().catch(() => ({}));
         }
 
-        const inputAesthetic = body.aesthetic || "trendy casual chic";
+        const inputAesthetic = body.aesthetic || "classic";
         const ethnicity = body.ethnicity || "medium skin tone";
         const age = body.age || "Young";
         const hairColor = body.hairColor || "Dark espresso brown";
-        const outfit = body.outfit || "Simple heather grey fitted t-shirt";
-        const background = body.background || "Solid high-key PURE WHITE seamless studio backdrop";
-
+        const outfit = body.outfit || "structured corset-style top, matte premium crepe, clean lines (white)";
+        const pose = body.pose || "standing tall, shoulders relaxed, arms down and fully out of frame";
         const makeup = body.makeup || "soft makeup";
         const expression = body.expression || "neutral expression";
-        const lighting = body.lighting || "Soft shadowless lighting";
         const hairstylePrompt = body.hairstylePrompt || "glossy. Straight to wavy, thick, smooth. Long layered butterfly cut, 90s blowout style. Face-framing curtain bangs. Heavily layered mid-lengths to ends. Voluminous.";
 
-        const AUTO_SUBJECT_PROMPT = `Generate a stunning, high-end editorial fashion photography reference image.
+        const lookMap: Record<string, string> = {
+            "classic": "sexy model-off-duty luxe (clean, expensive, ultra photogenic)",
+            "clean tiktok girl": "clean girl aesthetic, tiktok trendy soft glam, dewy skin, effortless beauty, relatable but beautiful",
+            "y2k": "nostalgic Y2K pop star aesthetic, 2000s fashion model vibe, trendy, striking",
+            "goth": "dark alternative goth beauty, edgy, mysterious, striking pale photogenic contrast",
+            "old money": "quiet luxury, old money aesthetic, sophisticated, wealthy heir vibe, impeccably groomed",
+            "parisian girl": "parisian sexy supermodel vibe (expensive, clean, ultra photogenic)"
+        };
 
-SUBJECT & STYLE:
-- Model: ${age} female, beautifully striking, gorgeous model features, ${ethnicity}, ${expression}, ${makeup}. VERY IMPORTANT: The model MUST have a skinny, beautiful, fit body shape but with prominent, large natural breasts.
-- Hair: ${hairColor}, ${hairstylePrompt}
-- Attire & Aesthetic: ${outfit} with scoop neckline. Overall style aesthetic: ${inputAesthetic}.
-- Environment: ${background}. ${lighting}.
-- Specs: High-end commercial fashion photography, gorgeous flawless retouching but keeping realistic natural skin texture, masterpiece, 8k resolution, elegant, magazine cover quality.`;
+        const jsonPrompt = {
+            "hairstyle_model_prompt": {
+                "id": `women_${inputAesthetic.replace(/\s+/g, "_")}_model`,
+                "meta": {
+                    "aspect_ratio": "4:5 portrait",
+                    "quality": "ultra_photorealistic",
+                    "resolution": "8k UHD",
+                    "camera": "iPhone 17 Pro Max (rear camera, studio portrait)",
+                    "lens": "24mm wide",
+                    "style": `premium studio catalog model, pure white background ONLY, hair-focused, ${inputAesthetic} aesthetic, minimal retouch`,
+                    "consistency_rule": "NEW WOMAN. Completely different identity. No resemblance to any real person."
+                },
+                "composition": {
+                    "shot_type": "studio portrait (not selfie)",
+                    "pose": pose,
+                    "framing": "top of head to mid-chest, centered",
+                    "head_angle": "front-facing (0–3°), chin level",
+                    "eye_contact": "direct eye contact with the camera",
+                },
+                "subject": {
+                    "category": "Women",
+                    "age": age,
+                    "model_profile": {
+                        "type": "agency-grade commercial beauty / fashion model",
+                        "look": lookMap[inputAesthetic] || lookMap["classic"],
+                        "beauty_traits": [
+                            "harmonious facial proportions",
+                            "symmetrical features",
+                            "high cheekbones",
+                            "soft defined jawline",
+                            "almond-shaped eyes",
+                            "balanced nose",
+                            "full but natural lips"
+                        ],
+                        "ethnicity": ethnicity
+                    },
+                    "expression": expression,
+                    "skin_and_makeup": {
+                        "skin": "healthy luxury skin, realistic pores, even tone, soft glow",
+                        "makeup": makeup
+                    },
+                    "hair": {
+                        "color": hairColor,
+                        "description": hairstylePrompt
+                    },
+                    "wardrobe": {
+                        "outfit": outfit,
+                        "logo_rule": "no logos, no prints, no text"
+                    }
+                },
+                "photography": {
+                    "lighting": "two large softboxes 45° left/right + gentle frontal fill; subtle hair-light kicker to show crown lift and length shine",
+                    "background": "pure white seamless (#FFFFFF) ONLY, evenly lit, absolutely no gradient, no texture, nothing else",
+                    "exposure": "bright premium catalog exposure",
+                    "focus": "tack-sharp eyes + crisp part + length shine",
+                    "white_balance": "neutral studio daylight",
+                    "dynamic_range": "high, preserve specular highlights without blowing out whites",
+                    "retouch_policy": "minimal editorial retouch only; keep pores and realism"
+                }
+            }
+        };
 
-        const AUTO_SUBJECT_NEGATIVE_PROMPT = "AI generated, synthetic, plastic skin, overly smooth, CGI, render, 3d, doll-like, fake, overly perfect, unnatural skin, shiny plastic skin, uncanny valley, cartoon, illustration, drawing, text, watermark, logos, blurry, bad proportions, distorted, asymmetrical face, messy hair covering face, smiling, dramatic lighting, shadows, colorful background, extravagant clothes";
+        const AUTO_SUBJECT_PROMPT = JSON.stringify(jsonPrompt, null, 2);
+
+        const AUTO_SUBJECT_NEGATIVE_PROMPT = [
+            "no phone", "no mirror", "no props", "no text overlays", "no watermark",
+            "no logos on clothing", "no heavy jewelry", "no distorted face", "no asymmetrical eyes",
+            "no extra fingers/limbs", "no colored background", "no background gradient",
+            "no background texture", "no background objects", "no studio elements visible",
+            "no heavy beauty filter", "no uncanny valley", "no low-resolution artifacts",
+            "no harsh shadows", "no frizz", "no flyaways", "no hair covering the eyes"
+        ].join(", ");
         console.log("[Auto-Subject] Generating automatic subject image...");
         const id = uuid();
         const filename = "ref_0.png";
