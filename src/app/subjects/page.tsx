@@ -643,6 +643,8 @@ export default function SubjectsPage() {
                                             <option value="DEFAULT">90s Blowout Layered</option>
                                             <option value="MANUAL:sleek straight long hair, center part, glossy, perfectly smooth glass hair">Sleek Straight Glass Hair</option>
                                             <option value="MANUAL:loose effortless beach waves, texturized, casual and chic">Effortless Beach Waves</option>
+                                            <option value="MANUAL:textured wavy long bob, shoulder length lob, effortless cool girl waves">Wavy Lob</option>
+                                            <option value="MANUAL:perfectly defined ringlet curls, highly textured, moisturizing shine, flawless curly hair">Defined Curls</option>
                                             <option value="MANUAL:sharp chin-length classic french bob, slight effortless wave">Classic French Bob</option>
                                             <option value="MANUAL:half-up half-down styling, sleek crown, long voluminous lengths, soft fashion glam">Half-Up Half-Down Glam</option>
                                             <option value="MANUAL:tight bouncy curls, extreme volume, natural texture, healthy shine">Voluminous Natural Curls</option>
