@@ -155,10 +155,9 @@ export default function SubjectsPage() {
             fd.set("age", (form.elements.namedItem("age") as HTMLSelectElement).value);
             fd.set("hairColor", (form.elements.namedItem("hairColor") as HTMLSelectElement).value);
             fd.set("outfit", (form.elements.namedItem("outfit") as HTMLSelectElement).value);
-            fd.set("background", (form.elements.namedItem("background") as HTMLSelectElement).value);
+            fd.set("pose", (form.elements.namedItem("pose") as HTMLSelectElement).value);
             fd.set("makeup", (form.elements.namedItem("makeup") as HTMLSelectElement).value);
             fd.set("expression", (form.elements.namedItem("expression") as HTMLSelectElement).value);
-            fd.set("lighting", (form.elements.namedItem("lighting") as HTMLSelectElement).value);
 
             if (preset) {
                 fd.set("hairstylePrompt", preset.hairstylePrompt);
