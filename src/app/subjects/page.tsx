@@ -24,36 +24,60 @@ const AESTHETIC_OUTFITS: Record<string, { value: string, label: string }[]> = {
         { value: "elegant minimalist slip dress", label: "Minimalist Slip Dress" },
         { value: "crisp white button-down shirt, slightly unbuttoned", label: "White Button-Down" },
         { value: "simple high-quality fitted t-shirt", label: "Fitted T-Shirt" },
+        { value: "chic black turtleneck sweater", label: "Black Turtleneck" },
+        { value: "tailored beige trench coat over a white tee", label: "Beige Trench & White Tee" },
+        { value: "elegant silk blouse with bow tie", label: "Silk Bow Blouse" },
+        { value: "strapless sweetheart neckline gown bodice", label: "Strapless Sweetheart Gown (Bodice)" },
     ],
     "clean tiktok girl": [
         { value: "casual stylish denim and white crop top", label: "Denim & Crop Top" },
         { value: "cozy oversized ribbed sweater off one shoulder", label: "Off-Shoulder Sweater" },
         { value: "trendy matching athleisure set", label: "Athleisure Set" },
         { value: "simple sleek bodysuit", label: "Sleek Bodysuit" },
+        { value: "cute knit pastel cardigan and camisole", label: "Pastel Cardigan" },
+        { value: "baggy vintage t-shirt and loose jeans", label: "Baggy Vintage Tee" },
+        { value: "basic white tank top with silver jewelry", label: "White Tank + Silver Jewelry" },
+        { value: "plaid shirt open over a bra top", label: "Plaid Shirt Over Bra" },
     ],
     "y2k": [
         { value: "velour tracksuit jacket with rhinestone details", label: "Velour Tracksuit" },
         { value: "cropped baby tee with a cute graphic", label: "Graphic Baby Tee" },
         { value: "denim halter top", label: "Denim Halter" },
         { value: "metallic tube top", label: "Metallic Tube Top" },
+        { value: "asymmetrical off-shoulder long sleeve", label: "Asymmetrical Off-Shoulder" },
+        { value: "pleated mini skirt with a tied front top", label: "Tied Front Top" },
+        { value: "mesh long sleeve printed top over a cami", label: "Mesh Printed Top" },
+        { value: "fuzzy faux fur trim cardigan", label: "Fuzzy Trim Cardigan" },
     ],
     "goth": [
         { value: "black lace-trimmed corset top", label: "Lace Corset" },
         { value: "fishnet long sleeve under a vintage black band tee", label: "Fishnet & Band Tee" },
         { value: "dark romantic ruffled black blouse", label: "Ruffled Blouse" },
         { value: "structured leather bustier", label: "Leather Bustier" },
+        { value: "sheer black mesh crop top", label: "Sheer Mesh Crop Top" },
+        { value: "strappy pentagram harness over black dress", label: "Harness over Black Dress" },
+        { value: "velvet off-shoulder top in deep burgundy", label: "Burgundy Velvet Top" },
+        { value: "black latex zip-up top", label: "Black Latex Zip-Up" },
     ],
     "old money": [
         { value: "cashmere turtleneck sweater in camel", label: "Camel Turtleneck" },
         { value: "stylish tailored navy blazer over white top", label: "Navy Blazer" },
         { value: "elegant pearl button cardigan", label: "Pearl Cardigan" },
         { value: "classic tweed cropped jacket", label: "Tweed Jacket" },
+        { value: "cable knit v-neck tennis sweater", label: "Cable Knit Tennis Sweater" },
+        { value: "silk scarf tied over a crisp oxford shirt", label: "Oxford + Silk Scarf" },
+        { value: "high-neck ruffled poplin blouse", label: "High-Neck Poplin Blouse" },
+        { value: "tan cashmere wrap coat", label: "Cashmere Wrap Coat" },
     ],
     "parisian girl": [
         { value: "structured black bustier top, fashion not lingerie", label: "Black Bustier" },
         { value: "classic breton striped long sleeve top", label: "Striped Top" },
         { value: "effortless oversized button-down shirt tucked in", label: "Oversized Shirt" },
         { value: "chic vintage silk camisole", label: "Silk Camisole" },
+        { value: "red wrap top with tiny white polka dots", label: "Polka Dot Wrap Top" },
+        { value: "oversized men's blazer worn as a dress", label: "Oversized Blazer" },
+        { value: "soft mohair v-neck sweater, slightly messy", label: "Mohair V-Neck" },
+        { value: "simple black slip dress with dainty jewelry", label: "Black Slip Dress" },
     ]
 };
 
@@ -146,9 +170,6 @@ export default function SubjectsPage() {
         const form = e.currentTarget;
 
         try {
-            const presetId = (form.elements.namedItem("presetId") as HTMLSelectElement).value;
-            const preset = presets.find(p => p.id === presetId);
-
             const fd = new FormData();
             fd.set("aesthetic", (form.elements.namedItem("aesthetic") as HTMLSelectElement).value);
             fd.set("ethnicity", (form.elements.namedItem("ethnicity") as HTMLSelectElement).value);
@@ -159,9 +180,18 @@ export default function SubjectsPage() {
             fd.set("makeup", (form.elements.namedItem("makeup") as HTMLSelectElement).value);
             fd.set("expression", (form.elements.namedItem("expression") as HTMLSelectElement).value);
 
-            if (preset) {
-                fd.set("hairstylePrompt", preset.hairstylePrompt);
-                fd.set("hairstyleName", preset.name);
+            const combo = (form.elements.namedItem("hairstyleCombo") as HTMLSelectElement).value;
+            if (combo.startsWith("PRESET:")) {
+                const presetId = combo.split(":")[1];
+                const preset = presets.find(p => p.id === presetId);
+                if (preset) {
+                    fd.set("hairstylePrompt", preset.hairstylePrompt);
+                    fd.set("hairstyleName", preset.name);
+                }
+            } else if (combo.startsWith("MANUAL:")) {
+                fd.set("hairstylePrompt", combo.replace("MANUAL:", ""));
+            } else {
+                fd.set("hairstylePrompt", "glossy. Straight to wavy, thick, smooth. Long layered butterfly cut, 90s blowout style. Face-framing curtain bangs. Heavily layered mid-lengths to ends. Voluminous.");
             }
 
             const res = await fetch("/api/subjects/auto", {
@@ -607,12 +637,28 @@ export default function SubjectsPage() {
 
                             <form onSubmit={handleAutoGenerateSubject}>
                                 <div className="form-group">
-                                    <label className="form-label">Hairstyle Preset (Optional)</label>
-                                    <select name="presetId" className="form-select" defaultValue="">
-                                        <option value="">Default Blowout</option>
-                                        {presets.map(p => (
-                                            <option key={p.id} value={p.id}>{p.name}</option>
-                                        ))}
+                                    <label className="form-label">Hairstyle</label>
+                                    <select name="hairstyleCombo" className="form-select" defaultValue="DEFAULT">
+                                        <optgroup label="General Styles">
+                                            <option value="DEFAULT">90s Blowout Layered</option>
+                                            <option value="MANUAL:sleek straight long hair, center part, glossy, perfectly smooth glass hair">Sleek Straight Glass Hair</option>
+                                            <option value="MANUAL:loose effortless beach waves, texturized, casual and chic">Effortless Beach Waves</option>
+                                            <option value="MANUAL:sharp chin-length classic french bob, slight effortless wave">Classic French Bob</option>
+                                            <option value="MANUAL:half-up half-down styling, sleek crown, long voluminous lengths, soft fashion glam">Half-Up Half-Down Glam</option>
+                                            <option value="MANUAL:tight bouncy curls, extreme volume, natural texture, healthy shine">Voluminous Natural Curls</option>
+                                            <option value="MANUAL:messy romantic 90s updo with face framing pieces">Romantic 90s Updo</option>
+                                            <option value="MANUAL:long straight hair with blunt bangs across forehead">Long Hair + Blunt Bangs</option>
+                                            <option value="MANUAL:feathered layers throughout, massive 90s supermodel volume, airy flipped ends">Feathered Supermodel Layers</option>
+                                            <option value="MANUAL:chic gamine pixie cut, short, defined texture, effortless">Chic Pixie Cut</option>
+                                            <option value="MANUAL:sleek high ponytail, snatched, smooth, polished">Sleek High Ponytail</option>
+                                        </optgroup>
+                                        {presets.length > 0 && (
+                                            <optgroup label="Saved Presets">
+                                                {presets.map(p => (
+                                                    <option key={`PRESET:${p.id}`} value={`PRESET:${p.id}`}>{p.name}</option>
+                                                ))}
+                                            </optgroup>
+                                        )}
                                     </select>
                                 </div>
 
