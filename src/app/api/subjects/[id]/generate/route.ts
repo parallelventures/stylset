@@ -22,17 +22,14 @@ export async function POST(
             return NextResponse.json({ error: "Subject not found" }, { status: 404 });
         }
 
-        // Get all presets
-        const presets = await prisma.hairstylePreset.findMany({
-            orderBy: { createdAt: "asc" },
-        });
-
-        if (presets.length === 0) {
+        if (!body.selections || !Array.isArray(body.selections) || body.selections.length === 0) {
             return NextResponse.json(
-                { error: "No hairstyle presets found. Run the seed script first." },
+                { error: "No hairstyles selected." },
                 { status: 400 }
             );
         }
+
+        const variations = body.selections; // Array of { presetId?, hairstylePrompt, negativeHairPrompt, name }
 
         // Get default template
         const template = await prisma.slideRequestTemplate.findFirst({
@@ -44,8 +41,8 @@ export async function POST(
         const firstSetId = uuid();
         const CHUNK_SIZE = 6;
 
-        for (let chunkIdx = 0; chunkIdx < Math.ceil(presets.length / CHUNK_SIZE); chunkIdx++) {
-            const chunkPresets = presets.slice(chunkIdx * CHUNK_SIZE, (chunkIdx + 1) * CHUNK_SIZE);
+        for (let chunkIdx = 0; chunkIdx < Math.ceil(variations.length / CHUNK_SIZE); chunkIdx++) {
+            const chunkPresets = variations.slice(chunkIdx * CHUNK_SIZE, (chunkIdx + 1) * CHUNK_SIZE);
             const setId = chunkIdx === 0 ? firstSetId : uuid();
             const setName = `${subject.name} — ${now.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} (Part ${chunkIdx + 1})`;
 
@@ -61,18 +58,18 @@ export async function POST(
 
             // Create slide for each preset in this chunk
             for (let i = 0; i < chunkPresets.length; i++) {
-                const preset = chunkPresets[i];
+                const variation = chunkPresets[i];
                 await prisma.slideGeneration.create({
                     data: {
                         id: uuid(),
                         subjectId: id,
                         templateId: template?.id || null,
-                        presetId: preset.id,
+                        presetId: variation.presetId || null,
                         slideshowSetId: setId,
                         orderIndex: i,
                         inputJson: JSON.stringify({
-                            hairstylePrompt: preset.hairstylePrompt,
-                            negativeHairPrompt: preset.negativeHairPrompt || "",
+                            hairstylePrompt: variation.hairstylePrompt,
+                            negativeHairPrompt: variation.negativeHairPrompt || "",
                         }),
                         status: "queued",
                     },
@@ -88,7 +85,7 @@ export async function POST(
         return NextResponse.json({
             ok: true,
             setId: firstSetId,
-            message: `Generating ${presets.length} variations across ${Math.ceil(presets.length / CHUNK_SIZE)} sets...`,
+            message: `Generating ${variations.length} variations across ${Math.ceil(variations.length / CHUNK_SIZE)} sets...`,
         });
     } catch (error: unknown) {
         const msg = error instanceof Error ? error.message : String(error);

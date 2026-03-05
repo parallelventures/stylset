@@ -81,6 +81,22 @@ const AESTHETIC_OUTFITS: Record<string, { value: string, label: string }[]> = {
     ]
 };
 
+const GENERAL_HAIRSTYLES = [
+    { value: "DEFAULT", label: "90s Blowout Layered" },
+    { value: "MANUAL:sleek straight long hair, center part, glossy, perfectly smooth glass hair", label: "Sleek Straight Glass Hair" },
+    { value: "MANUAL:loose effortless beach waves, texturized, casual and chic", label: "Effortless Beach Waves" },
+    { value: "MANUAL:textured wavy long bob, shoulder length lob, effortless cool girl waves", label: "Wavy Lob" },
+    { value: "MANUAL:perfectly defined ringlet curls, highly textured, moisturizing shine, flawless curly hair", label: "Defined Curls" },
+    { value: "MANUAL:sharp chin-length classic french bob, slight effortless wave", label: "Classic French Bob" },
+    { value: "MANUAL:half-up half-down styling, sleek crown, long voluminous lengths, soft fashion glam", label: "Half-Up Half-Down Glam" },
+    { value: "MANUAL:tight bouncy curls, extreme volume, natural texture, healthy shine", label: "Voluminous Natural Curls" },
+    { value: "MANUAL:messy romantic 90s updo with face framing pieces", label: "Romantic 90s Updo" },
+    { value: "MANUAL:long straight hair with blunt bangs across forehead", label: "Long Hair + Blunt Bangs" },
+    { value: "MANUAL:feathered layers throughout, massive 90s supermodel volume, airy flipped ends", label: "Feathered Supermodel Layers" },
+    { value: "MANUAL:chic gamine pixie cut, short, defined texture, effortless", label: "Chic Pixie Cut" },
+    { value: "MANUAL:sleek high ponytail, snatched, smooth, polished", label: "Sleek High Ponytail" },
+];
+
 export default function SubjectsPage() {
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [presets, setPresets] = useState<any[]>([]);
@@ -99,6 +115,8 @@ export default function SubjectsPage() {
     const [aesthetic, setAesthetic] = useState("classic");
     const [outfit, setOutfit] = useState("structured corset-style top, matte premium crepe, clean lines (white)");
     const [enhanceQuality, setEnhanceQuality] = useState(false);
+    const [hairstyleModalSubject, setHairstyleModalSubject] = useState<Subject | null>(null);
+    const [selectedHairstyles, setSelectedHairstyles] = useState<string[]>([]);
     const router = useRouter();
 
     async function loadSubjects() {
@@ -209,17 +227,47 @@ export default function SubjectsPage() {
         }
     }
 
-    async function handleQuickGenerate(subjectId: string) {
+    async function handleGenerateSelected() {
+        if (!hairstyleModalSubject || selectedHairstyles.length === 0) return;
+        const subjectId = hairstyleModalSubject.id;
+
+        const selections = selectedHairstyles.map(combo => {
+            if (combo.startsWith("PRESET:")) {
+                const presetId = combo.split(":")[1];
+                const preset = presets.find(p => p.id === presetId);
+                return {
+                    presetId: preset?.id,
+                    hairstylePrompt: preset?.hairstylePrompt || "",
+                    negativeHairPrompt: preset?.negativeHairPrompt || "",
+                    name: preset?.name || "Preset"
+                };
+            } else if (combo.startsWith("MANUAL:")) {
+                const prompt = combo.replace("MANUAL:", "");
+                const label = GENERAL_HAIRSTYLES.find(h => h.value === combo)?.label || "Manual";
+                return {
+                    hairstylePrompt: prompt,
+                    name: label
+                };
+            } else {
+                return {
+                    hairstylePrompt: "glossy. Straight to wavy, thick, smooth. Long layered butterfly cut, 90s blowout style. Face-framing curtain bangs. Heavily layered mid-lengths to ends. Voluminous.",
+                    name: "90s Blowout Layered"
+                };
+            }
+        });
+
         setGenerating(subjectId);
+        setHairstyleModalSubject(null);
+        setSelectedHairstyles([]);
+
         try {
             const res = await fetch(`/api/subjects/${subjectId}/generate`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({})
+                body: JSON.stringify({ selections })
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error);
-            // Navigate to the new set
             router.push(`/sets/${data.setId}`);
         } catch (err: unknown) {
             alert(err instanceof Error ? err.message : "Generation failed");
@@ -405,14 +453,17 @@ export default function SubjectsPage() {
                                 <div className="flex gap-2" style={{ marginTop: 14 }}>
                                     <button
                                         className="btn btn-primary btn-sm"
-                                        onClick={() => handleQuickGenerate(s.id)}
+                                        onClick={() => {
+                                            setHairstyleModalSubject(s);
+                                            setSelectedHairstyles([]);
+                                        }}
                                         disabled={isGenerating || isGeneratingSelfies}
                                         style={{ flex: 1 }}
                                     >
                                         {isGenerating ? (
                                             <><span className="spinner" /> Generating…</>
                                         ) : (
-                                            "⚡ All Hairstyles"
+                                            "✨ Hairstyles"
                                         )}
                                     </button>
                                     <button
@@ -640,19 +691,9 @@ export default function SubjectsPage() {
                                     <label className="form-label">Hairstyle</label>
                                     <select name="hairstyleCombo" className="form-select" defaultValue="DEFAULT">
                                         <optgroup label="General Styles">
-                                            <option value="DEFAULT">90s Blowout Layered</option>
-                                            <option value="MANUAL:sleek straight long hair, center part, glossy, perfectly smooth glass hair">Sleek Straight Glass Hair</option>
-                                            <option value="MANUAL:loose effortless beach waves, texturized, casual and chic">Effortless Beach Waves</option>
-                                            <option value="MANUAL:textured wavy long bob, shoulder length lob, effortless cool girl waves">Wavy Lob</option>
-                                            <option value="MANUAL:perfectly defined ringlet curls, highly textured, moisturizing shine, flawless curly hair">Defined Curls</option>
-                                            <option value="MANUAL:sharp chin-length classic french bob, slight effortless wave">Classic French Bob</option>
-                                            <option value="MANUAL:half-up half-down styling, sleek crown, long voluminous lengths, soft fashion glam">Half-Up Half-Down Glam</option>
-                                            <option value="MANUAL:tight bouncy curls, extreme volume, natural texture, healthy shine">Voluminous Natural Curls</option>
-                                            <option value="MANUAL:messy romantic 90s updo with face framing pieces">Romantic 90s Updo</option>
-                                            <option value="MANUAL:long straight hair with blunt bangs across forehead">Long Hair + Blunt Bangs</option>
-                                            <option value="MANUAL:feathered layers throughout, massive 90s supermodel volume, airy flipped ends">Feathered Supermodel Layers</option>
-                                            <option value="MANUAL:chic gamine pixie cut, short, defined texture, effortless">Chic Pixie Cut</option>
-                                            <option value="MANUAL:sleek high ponytail, snatched, smooth, polished">Sleek High Ponytail</option>
+                                            {GENERAL_HAIRSTYLES.map(h => (
+                                                <option key={h.value} value={h.value}>{h.label}</option>
+                                            ))}
                                         </optgroup>
                                         {presets.length > 0 && (
                                             <optgroup label="Saved Presets">
@@ -783,6 +824,134 @@ export default function SubjectsPage() {
                 onCancel={() => setSubjectToDelete(null)}
                 confirmText="Delete Subject"
             />
+            <AnimatePresence>
+                {hairstyleModalSubject && (
+                    <motion.div
+                        className="modal-overlay"
+                        onClick={() => setHairstyleModalSubject(null)}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                    >
+                        <motion.div
+                            className="modal"
+                            style={{
+                                width: "100%",
+                                maxWidth: 500,
+                                maxHeight: "80vh",
+                                display: "flex",
+                                flexDirection: "column"
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            transition={springAnimation}
+                        >
+                            <div className="modal-header">
+                                <h3>✨ Generate Hairstyles</h3>
+                                <button
+                                    className="btn btn-icon btn-secondary"
+                                    onClick={() => setHairstyleModalSubject(null)}
+                                    title="Close"
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                </button>
+                            </div>
+                            <div style={{ flex: 1, overflowY: "auto", padding: "16px 24px" }}>
+                                <p className="text-sm text-secondary" style={{ marginBottom: 16 }}>
+                                    Select the hairstyles you want to generate for <strong>{hairstyleModalSubject.name}</strong>.
+                                </p>
+
+                                <div style={{ marginBottom: 16, display: "flex", gap: 8 }}>
+                                    <button
+                                        className="btn btn-secondary btn-sm"
+                                        style={{ flex: 1 }}
+                                        onClick={() => {
+                                            const allVals = [
+                                                ...GENERAL_HAIRSTYLES.map(h => h.value),
+                                                ...presets.map(p => `PRESET:${p.id}`)
+                                            ];
+                                            setSelectedHairstyles(allVals);
+                                        }}
+                                    >Select All</button>
+                                    <button
+                                        className="btn btn-secondary btn-sm"
+                                        style={{ flex: 1 }}
+                                        onClick={() => setSelectedHairstyles([])}
+                                    >Clear All</button>
+                                </div>
+
+                                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                                    <div>
+                                        <h4 style={{ marginBottom: 8, fontSize: "14px", color: "var(--foreground)" }}>General Styles</h4>
+                                        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                                            {GENERAL_HAIRSTYLES.map(h => {
+                                                const checked = selectedHairstyles.includes(h.value);
+                                                return (
+                                                    <label key={h.value} style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: "14px" }}>
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={checked}
+                                                            onChange={() => {
+                                                                if (checked) {
+                                                                    setSelectedHairstyles(prev => prev.filter(v => v !== h.value));
+                                                                } else {
+                                                                    setSelectedHairstyles(prev => [...prev, h.value]);
+                                                                }
+                                                            }}
+                                                            style={{ width: 16, height: 16, cursor: "pointer", accentColor: "var(--primary)" }}
+                                                        />
+                                                        {h.label}
+                                                    </label>
+                                                )
+                                            })}
+                                        </div>
+                                    </div>
+                                    {presets.length > 0 && (
+                                        <div style={{ marginTop: 8 }}>
+                                            <h4 style={{ marginBottom: 8, fontSize: "14px", color: "var(--foreground)" }}>Saved Presets</h4>
+                                            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                                                {presets.map(p => {
+                                                    const val = `PRESET:${p.id}`;
+                                                    const checked = selectedHairstyles.includes(val);
+                                                    return (
+                                                        <label key={val} style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: "14px" }}>
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={checked}
+                                                                onChange={() => {
+                                                                    if (checked) {
+                                                                        setSelectedHairstyles(prev => prev.filter(v => v !== val));
+                                                                    } else {
+                                                                        setSelectedHairstyles(prev => [...prev, val]);
+                                                                    }
+                                                                }}
+                                                                style={{ width: 16, height: 16, cursor: "pointer", accentColor: "var(--primary)" }}
+                                                            />
+                                                            {p.name}
+                                                        </label>
+                                                    )
+                                                })}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="modal-footer" style={{ borderTop: "1px solid var(--border)", padding: "16px 24px" }}>
+                                <button className="btn btn-secondary" onClick={() => setHairstyleModalSubject(null)}>Cancel</button>
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={handleGenerateSelected}
+                                    disabled={selectedHairstyles.length === 0}
+                                >
+                                    Generate {selectedHairstyles.length > 0 ? `(${selectedHairstyles.length})` : ""}
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </>
     );
 }
