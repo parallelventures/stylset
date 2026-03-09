@@ -82,5 +82,59 @@ export const SELFIE_SCENARIOS = [
         location: "trendy high-end fashion boutique interior, soft pastel tones, rack of clothes in background",
         outfit: "pink pastel cardigan with pearl buttons",
         hair: "long bouncy blowout, curtain bangs",
+    },
+    {
+        name: "Sunlit Balcony",
+        location: "sunlit balcony overlooking the mediterranean sea, warm light",
+        outfit: "breezy white linen summer dress",
+        hair: "windswept loose waves",
+    },
+    {
+        name: "Gym Mirror",
+        location: "high-end luxury gym mirror, neon lighting, clean equipment in background",
+        outfit: "matching premium athletic wear set, leggings and sports bra",
+        hair: "high sleek ponytail",
+    },
+    {
+        name: "Art Gallery",
+        location: "modern art gallery, bright white walls, abstract paintings",
+        outfit: "chic minimalist black turtleneck and trousers",
+        hair: "sleek low bun",
+    },
+    {
+        name: "Evening Gala",
+        location: "glamorous evening gala red carpet background, sparkling lights",
+        outfit: "elegant floor-length sequin evening gown",
+        hair: "classic hollywood waves",
+    },
+    {
+        name: "Tropical Beach Resort",
+        location: "luxury tropical beach resort, palm trees, clear blue water in background",
+        outfit: "designer swimsuit with a sheer cover-up",
+        hair: "wet look slicked back hair",
+    },
+    {
+        name: "Cozy Winter Cabin",
+        location: "cozy winter log cabin interior, fireplace glowing in the background, snowy window",
+        outfit: "thick oversized cable-knit sweater, comfy scarf",
+        hair: "messy bun with face-framing pieces",
+    },
+    {
+        name: "Neon City Streets",
+        location: "cyberpunk neon-lit city streets at night, blurred rain and lights",
+        outfit: "edgy black leather jacket with a graphic band tee",
+        hair: "shaggy wolf cut",
+    },
+    {
+        name: "First Class Flight",
+        location: "first-class luxury airplane cabin seat, soft window light above the clouds",
+        outfit: "chic matching cashmere lounge set",
+        hair: "loose romantic curls",
+    },
+    {
+        name: "Vintage Record Store",
+        location: "aesthetic vintage record store interior, racks of vinyl, warm retro lighting",
+        outfit: "denim overalls and a striped vintage tee",
+        hair: "shag with bangs",
     }
 ];
