@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { storageUrl } from "@/lib/urls";
+import { SELFIE_SCENARIOS } from "@/lib/selfies";
 import { motion, AnimatePresence } from "framer-motion";
 import { springAnimation } from "@/app/template";
 import { CardGridSkeleton } from "@/components/Skeleton";
@@ -117,6 +118,8 @@ export default function SubjectsPage() {
     const [enhanceQuality, setEnhanceQuality] = useState(false);
     const [hairstyleModalSubject, setHairstyleModalSubject] = useState<Subject | null>(null);
     const [selectedHairstyles, setSelectedHairstyles] = useState<string[]>([]);
+    const [selfieModalSubject, setSelfieModalSubject] = useState<Subject | null>(null);
+    const [selectedSelfies, setSelectedSelfies] = useState<string[]>([]);
     const router = useRouter();
 
     async function loadSubjects() {
@@ -275,11 +278,23 @@ export default function SubjectsPage() {
         }
     }
 
-    async function handleGenerateSelfies(subjectId: string) {
+    async function handleGenerateSelectedSelfies() {
+        if (!selfieModalSubject || selectedSelfies.length === 0) return;
+        const subjectId = selfieModalSubject.id;
+
+        const selections = selectedSelfies.map(name => {
+            return SELFIE_SCENARIOS.find(s => s.name === name);
+        }).filter(Boolean);
+
         setGenerating(subjectId + "_selfies");
+        setSelfieModalSubject(null);
+        setSelectedSelfies([]);
+
         try {
             const res = await fetch(`/api/subjects/${subjectId}/generate-selfies`, {
                 method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ selections })
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error);
@@ -468,7 +483,10 @@ export default function SubjectsPage() {
                                     </button>
                                     <button
                                         className="btn btn-secondary btn-sm"
-                                        onClick={() => handleGenerateSelfies(s.id)}
+                                        onClick={() => {
+                                            setSelfieModalSubject(s);
+                                            setSelectedSelfies([]);
+                                        }}
                                         disabled={isGenerating || isGeneratingSelfies}
                                         style={{ flex: 1 }}
                                     >
@@ -946,6 +964,103 @@ export default function SubjectsPage() {
                                     disabled={selectedHairstyles.length === 0}
                                 >
                                     Generate {selectedHairstyles.length > 0 ? `(${selectedHairstyles.length})` : ""}
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            <AnimatePresence>
+                {selfieModalSubject && (
+                    <motion.div
+                        className="modal-overlay"
+                        onClick={() => setSelfieModalSubject(null)}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                    >
+                        <motion.div
+                            className="modal"
+                            style={{
+                                width: "100%",
+                                maxWidth: 500,
+                                maxHeight: "80vh",
+                                display: "flex",
+                                flexDirection: "column"
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            transition={springAnimation}
+                        >
+                            <div className="modal-header">
+                                <h3>📸 Generate Selfies</h3>
+                                <button
+                                    className="btn btn-icon btn-secondary"
+                                    onClick={() => setSelfieModalSubject(null)}
+                                    title="Close"
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                </button>
+                            </div>
+                            <div style={{ flex: 1, overflowY: "auto", padding: "16px 24px" }}>
+                                <p className="text-sm text-secondary" style={{ marginBottom: 16 }}>
+                                    Select the selfie scenarios you want to generate for <strong>{selfieModalSubject.name}</strong>.
+                                </p>
+
+                                <div style={{ marginBottom: 16, display: "flex", gap: 8 }}>
+                                    <button
+                                        className="btn btn-secondary btn-sm"
+                                        style={{ flex: 1 }}
+                                        onClick={() => {
+                                            const allVals = SELFIE_SCENARIOS.map(s => s.name);
+                                            setSelectedSelfies(allVals);
+                                        }}
+                                    >Select All</button>
+                                    <button
+                                        className="btn btn-secondary btn-sm"
+                                        style={{ flex: 1 }}
+                                        onClick={() => setSelectedSelfies([])}
+                                    >Clear All</button>
+                                </div>
+
+                                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                                    <div>
+                                        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                                            {SELFIE_SCENARIOS.map(scenario => {
+                                                const checked = selectedSelfies.includes(scenario.name);
+                                                return (
+                                                    <label key={scenario.name} style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: "14px" }}>
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={checked}
+                                                            onChange={() => {
+                                                                if (checked) {
+                                                                    setSelectedSelfies(prev => prev.filter(v => v !== scenario.name));
+                                                                } else {
+                                                                    setSelectedSelfies(prev => [...prev, scenario.name]);
+                                                                }
+                                                            }}
+                                                            style={{ width: 16, height: 16, cursor: "pointer", accentColor: "var(--primary)" }}
+                                                        />
+                                                        {scenario.name}
+                                                    </label>
+                                                )
+                                            })}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="modal-footer" style={{ borderTop: "1px solid var(--border)", padding: "16px 24px" }}>
+                                <button className="btn btn-secondary" onClick={() => setSelfieModalSubject(null)}>Cancel</button>
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={handleGenerateSelectedSelfies}
+                                    disabled={selectedSelfies.length === 0}
+                                >
+                                    Generate {selectedSelfies.length > 0 ? `(${selectedSelfies.length})` : ""}
                                 </button>
                             </div>
                         </motion.div>
