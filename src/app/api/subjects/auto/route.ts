@@ -19,6 +19,7 @@ export async function POST(req: Request) {
             body = await req.json().catch(() => ({}));
         }
 
+        const gender = body.gender || "Women";
         const inputAesthetic = body.aesthetic || "classic";
         const ethnicity = body.ethnicity || "medium skin tone";
         const age = body.age || "Young";
@@ -35,12 +36,20 @@ export async function POST(req: Request) {
             "y2k": "nostalgic Y2K pop star aesthetic, 2000s fashion model vibe, trendy, striking",
             "goth": "dark alternative goth beauty, edgy, mysterious, striking pale photogenic contrast",
             "old money": "quiet luxury, old money aesthetic, sophisticated, wealthy heir vibe, impeccably groomed",
-            "parisian girl": "parisian sexy supermodel vibe (expensive, clean, ultra photogenic)"
+            "parisian girl": "parisian sexy supermodel vibe (expensive, clean, ultra photogenic)",
+            "streetwear / trendy": "modern streetwear fashion model, trendy, effortless cool, striking features",
+            "goth / alternative": "dark alternative goth, edgy, mysterious fashion model, striking pale photogenic contrast",
+            "sporty / athleisure": "athletic sporty fitness model, healthy glowing look, dynamic"
         };
+
+        let lookString = lookMap[inputAesthetic] || lookMap["classic"];
+        if (gender === "Men" && inputAesthetic === "classic") {
+            lookString = "handsome male fashion model, sharp jawline, clean masculine beauty (expensive, ultra photogenic)";
+        }
 
         const jsonPrompt = {
             "hairstyle_model_prompt": {
-                "id": `women_${inputAesthetic.replace(/\s+/g, "_")}_model`,
+                "id": `${gender.toLowerCase()}_${inputAesthetic.replace(/\s+/g, "_")}_model`,
                 "meta": {
                     "aspect_ratio": "4:5 portrait",
                     "quality": "ultra_photorealistic",
@@ -48,7 +57,7 @@ export async function POST(req: Request) {
                     "camera": "iPhone 17 Pro Max (rear camera, studio portrait)",
                     "lens": "24mm wide",
                     "style": `premium studio catalog model, pure white background ONLY, hair-focused, ${inputAesthetic} aesthetic, minimal retouch`,
-                    "consistency_rule": "NEW WOMAN. Completely different identity. No resemblance to any real person."
+                    "consistency_rule": `NEW ${gender.toUpperCase()}. Completely different identity. No resemblance to any real person.`
                 },
                 "composition": {
                     "shot_type": "studio portrait (not selfie)",
@@ -58,11 +67,11 @@ export async function POST(req: Request) {
                     "eye_contact": "direct eye contact with the camera",
                 },
                 "subject": {
-                    "category": "Women",
+                    "category": gender,
                     "age": age,
                     "model_profile": {
                         "type": "agency-grade commercial beauty / fashion model",
-                        "look": lookMap[inputAesthetic] || lookMap["classic"],
+                        "look": lookString,
                         "beauty_traits": [
                             "harmonious facial proportions",
                             "symmetrical features",

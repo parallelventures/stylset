@@ -82,6 +82,42 @@ const AESTHETIC_OUTFITS: Record<string, { value: string, label: string }[]> = {
     ]
 };
 
+const MEN_AESTHETIC_OUTFITS: Record<string, { value: string, label: string }[]> = {
+    "classic": [
+        { value: "tailored sharp navy suit white crisp shirt no tie", label: "Navy Suit, No Tie" },
+        { value: "crisp white high-quality crewneck t-shirt", label: "Crisp White Tee" },
+        { value: "premium fitted black turtleneck", label: "Black Turtleneck" },
+        { value: "white button-down shirt slightly unbuttoned at collar", label: "White Button-Down" },
+        { value: "beige tailored trench coat over simple shirt", label: "Beige Trench Coat" },
+        { value: "simple grey cashmere crewneck sweater", label: "Grey Cashmere Sweater" }
+    ],
+    "streetwear / trendy": [
+        { value: "oversized vintage graphic tee with chain", label: "Vintage Graphic Tee" },
+        { value: "premium heavyweight hoodie", label: "Heavyweight Hoodie" },
+        { value: "bomber jacket over essential tee", label: "Bomber Jacket" },
+        { value: "light wash denim jacket", label: "Denim Jacket" },
+        { value: "minimalist technical outerwear jacket", label: "Technical Jacket" }
+    ],
+    "old money": [
+        { value: "cable knit v-neck tennis sweater", label: "Cable Knit Sweater" },
+        { value: "navy blazer with brass buttons over oxford shirt", label: "Navy Blazer" },
+        { value: "quarter-zip cashmere sweater over collared shirt", label: "Quarter-Zip Cashmere" },
+        { value: "fine knit polo shirt in neutral tones", label: "Knit Polo" },
+        { value: "light grey tailored sport coat", label: "Grey Sport Coat" }
+    ],
+    "goth / alternative": [
+        { value: "black leather biker jacket", label: "Leather Biker Jacket" },
+        { value: "black denim vest over vintage band tee", label: "Denim Vest & Band Tee" },
+        { value: "distressed black knit sweater", label: "Distressed Sweater" },
+        { value: "sleek all-black tailored gothic suit", label: "All-Black Tailored Suit" }
+    ],
+    "sporty / athleisure": [
+        { value: "sleek technical running jacket", label: "Technical Running Jacket" },
+        { value: "fitted gym compression shirt", label: "Compression Shirt" },
+        { value: "premium athleisure zip-up hoodie", label: "Athleisure Zip-Up" }
+    ]
+};
+
 const GENERAL_HAIRSTYLES = [
     { value: "DEFAULT", label: "90s Blowout Layered" },
     { value: "MANUAL:sleek straight long hair, center part, glossy, perfectly smooth glass hair", label: "Sleek Straight Glass Hair" },
@@ -96,6 +132,19 @@ const GENERAL_HAIRSTYLES = [
     { value: "MANUAL:feathered layers throughout, massive 90s supermodel volume, airy flipped ends", label: "Feathered Supermodel Layers" },
     { value: "MANUAL:chic gamine pixie cut, short, defined texture, effortless", label: "Chic Pixie Cut" },
     { value: "MANUAL:sleek high ponytail, snatched, smooth, polished", label: "Sleek High Ponytail" },
+];
+
+const MEN_GENERAL_HAIRSTYLES = [
+    { value: "DEFAULT", label: "Clean Medium Length Throwback" },
+    { value: "MANUAL:short textured crew cut, mid fade, short fringe", label: "Textured Crew Cut + Fade" },
+    { value: "MANUAL:slicked back hair, pompadour style, neat glossy sides", label: "Slicked Back Pompadour" },
+    { value: "MANUAL:messy textured fringe, effortless look, medium length top", label: "Textured Fringe" },
+    { value: "MANUAL:clean short buzz cut, sharp hairline, immaculate taper", label: "Buzz Cut + Taper" },
+    { value: "MANUAL:long flowing men's hair, shoulder length, effortless waves", label: "Long Flowing Waves" },
+    { value: "MANUAL:classic side part, clean cut ivy league style, businessman haircut", label: "Classic Side Part" },
+    { value: "MANUAL:modern mullet, textured top, short sides, flowing back", label: "Modern Mullet" },
+    { value: "MANUAL:tight short curls, clean fade on side", label: "Short Natural Curls + Fade" },
+    { value: "MANUAL:volume blowout, swept back loosely, casual but styled, thick hair", label: "Swept Back Blowout" },
 ];
 
 export default function SubjectsPage() {
@@ -120,6 +169,8 @@ export default function SubjectsPage() {
     const [selectedHairstyles, setSelectedHairstyles] = useState<string[]>([]);
     const [selfieModalSubject, setSelfieModalSubject] = useState<Subject | null>(null);
     const [selectedSelfies, setSelectedSelfies] = useState<string[]>([]);
+    const [gender, setGender] = useState("Women");
+    const [generateGender, setGenerateGender] = useState("Women");
     const router = useRouter();
 
     async function loadSubjects() {
@@ -147,7 +198,8 @@ export default function SubjectsPage() {
     function handleAestheticChange(e: React.ChangeEvent<HTMLSelectElement>) {
         const val = e.target.value;
         setAesthetic(val);
-        const options = AESTHETIC_OUTFITS[val] || AESTHETIC_OUTFITS["classic"];
+        const dict = gender === "Women" ? AESTHETIC_OUTFITS : MEN_AESTHETIC_OUTFITS;
+        const options = dict[val] || dict["classic"];
         setOutfit(options[0].value);
     }
 
@@ -192,6 +244,7 @@ export default function SubjectsPage() {
 
         try {
             const fd = new FormData();
+            fd.set("gender", gender);
             fd.set("aesthetic", (form.elements.namedItem("aesthetic") as HTMLSelectElement).value);
             fd.set("ethnicity", (form.elements.namedItem("ethnicity") as HTMLSelectElement).value);
             fd.set("age", (form.elements.namedItem("age") as HTMLSelectElement).value);
@@ -246,7 +299,8 @@ export default function SubjectsPage() {
                 };
             } else if (combo.startsWith("MANUAL:")) {
                 const prompt = combo.replace("MANUAL:", "");
-                const label = GENERAL_HAIRSTYLES.find(h => h.value === combo)?.label || "Manual";
+                const styles = generateGender === "Women" ? GENERAL_HAIRSTYLES : MEN_GENERAL_HAIRSTYLES;
+                const label = styles.find(h => h.value === combo)?.label || "Manual";
                 return {
                     hairstylePrompt: prompt,
                     name: label
@@ -471,6 +525,7 @@ export default function SubjectsPage() {
                                         onClick={() => {
                                             setHairstyleModalSubject(s);
                                             setSelectedHairstyles([]);
+                                            setGenerateGender("Women");
                                         }}
                                         disabled={isGenerating || isGeneratingSelfies}
                                         style={{ flex: 1 }}
@@ -706,10 +761,24 @@ export default function SubjectsPage() {
 
                             <form onSubmit={handleAutoGenerateSubject}>
                                 <div className="form-group">
+                                    <label className="form-label">Gender</label>
+                                    <select name="gender" className="form-select" value={gender} onChange={(e) => {
+                                        const val = e.target.value;
+                                        setGender(val);
+                                        setAesthetic("classic");
+                                        if (val === "Women") setOutfit(AESTHETIC_OUTFITS["classic"][0].value);
+                                        else setOutfit(MEN_AESTHETIC_OUTFITS["classic"][0].value);
+                                    }}>
+                                        <option value="Women">Women</option>
+                                        <option value="Men">Men</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
                                     <label className="form-label">Hairstyle</label>
                                     <select name="hairstyleCombo" className="form-select" defaultValue="DEFAULT">
                                         <optgroup label="General Styles">
-                                            {GENERAL_HAIRSTYLES.map(h => (
+                                            {(gender === "Women" ? GENERAL_HAIRSTYLES : MEN_GENERAL_HAIRSTYLES).map(h => (
                                                 <option key={h.value} value={h.value}>{h.label}</option>
                                             ))}
                                         </optgroup>
@@ -726,12 +795,24 @@ export default function SubjectsPage() {
                                 <div className="form-group">
                                     <label className="form-label">Aesthetic / Style</label>
                                     <select name="aesthetic" className="form-select" value={aesthetic} onChange={handleAestheticChange}>
-                                        <option value="classic">Classic Beauty</option>
-                                        <option value="clean tiktok girl">Clean TikTok Girl</option>
-                                        <option value="y2k">Y2K Nostalgia</option>
-                                        <option value="goth">Goth / Alternative</option>
-                                        <option value="old money">Quiet Luxury / Old Money</option>
-                                        <option value="parisian girl">Parisian Girl / Effortless</option>
+                                        {gender === "Women" ? (
+                                            <>
+                                                <option value="classic">Classic Beauty</option>
+                                                <option value="clean tiktok girl">Clean TikTok Girl</option>
+                                                <option value="y2k">Y2K Nostalgia</option>
+                                                <option value="goth">Goth / Alternative</option>
+                                                <option value="old money">Quiet Luxury / Old Money</option>
+                                                <option value="parisian girl">Parisian Girl / Effortless</option>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <option value="classic">Classic / Sharp</option>
+                                                <option value="streetwear / trendy">Streetwear / Trendy</option>
+                                                <option value="old money">Old Money / Quiet Luxury</option>
+                                                <option value="goth / alternative">Goth / Alternative</option>
+                                                <option value="sporty / athleisure">Sporty / Athleisure</option>
+                                            </>
+                                        )}
                                     </select>
                                 </div>
 
@@ -772,7 +853,10 @@ export default function SubjectsPage() {
                                 <div className="form-group">
                                     <label className="form-label">Outfit</label>
                                     <select name="outfit" className="form-select" value={outfit} onChange={(e) => setOutfit(e.target.value)}>
-                                        {(AESTHETIC_OUTFITS[aesthetic] || AESTHETIC_OUTFITS["classic"]).map((opt, i) => (
+                                        {(gender === "Women"
+                                            ? (AESTHETIC_OUTFITS[aesthetic] || AESTHETIC_OUTFITS["classic"])
+                                            : (MEN_AESTHETIC_OUTFITS[aesthetic] || MEN_AESTHETIC_OUTFITS["classic"])
+                                        ).map((opt, i) => (
                                             <option key={i} value={opt.value}>{opt.label}</option>
                                         ))}
                                     </select>
@@ -881,13 +965,25 @@ export default function SubjectsPage() {
                                     Select the hairstyles you want to generate for <strong>{hairstyleModalSubject.name}</strong>.
                                 </p>
 
+                                <div style={{ marginBottom: "16px", display: "flex", gap: "12px", alignItems: "center" }}>
+                                    <label style={{ fontSize: "14px", fontWeight: 500 }}>Subject Gender:</label>
+                                    <select className="form-select" style={{ width: "auto" }} value={generateGender} onChange={(e) => {
+                                        setGenerateGender(e.target.value);
+                                        setSelectedHairstyles([]);
+                                    }}>
+                                        <option value="Women">Women</option>
+                                        <option value="Men">Men</option>
+                                    </select>
+                                </div>
+
                                 <div style={{ marginBottom: 16, display: "flex", gap: 8 }}>
                                     <button
                                         className="btn btn-secondary btn-sm"
                                         style={{ flex: 1 }}
                                         onClick={() => {
+                                            const styles = generateGender === "Women" ? GENERAL_HAIRSTYLES : MEN_GENERAL_HAIRSTYLES;
                                             const allVals = [
-                                                ...GENERAL_HAIRSTYLES.map(h => h.value),
+                                                ...styles.map(h => h.value),
                                                 ...presets.map(p => `PRESET:${p.id}`)
                                             ];
                                             setSelectedHairstyles(allVals);
@@ -904,7 +1000,7 @@ export default function SubjectsPage() {
                                     <div>
                                         <h4 style={{ marginBottom: 8, fontSize: "14px", color: "var(--foreground)" }}>General Styles</h4>
                                         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                                            {GENERAL_HAIRSTYLES.map(h => {
+                                            {(generateGender === "Women" ? GENERAL_HAIRSTYLES : MEN_GENERAL_HAIRSTYLES).map(h => {
                                                 const checked = selectedHairstyles.includes(h.value);
                                                 return (
                                                     <label key={h.value} style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: "14px" }}>
