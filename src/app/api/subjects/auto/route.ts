@@ -47,71 +47,83 @@ export async function POST(req: Request) {
             lookString = "handsome male fashion model, sharp jawline, clean masculine beauty (expensive, ultra photogenic)";
         }
 
-        const jsonPrompt = {
-            "hairstyle_model_prompt": {
-                "id": `${gender.toLowerCase()}_${inputAesthetic.replace(/\s+/g, "_")}_model`,
-                "meta": {
-                    "aspect_ratio": "4:5 portrait",
-                    "quality": "ultra_photorealistic",
-                    "resolution": "8k UHD",
-                    "camera": "iPhone 17 Pro Max (rear camera, studio portrait)",
-                    "lens": "24mm wide",
-                    "style": `premium studio catalog model, pure white background ONLY, hair-focused, ${inputAesthetic} aesthetic, minimal retouch`,
-                    "consistency_rule": `NEW ${gender.toUpperCase()}. Completely different identity. No resemblance to any real person.`
-                },
-                "composition": {
-                    "shot_type": "studio portrait (not selfie)",
-                    "pose": pose,
-                    "framing": "top of head to mid-chest, centered",
-                    "head_angle": "front-facing (0–3°), chin level",
-                    "eye_contact": "direct eye contact with the camera",
-                },
-                "subject": {
-                    "category": gender,
-                    "age": age,
-                    "model_profile": {
-                        "type": "agency-grade commercial beauty / fashion model",
-                        "look": lookString,
-                        "beauty_traits": [
-                            "harmonious facial proportions",
-                            "symmetrical features",
-                            "high cheekbones",
-                            "soft defined jawline",
-                            "almond-shaped eyes",
-                            "balanced nose",
-                            "full but natural lips"
-                        ],
-                        "ethnicity": ethnicity
-                    },
-                    "expression": expression,
-                    "skin_and_makeup": {
-                        "skin": "healthy luxury skin, realistic pores, even tone, soft glow",
-                        "makeup": makeup
-                    },
-                    "hair": {
-                        "color": hairColor,
-                        "description": hairstylePrompt
-                    },
-                    "wardrobe": {
-                        "outfit": outfit,
-                        "logo_rule": "no logos, no prints, no text"
-                    }
-                },
-                "photography": {
-                    "lighting": "two large softboxes 45° left/right + gentle frontal fill; subtle hair-light kicker to show crown lift and length shine",
-                    "background": "pure white seamless (#FFFFFF) ONLY, evenly lit, absolutely no gradient, no texture, nothing else",
-                    "exposure": "bright premium catalog exposure",
-                    "focus": "tack-sharp eyes + crisp part + length shine",
-                    "white_balance": "neutral studio daylight",
-                    "dynamic_range": "high, preserve specular highlights without blowing out whites",
-                    "retouch_policy": "minimal editorial retouch only; keep pores and realism"
-                }
+        let jsonPrompt;
+
+        if (body.rawJson) {
+            try {
+                // Ensure it's valid JSON
+                JSON.parse(body.rawJson);
+            } catch (err) {
+                throw new Error("Invalid raw JSON provided");
             }
-        };
+            jsonPrompt = JSON.parse(body.rawJson);
+        } else {
+            jsonPrompt = {
+                "hairstyle_model_prompt": {
+                    "id": `${gender.toLowerCase()}_${inputAesthetic.replace(/\s+/g, "_")}_model`,
+                    "meta": {
+                        "aspect_ratio": "4:5 portrait",
+                        "quality": "ultra_photorealistic",
+                        "resolution": "8k UHD",
+                        "camera": "iPhone 17 Pro Max (rear camera, studio portrait)",
+                        "lens": "24mm wide",
+                        "style": `premium studio catalog model, pure white background ONLY, hair-focused, ${inputAesthetic} aesthetic, minimal retouch`,
+                        "consistency_rule": `NEW ${gender.toUpperCase()}. Completely different identity. No resemblance to any real person.`
+                    },
+                    "composition": {
+                        "shot_type": "studio portrait (not selfie)",
+                        "pose": pose,
+                        "framing": "top of head to mid-chest, centered",
+                        "head_angle": "front-facing (0–3°), chin level",
+                        "eye_contact": "direct eye contact with the camera",
+                    },
+                    "subject": {
+                        "category": gender,
+                        "age": age,
+                        "model_profile": {
+                            "type": "agency-grade commercial beauty / fashion model",
+                            "look": lookString,
+                            "beauty_traits": [
+                                "harmonious facial proportions",
+                                "symmetrical features",
+                                "high cheekbones",
+                                "soft defined jawline",
+                                "almond-shaped eyes",
+                                "balanced nose",
+                                "full but natural lips"
+                            ],
+                            "ethnicity": ethnicity
+                        },
+                        "expression": expression,
+                        "skin_and_makeup": {
+                            "skin": "healthy luxury skin, realistic pores, even tone, soft glow",
+                            "makeup": makeup
+                        },
+                        "hair": {
+                            "color": hairColor,
+                            "description": hairstylePrompt
+                        },
+                        "wardrobe": {
+                            "outfit": outfit,
+                            "logo_rule": "no logos, no prints, no text"
+                        }
+                    },
+                    "photography": {
+                        "lighting": "two large softboxes 45° left/right + gentle frontal fill; subtle hair-light kicker to show crown lift and length shine",
+                        "background": "pure white seamless (#FFFFFF) ONLY, evenly lit, absolutely no gradient, no texture, nothing else",
+                        "exposure": "bright premium catalog exposure",
+                        "focus": "tack-sharp eyes + crisp part + length shine",
+                        "white_balance": "neutral studio daylight",
+                        "dynamic_range": "high, preserve specular highlights without blowing out whites",
+                        "retouch_policy": "minimal editorial retouch only; keep pores and realism"
+                    }
+                }
+            };
+        }
 
-        const AUTO_SUBJECT_PROMPT = JSON.stringify(jsonPrompt, null, 2);
+        const AUTO_SUBJECT_PROMPT = typeof jsonPrompt === 'string' ? jsonPrompt : JSON.stringify(jsonPrompt, null, 2);
 
-        const AUTO_SUBJECT_NEGATIVE_PROMPT = [
+        let AUTO_SUBJECT_NEGATIVE_PROMPT = body.rawNegativePrompt || [
             "no phone", "no mirror", "no props", "no text overlays", "no watermark",
             "no logos on clothing", "no heavy jewelry", "no distorted face", "no asymmetrical eyes",
             "no extra fingers/limbs", "no colored background", "no background gradient",

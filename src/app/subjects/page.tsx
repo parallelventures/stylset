@@ -171,6 +171,8 @@ export default function SubjectsPage() {
     const [selectedSelfies, setSelectedSelfies] = useState<string[]>([]);
     const [gender, setGender] = useState("Women");
     const [generateGender, setGenerateGender] = useState("Women");
+    const [autoMode, setAutoMode] = useState<"builder" | "json">("builder");
+    const [autoRawJson, setAutoRawJson] = useState("");
     const router = useRouter();
 
     async function loadSubjects() {
@@ -244,28 +246,32 @@ export default function SubjectsPage() {
 
         try {
             const fd = new FormData();
-            fd.set("gender", gender);
-            fd.set("aesthetic", (form.elements.namedItem("aesthetic") as HTMLSelectElement).value);
-            fd.set("ethnicity", (form.elements.namedItem("ethnicity") as HTMLSelectElement).value);
-            fd.set("age", (form.elements.namedItem("age") as HTMLSelectElement).value);
-            fd.set("hairColor", (form.elements.namedItem("hairColor") as HTMLSelectElement).value);
-            fd.set("outfit", (form.elements.namedItem("outfit") as HTMLSelectElement).value);
-            fd.set("pose", (form.elements.namedItem("pose") as HTMLSelectElement).value);
-            fd.set("makeup", (form.elements.namedItem("makeup") as HTMLSelectElement).value);
-            fd.set("expression", (form.elements.namedItem("expression") as HTMLSelectElement).value);
-
-            const combo = (form.elements.namedItem("hairstyleCombo") as HTMLSelectElement).value;
-            if (combo.startsWith("PRESET:")) {
-                const presetId = combo.split(":")[1];
-                const preset = presets.find(p => p.id === presetId);
-                if (preset) {
-                    fd.set("hairstylePrompt", preset.hairstylePrompt);
-                    fd.set("hairstyleName", preset.name);
-                }
-            } else if (combo.startsWith("MANUAL:")) {
-                fd.set("hairstylePrompt", combo.replace("MANUAL:", ""));
+            if (autoMode === "json") {
+                fd.set("rawJson", autoRawJson);
             } else {
-                fd.set("hairstylePrompt", "glossy. Straight to wavy, thick, smooth. Long layered butterfly cut, 90s blowout style. Face-framing curtain bangs. Heavily layered mid-lengths to ends. Voluminous.");
+                fd.set("gender", gender);
+                fd.set("aesthetic", (form.elements.namedItem("aesthetic") as HTMLSelectElement).value);
+                fd.set("ethnicity", (form.elements.namedItem("ethnicity") as HTMLSelectElement).value);
+                fd.set("age", (form.elements.namedItem("age") as HTMLSelectElement).value);
+                fd.set("hairColor", (form.elements.namedItem("hairColor") as HTMLSelectElement).value);
+                fd.set("outfit", (form.elements.namedItem("outfit") as HTMLSelectElement).value);
+                fd.set("pose", (form.elements.namedItem("pose") as HTMLSelectElement).value);
+                fd.set("makeup", (form.elements.namedItem("makeup") as HTMLSelectElement).value);
+                fd.set("expression", (form.elements.namedItem("expression") as HTMLSelectElement).value);
+
+                const combo = (form.elements.namedItem("hairstyleCombo") as HTMLSelectElement).value;
+                if (combo.startsWith("PRESET:")) {
+                    const presetId = combo.split(":")[1];
+                    const preset = presets.find(p => p.id === presetId);
+                    if (preset) {
+                        fd.set("hairstylePrompt", preset.hairstylePrompt);
+                        fd.set("hairstyleName", preset.name);
+                    }
+                } else if (combo.startsWith("MANUAL:")) {
+                    fd.set("hairstylePrompt", combo.replace("MANUAL:", ""));
+                } else {
+                    fd.set("hairstylePrompt", "glossy. Straight to wavy, thick, smooth. Long layered butterfly cut, 90s blowout style. Face-framing curtain bangs. Heavily layered mid-lengths to ends. Voluminous.");
+                }
             }
 
             const res = await fetch("/api/subjects/auto", {
@@ -760,8 +766,44 @@ export default function SubjectsPage() {
                             </div>
 
                             <form onSubmit={handleAutoGenerateSubject}>
-                                <div className="form-group">
-                                    <label className="form-label">Gender</label>
+                                <div style={{ display: "flex", gap: "8px", marginBottom: "20px" }}>
+                                    <button
+                                        type="button"
+                                        className={`btn btn-sm ${autoMode === "builder" ? "btn-primary" : "btn-secondary"}`}
+                                        style={{ flex: 1 }}
+                                        onClick={() => setAutoMode("builder")}
+                                    >
+                                        Builder
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className={`btn btn-sm ${autoMode === "json" ? "btn-primary" : "btn-secondary"}`}
+                                        style={{ flex: 1 }}
+                                        onClick={() => setAutoMode("json")}
+                                    >
+                                        Paste JSON
+                                    </button>
+                                </div>
+
+                                {autoMode === "json" ? (
+                                    <div className="form-group">
+                                        <label className="form-label">Raw JSON Prompt</label>
+                                        <div className="text-secondary text-sm" style={{ marginBottom: "8px" }}>
+                                            Paste your custom JSON here. Gemini 3 Pro Image Preview will generate the image directly based on this JSON structure.
+                                        </div>
+                                        <textarea
+                                            className="form-textarea mono"
+                                            rows={14}
+                                            placeholder='{\n  "hairstyle_model_prompt": {\n    "meta": { ... }\n  }\n}'
+                                            value={autoRawJson}
+                                            onChange={(e) => setAutoRawJson(e.target.value)}
+                                            required
+                                        ></textarea>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="form-group">
+                                            <label className="form-label">Gender</label>
                                     <select name="gender" className="form-select" value={gender} onChange={(e) => {
                                         const val = e.target.value;
                                         setGender(val);
@@ -893,7 +935,8 @@ export default function SubjectsPage() {
                                         <option value="bold dramatic editorial makeup">Bold Editorial</option>
                                     </select>
                                 </div>
-
+                                    </>
+                                )}
 
                                 <div className="modal-footer">
                                     <button
