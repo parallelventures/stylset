@@ -54,7 +54,7 @@ export async function POST(req: Request) {
                 // Ensure it's valid JSON
                 JSON.parse(body.rawJson);
             } catch (err) {
-                throw new Error("Invalid raw JSON provided");
+                throw new Error("Invalid raw JSON provided: " + (err instanceof Error ? err.message : String(err)));
             }
             jsonPrompt = JSON.parse(body.rawJson);
         } else {
