@@ -848,12 +848,32 @@ export default function SubjectsPage() {
                                                     </div>
                                                 ) : (
                                                     <div className="flex gap-2 items-center justify-center">
-                                                        {autoPreviews.map(p => (
+                                                        {autoPreviews.map((p, i) => (
                                                             <div key={p} style={{
                                                                 width: 64, height: 64, borderRadius: "var(--radius-sm)",
                                                                 overflow: "hidden", border: "1px solid var(--border)", position: "relative"
                                                             }}>
                                                                 <img src={p} alt="Reference preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                                                <button
+                                                                    type="button"
+                                                                    style={{
+                                                                        position: "absolute", top: 4, right: 4, width: 20, height: 20, 
+                                                                        borderRadius: "50%", background: "rgba(0,0,0,0.6)", color: "white",
+                                                                        border: "none", display: "flex", alignItems: "center", justifyContent: "center",
+                                                                        cursor: "pointer", padding: 0
+                                                                    }}
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        const newFiles = [...autoFiles];
+                                                                        newFiles.splice(i, 1);
+                                                                        setAutoFiles(newFiles);
+                                                                        const newPreviews = [...autoPreviews];
+                                                                        newPreviews.splice(i, 1);
+                                                                        setAutoPreviews(newPreviews);
+                                                                    }}
+                                                                >
+                                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                                                </button>
                                                             </div>
                                                         ))}
                                                         <div className="text-sm text-secondary ml-2">{autoFiles.length} reference image{autoFiles.length > 1 ? "s" : ""}</div>
