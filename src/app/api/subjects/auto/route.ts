@@ -47,18 +47,12 @@ export async function POST(req: Request) {
             lookString = "handsome male fashion model, sharp jawline, clean masculine beauty (expensive, ultra photogenic)";
         }
 
-        let jsonPrompt;
+        let AUTO_SUBJECT_PROMPT;
 
         if (body.rawJson) {
-            try {
-                // Ensure it's valid JSON
-                JSON.parse(body.rawJson);
-            } catch (err) {
-                throw new Error("Invalid raw JSON provided: " + (err instanceof Error ? err.message : String(err)));
-            }
-            jsonPrompt = JSON.parse(body.rawJson);
+            AUTO_SUBJECT_PROMPT = body.rawJson;
         } else {
-            jsonPrompt = {
+            const jsonPrompt = {
                 "hairstyle_model_prompt": {
                     "id": `${gender.toLowerCase()}_${inputAesthetic.replace(/\s+/g, "_")}_model`,
                     "meta": {
@@ -119,9 +113,8 @@ export async function POST(req: Request) {
                     }
                 }
             };
+            AUTO_SUBJECT_PROMPT = JSON.stringify(jsonPrompt, null, 2);
         }
-
-        const AUTO_SUBJECT_PROMPT = typeof jsonPrompt === 'string' ? jsonPrompt : JSON.stringify(jsonPrompt, null, 2);
 
         let AUTO_SUBJECT_NEGATIVE_PROMPT = body.rawNegativePrompt || [
             "no phone", "no mirror", "no props", "no text overlays", "no watermark",

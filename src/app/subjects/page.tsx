@@ -781,15 +781,15 @@ export default function SubjectsPage() {
                                         style={{ flex: 1 }}
                                         onClick={() => setAutoMode("json")}
                                     >
-                                        Paste JSON
+                                        Freeform Prompt
                                     </button>
                                 </div>
 
                                 {autoMode === "json" ? (
                                     <div className="form-group">
-                                        <label className="form-label">Raw JSON Prompt</label>
+                                        <label className="form-label">Raw Prompt (Text or JSON)</label>
                                         <div className="text-secondary text-sm" style={{ marginBottom: "8px" }}>
-                                            Paste your custom JSON here. Gemini 3 Pro Image Preview will generate the image directly based on this JSON structure.
+                                            Paste your custom prompt here. Gemini 3 Pro Image Preview will generate the image directly based on this text.
                                         </div>
                                         <textarea
                                             className="form-textarea mono"
