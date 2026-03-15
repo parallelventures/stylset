@@ -10,10 +10,16 @@ export const runtime = "nodejs";
 export async function POST(req: Request) {
     try {
         let body: any = {};
+        const files: File[] = [];
+
         try {
             const formData = await req.formData();
             for (const [key, value] of formData.entries()) {
-                body[key] = value;
+                if (key === "images") {
+                    files.push(value as File);
+                } else {
+                    body[key] = value;
+                }
             }
         } catch {
             body = await req.json().catch(() => ({}));
@@ -126,12 +132,28 @@ export async function POST(req: Request) {
         ].join(", ");
         console.log("[Auto-Subject] Generating automatic subject image...");
         const id = uuid();
+        const uploadedImgPaths: string[] = [];
+
+        // Upload any reference images provided via drag and drop
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            if (file && file.size > 0) {
+                const buffer = Buffer.from(await file.arrayBuffer());
+                const ext = path.extname(file.name) || ".png";
+                const filename = `input_ref_${i}${ext}`;
+                const fileStoragePath = subjectPath(id, filename);
+                const mimeType = ext === ".png" ? "image/png" : ext === ".webp" ? "image/webp" : "image/jpeg";
+                await uploadFile(fileStoragePath, buffer, mimeType);
+                uploadedImgPaths.push(fileStoragePath);
+            }
+        }
+
         const filename = "ref_0.png";
         const storagePath = subjectPath(id, filename);
 
         const result = await generateAndSaveImage(
             {
-                referenceImagePaths: [],
+                referenceImagePaths: uploadedImgPaths,
                 finalPromptText: AUTO_SUBJECT_PROMPT,
                 negativePrompt: AUTO_SUBJECT_NEGATIVE_PROMPT,
                 aspectRatio: "3:4"
@@ -158,7 +180,7 @@ export async function POST(req: Request) {
                 id,
                 name,
                 description,
-                referenceImagePaths: JSON.stringify([storagePath]),
+                referenceImagePaths: JSON.stringify([storagePath, ...uploadedImgPaths]),
                 lockedAttributesJson,
             },
         });

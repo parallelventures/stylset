@@ -173,6 +173,9 @@ export default function SubjectsPage() {
     const [generateGender, setGenerateGender] = useState("Women");
     const [autoMode, setAutoMode] = useState<"builder" | "json">("builder");
     const [autoRawJson, setAutoRawJson] = useState("");
+    const [autoFiles, setAutoFiles] = useState<File[]>([]);
+    const [autoPreviews, setAutoPreviews] = useState<string[]>([]);
+    const autoFileInputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
 
     async function loadSubjects() {
@@ -195,6 +198,12 @@ export default function SubjectsPage() {
         const selected = Array.from(e.target.files || []);
         setFiles(selected);
         setPreviews(selected.map((f) => URL.createObjectURL(f)));
+    }
+
+    function handleAutoFiles(e: React.ChangeEvent<HTMLInputElement>) {
+        const selected = Array.from(e.target.files || []);
+        setAutoFiles(selected);
+        setAutoPreviews(selected.map((f) => URL.createObjectURL(f)));
     }
 
     function handleAestheticChange(e: React.ChangeEvent<HTMLSelectElement>) {
@@ -248,6 +257,9 @@ export default function SubjectsPage() {
             const fd = new FormData();
             if (autoMode === "json") {
                 fd.set("rawJson", autoRawJson);
+                for (const f of autoFiles) {
+                    fd.append("images", f);
+                }
             } else {
                 fd.set("gender", gender);
                 fd.set("aesthetic", (form.elements.namedItem("aesthetic") as HTMLSelectElement).value);
@@ -786,20 +798,70 @@ export default function SubjectsPage() {
                                 </div>
 
                                 {autoMode === "json" ? (
-                                    <div className="form-group">
-                                        <label className="form-label">Raw Prompt (Text or JSON)</label>
-                                        <div className="text-secondary text-sm" style={{ marginBottom: "8px" }}>
-                                            Paste your custom prompt here. Gemini 3 Pro Image Preview will generate the image directly based on this text.
+                                    <>
+                                        <div className="form-group">
+                                            <label className="form-label">Raw Prompt (Text or JSON)</label>
+                                            <div className="text-secondary text-sm" style={{ marginBottom: "8px" }}>
+                                                Paste your custom prompt here. Gemini 3 Pro Image Preview will generate the image directly based on this text.
+                                            </div>
+                                            <textarea
+                                                className="form-textarea mono"
+                                                rows={14}
+                                                placeholder='{\n  "hairstyle_model_prompt": {\n    "meta": { ... }\n  }\n}'
+                                                value={autoRawJson}
+                                                onChange={(e) => setAutoRawJson(e.target.value)}
+                                                required
+                                            ></textarea>
                                         </div>
-                                        <textarea
-                                            className="form-textarea mono"
-                                            rows={14}
-                                            placeholder='{\n  "hairstyle_model_prompt": {\n    "meta": { ... }\n  }\n}'
-                                            value={autoRawJson}
-                                            onChange={(e) => setAutoRawJson(e.target.value)}
-                                            required
-                                        ></textarea>
-                                    </div>
+                                        <div className="form-group">
+                                            <div className="flex gap-2 items-center" style={{ marginBottom: 8 }}>
+                                                <label className="form-label" style={{ margin: 0 }}>Reference Image (Optional)</label>
+                                                <span className="badge badge-neutral">Optional</span>
+                                            </div>
+                                            <div
+                                                className="upload-area"
+                                                onClick={() => autoFileInputRef.current?.click()}
+                                                onDragOver={(e) => { e.preventDefault(); e.currentTarget.style.borderColor = "var(--primary)"; }}
+                                                onDragLeave={(e) => { e.preventDefault(); e.currentTarget.style.borderColor = "var(--border)"; }}
+                                                onDrop={(e) => {
+                                                    e.preventDefault();
+                                                    e.currentTarget.style.borderColor = "var(--border)";
+                                                    const files = Array.from(e.dataTransfer.files);
+                                                    if (files.length) {
+                                                        setAutoFiles(files);
+                                                        setAutoPreviews(files.map(f => URL.createObjectURL(f)));
+                                                    }
+                                                }}
+                                            >
+                                                <input
+                                                    type="file"
+                                                    ref={autoFileInputRef}
+                                                    onChange={handleAutoFiles}
+                                                    accept="image/*"
+                                                    style={{ display: "none" }}
+                                                    multiple
+                                                />
+                                                {autoPreviews.length === 0 ? (
+                                                    <div className="empty-state" style={{ margin: 0, padding: 24, border: "none" }}>
+                                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--muted)", marginBottom: 8 }}><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                                        <div className="text-sm font-medium">Click or drag images to use as reference</div>
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex gap-2 items-center justify-center">
+                                                        {autoPreviews.map(p => (
+                                                            <div key={p} style={{
+                                                                width: 64, height: 64, borderRadius: "var(--radius-sm)",
+                                                                overflow: "hidden", border: "1px solid var(--border)", position: "relative"
+                                                            }}>
+                                                                <img src={p} alt="Reference preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                                            </div>
+                                                        ))}
+                                                        <div className="text-sm text-secondary ml-2">{autoFiles.length} reference image{autoFiles.length > 1 ? "s" : ""}</div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </>
                                 ) : (
                                     <>
                                         <div className="form-group">
