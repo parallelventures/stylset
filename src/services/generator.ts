@@ -3,7 +3,7 @@
  * Uses Supabase Storage.
  */
 import prisma from "@/lib/prisma";
-import { composePrompt, composeSelfiePrompt } from "@/lib/prompts";
+import { composePrompt, composeSelfiePrompt, composeColorOnlyPrompt } from "@/lib/prompts";
 import { generateAndSaveImage } from "@/services/geminiImage";
 import { uploadJson, setImagePath, setManifestPath, setZipPath, getFileUrl } from "@/lib/storage";
 import { createAndUploadZip } from "@/lib/zip";
@@ -48,14 +48,19 @@ export async function generateSet(setId: string): Promise<void> {
                     let hairstylePrompt = "";
                     let negativeHairPrompt = "";
                     let isSelfieMode = false;
+                    let isColorOnlyMode = false;
                     let selfieInput: any = {};
+                    let colorOnlyInput: any = {};
 
                     try {
                         const input = JSON.parse(slide.inputJson || "{}");
                         isSelfieMode = input.mode === "selfie";
+                        isColorOnlyMode = input.mode === "colorOnly";
 
                         if (isSelfieMode) {
                             selfieInput = input;
+                        } else if (isColorOnlyMode) {
+                            colorOnlyInput = input;
                         } else {
                             hairstylePrompt = input.hairstylePrompt || slide.preset?.hairstylePrompt || "";
                             negativeHairPrompt = input.negativeHairPrompt || slide.preset?.negativeHairPrompt || "";
@@ -71,12 +76,18 @@ export async function generateSet(setId: string): Promise<void> {
                             hair: selfieInput.hair,
                             style: basePrompt.prompt
                         })
-                        : composePrompt({
-                            lockedAttributes: lockedAttrs,
-                            basePrompt,
-                            hairstylePrompt,
-                            negativeHairPrompt: negativeHairPrompt || undefined,
-                        });
+                        : isColorOnlyMode
+                            ? composeColorOnlyPrompt({
+                                lockedAttributes: lockedAttrs,
+                                basePrompt,
+                                hairColorPrompt: colorOnlyInput.hairColorPrompt || "",
+                            })
+                            : composePrompt({
+                                lockedAttributes: lockedAttrs,
+                                basePrompt,
+                                hairstylePrompt,
+                                negativeHairPrompt: negativeHairPrompt || undefined,
+                            });
 
                     const cleanName = (slide.preset?.name || "").toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
                     const outputFileName = cleanName ? `${String(slide.orderIndex).padStart(3, "0")}_${cleanName}.png` : `${String(slide.orderIndex).padStart(3, "0")}.png`;

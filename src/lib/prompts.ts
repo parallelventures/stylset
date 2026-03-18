@@ -103,6 +103,99 @@ export function composePrompt(input: ComposeInput): ComposeOutput {
     };
 }
 
+/* ─── Color-Only Variation ─── */
+
+interface ComposeColorInput {
+    lockedAttributes: Record<string, string>;
+    basePrompt: Record<string, string>;
+    hairColorPrompt: string;
+}
+
+const COLOR_ONLY_LOCK = `CRITICAL RULES — MUST FOLLOW:
+You are looking at the SAME PERSON shown in the reference image(s).
+Generate a new image of this EXACT SAME PERSON with ONLY the HAIR COLOR changed.
+
+You MUST preserve ALL of the following EXACTLY as they appear in the reference:
+- Face (every facial feature, shape, symmetry)
+- Skin tone and texture
+- Body type, build, proportions
+- Age and expression
+- Pose and posture
+- Framing, camera angle, and cropping
+- Wardrobe / clothing
+- Background and environment
+- Lighting and color grading
+- Camera lens and depth of field
+- HAIRSTYLE: Keep the EXACT SAME hairstyle shape, length, texture, volume, parting, and styling as the reference. Do NOT change the haircut or style in ANY way.
+
+The ONLY thing that changes is the HAIR COLOR described below.
+Do NOT alter the hairstyle, haircut, hair length, hair texture, or anything else. The person MUST be recognizably the same individual with the same exact hairdo.`;
+
+const COLOR_ONLY_NEGATIVE = [
+    "different person",
+    "different identity",
+    "face change",
+    "altered face",
+    "different skin tone",
+    "altered body",
+    "different age",
+    "different expression",
+    "different wardrobe",
+    "different clothing",
+    "background change",
+    "different lighting",
+    "different pose",
+    "different camera angle",
+    "different framing",
+    "different hairstyle",
+    "different haircut",
+    "different hair length",
+    "different hair texture",
+    "different hair volume",
+].join(", ");
+
+export function composeColorOnlyPrompt(input: ComposeColorInput): ComposeOutput {
+    const parts: string[] = [];
+
+    // 1. Color-only identity lock
+    parts.push(COLOR_ONLY_LOCK);
+
+    // 2. Locked attributes
+    const attrLines: string[] = [];
+    for (const [key, value] of Object.entries(input.lockedAttributes)) {
+        attrLines.push(`- ${key}: ${value}`);
+    }
+    if (attrLines.length > 0) {
+        parts.push(`\nSCENE ATTRIBUTES TO PRESERVE:\n${attrLines.join("\n")}`);
+    }
+
+    // 3. Base template prompt
+    const templatePrompt = input.basePrompt.prompt || "";
+    if (templatePrompt) {
+        parts.push(`\nIMAGE STYLE: ${templatePrompt}`);
+    }
+
+    // 4. Hair color only
+    parts.push(`\nHAIR COLOR (the ONLY change — keep the EXACT same hairstyle): ${input.hairColorPrompt}`);
+
+    // Build negative
+    const negParts: string[] = [COLOR_ONLY_NEGATIVE];
+    if (input.basePrompt.negative_prompt) {
+        negParts.push(input.basePrompt.negative_prompt);
+    }
+
+    return {
+        finalPrompt: parts.join("\n"),
+        finalNegativePrompt: negParts.join(", "),
+        metadata: {
+            style: input.basePrompt.style || "photorealistic",
+            aspect_ratio: input.basePrompt.aspect_ratio || "3:4",
+            lighting: input.basePrompt.lighting || "",
+            background: input.basePrompt.background || "",
+        },
+    };
+}
+
 export interface ComposeSelfieInput {
     location: string;
     outfit: string;

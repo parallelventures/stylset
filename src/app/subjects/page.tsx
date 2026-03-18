@@ -185,6 +185,8 @@ export default function SubjectsPage() {
     const [selectedHairstyles, setSelectedHairstyles] = useState<string[]>([]);
     const [selfieModalSubject, setSelfieModalSubject] = useState<Subject | null>(null);
     const [selectedSelfies, setSelectedSelfies] = useState<string[]>([]);
+    const [colorModalSubject, setColorModalSubject] = useState<Subject | null>(null);
+    const [selectedColors, setSelectedColors] = useState<string[]>([]);
     const [gender, setGender] = useState("Women");
     const [generateGender, setGenerateGender] = useState("Women");
     const [selectedHairColor, setSelectedHairColor] = useState("");
@@ -398,6 +400,37 @@ export default function SubjectsPage() {
         }
     }
 
+    async function handleGenerateSelectedColors() {
+        if (!colorModalSubject || selectedColors.length === 0) return;
+        const subjectId = colorModalSubject.id;
+
+        const selections = selectedColors.map(val => {
+            const colorObj = HAIR_COLORS.find(c => c.value === val);
+            return {
+                hairColorPrompt: val,
+                name: colorObj?.label || "Color"
+            };
+        });
+
+        setGenerating(subjectId + "_colors");
+        setColorModalSubject(null);
+        setSelectedColors([]);
+
+        try {
+            const res = await fetch(`/api/subjects/${subjectId}/generate-colors`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ selections })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error);
+            router.push(`/sets/${data.setId}`);
+        } catch (err: unknown) {
+            alert(err instanceof Error ? err.message : "Color generation failed");
+            setGenerating(null);
+        }
+    }
+
     async function handleDeleteConfirmed() {
         if (!subjectToDelete) return;
         const id = subjectToDelete;
@@ -498,6 +531,7 @@ export default function SubjectsPage() {
                         const images: string[] = JSON.parse(s.referenceImagePaths || "[]");
                         const isGenerating = generating === s.id;
                         const isGeneratingSelfies = generating === s.id + "_selfies";
+                        const isGeneratingColors = generating === s.id + "_colors";
                         return (
                             <div key={s.id} className="card">
                                 {images.length > 0 && (
@@ -577,10 +611,25 @@ export default function SubjectsPage() {
                                     <button
                                         className="btn btn-secondary btn-sm"
                                         onClick={() => {
+                                            setColorModalSubject(s);
+                                            setSelectedColors([]);
+                                        }}
+                                        disabled={isGenerating || isGeneratingSelfies || isGeneratingColors}
+                                        style={{ flex: 1 }}
+                                    >
+                                        {isGeneratingColors ? (
+                                            <><span className="spinner" /> Generating…</>
+                                        ) : (
+                                            "🎨 Colors"
+                                        )}
+                                    </button>
+                                    <button
+                                        className="btn btn-secondary btn-sm"
+                                        onClick={() => {
                                             setSelfieModalSubject(s);
                                             setSelectedSelfies([]);
                                         }}
-                                        disabled={isGenerating || isGeneratingSelfies}
+                                        disabled={isGenerating || isGeneratingSelfies || isGeneratingColors}
                                         style={{ flex: 1 }}
                                     >
                                         {isGeneratingSelfies ? (
@@ -1225,6 +1274,99 @@ export default function SubjectsPage() {
                                     disabled={selectedHairstyles.length === 0}
                                 >
                                     Generate {selectedHairstyles.length > 0 ? `(${selectedHairstyles.length})` : ""}
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            <AnimatePresence>
+                {colorModalSubject && (
+                    <motion.div
+                        className="modal-overlay"
+                        onClick={() => setColorModalSubject(null)}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                    >
+                        <motion.div
+                            className="modal"
+                            style={{
+                                width: "100%",
+                                maxWidth: 500,
+                                maxHeight: "80vh",
+                                display: "flex",
+                                flexDirection: "column"
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            transition={springAnimation}
+                        >
+                            <div className="modal-header">
+                                <h3>🎨 Generate Hair Colors</h3>
+                                <button
+                                    className="btn btn-icon btn-secondary"
+                                    onClick={() => setColorModalSubject(null)}
+                                    title="Close"
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                </button>
+                            </div>
+                            <div style={{ flex: 1, overflowY: "auto", padding: "16px 24px" }}>
+                                <p className="text-sm text-secondary" style={{ marginBottom: 16 }}>
+                                    Select the colors you want to generate for <strong>{colorModalSubject.name}</strong>. The hairstyle will remain exactly the same as in the reference.
+                                </p>
+
+                                <div style={{ marginBottom: 16, display: "flex", gap: 8 }}>
+                                    <button
+                                        className="btn btn-secondary btn-sm"
+                                        style={{ flex: 1 }}
+                                        onClick={() => {
+                                            const allVals = HAIR_COLORS.filter(c => c.value !== "").map(c => c.value);
+                                            setSelectedColors(allVals);
+                                        }}
+                                    >Select All</button>
+                                    <button
+                                        className="btn btn-secondary btn-sm"
+                                        style={{ flex: 1 }}
+                                        onClick={() => setSelectedColors([])}
+                                    >Clear All</button>
+                                </div>
+
+                                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                                    {HAIR_COLORS.filter(c => c.value !== "").map(color => {
+                                        const checked = selectedColors.includes(color.value);
+                                        return (
+                                            <label key={color.value} style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: "14px" }}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={checked}
+                                                    onChange={() => {
+                                                        if (checked) {
+                                                            setSelectedColors(prev => prev.filter(v => v !== color.value));
+                                                        } else {
+                                                            setSelectedColors(prev => [...prev, color.value]);
+                                                        }
+                                                    }}
+                                                    style={{ width: 16, height: 16, cursor: "pointer", accentColor: "var(--primary)" }}
+                                                />
+                                                {color.label}
+                                            </label>
+                                        )
+                                    })}
+                                </div>
+                            </div>
+                            <div className="modal-footer" style={{ borderTop: "1px solid var(--border)", padding: "16px 24px" }}>
+                                <button className="btn btn-secondary" onClick={() => setColorModalSubject(null)}>Cancel</button>
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={handleGenerateSelectedColors}
+                                    disabled={selectedColors.length === 0}
+                                >
+                                    Generate {selectedColors.length > 0 ? `(${selectedColors.length})` : ""}
                                 </button>
                             </div>
                         </motion.div>
