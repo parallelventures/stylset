@@ -23,7 +23,7 @@ interface ComposeOutput {
 
 const IDENTITY_LOCK = `CRITICAL RULES — MUST FOLLOW:
 You are looking at the SAME PERSON shown in the reference image(s).
-Generate a new image of this EXACT SAME PERSON with ONLY the hairstyle changed.
+Generate a new image of this EXACT SAME PERSON with ONLY the hairstyle and hair color changed.
 
 You MUST preserve ALL of the following EXACTLY as they appear in the reference:
 - Face (every facial feature, shape, symmetry)
@@ -37,7 +37,7 @@ You MUST preserve ALL of the following EXACTLY as they appear in the reference:
 - Lighting and color grading
 - Camera lens and depth of field
 
-The ONLY thing that changes is the HAIRSTYLE described below.
+The ONLY things that change are the HAIRSTYLE and HAIR COLOR described below.
 Do NOT alter ANYTHING else. The person MUST be recognizably the same individual.`;
 
 const BASE_NEGATIVE = [

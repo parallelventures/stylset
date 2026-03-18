@@ -147,6 +147,22 @@ const MEN_GENERAL_HAIRSTYLES = [
     { value: "MANUAL:volume blowout, swept back loosely, casual but styled, thick hair", label: "Swept Back Blowout" },
 ];
 
+const HAIR_COLORS = [
+    { value: "", label: "Keep Original Color" },
+    { value: "jet black hair color", label: "Jet Black" },
+    { value: "dark espresso brown hair color", label: "Dark Espresso Brown" },
+    { value: "rich chocolate brown hair color", label: "Rich Chocolate Brown" },
+    { value: "warm chestnut brown hair color", label: "Warm Chestnut" },
+    { value: "ash brown hair color, cool toned", label: "Ash Brown" },
+    { value: "soft honey blonde hair color, warm golden tones", label: "Honey Blonde" },
+    { value: "icy platinum blonde hair color, almost white", label: "Platinum Blonde" },
+    { value: "strawberry blonde hair color, pinkish golden", label: "Strawberry Blonde" },
+    { value: "warm copper red hair color, vibrant ginger", label: "Copper Red / Ginger" },
+    { value: "deep auburn hair color, dark reddish brown", label: "Deep Auburn" },
+    { value: "caramel balayage hair color, blended warm tones from dark roots to caramel ends", label: "Caramel Balayage" },
+    { value: "silver grey hair color, modern and edgy", label: "Silver Grey" },
+];
+
 export default function SubjectsPage() {
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [presets, setPresets] = useState<any[]>([]);
@@ -171,6 +187,7 @@ export default function SubjectsPage() {
     const [selectedSelfies, setSelectedSelfies] = useState<string[]>([]);
     const [gender, setGender] = useState("Women");
     const [generateGender, setGenerateGender] = useState("Women");
+    const [selectedHairColor, setSelectedHairColor] = useState("");
     const [autoMode, setAutoMode] = useState<"builder" | "json">("builder");
     const [autoRawJson, setAutoRawJson] = useState("");
     const [autoFiles, setAutoFiles] = useState<File[]>([]);
@@ -305,28 +322,31 @@ export default function SubjectsPage() {
         if (!hairstyleModalSubject || selectedHairstyles.length === 0) return;
         const subjectId = hairstyleModalSubject.id;
 
+        const colorSuffix = selectedHairColor ? `. Hair color: ${selectedHairColor}` : "";
+        const colorLabel = selectedHairColor ? ` — ${HAIR_COLORS.find(c => c.value === selectedHairColor)?.label || ""}` : "";
+
         const selections = selectedHairstyles.map(combo => {
             if (combo.startsWith("PRESET:")) {
                 const presetId = combo.split(":")[1];
                 const preset = presets.find(p => p.id === presetId);
                 return {
                     presetId: preset?.id,
-                    hairstylePrompt: preset?.hairstylePrompt || "",
+                    hairstylePrompt: (preset?.hairstylePrompt || "") + colorSuffix,
                     negativeHairPrompt: preset?.negativeHairPrompt || "",
-                    name: preset?.name || "Preset"
+                    name: (preset?.name || "Preset") + colorLabel
                 };
             } else if (combo.startsWith("MANUAL:")) {
                 const prompt = combo.replace("MANUAL:", "");
                 const styles = generateGender === "Women" ? GENERAL_HAIRSTYLES : MEN_GENERAL_HAIRSTYLES;
                 const label = styles.find(h => h.value === combo)?.label || "Manual";
                 return {
-                    hairstylePrompt: prompt,
-                    name: label
+                    hairstylePrompt: prompt + colorSuffix,
+                    name: label + colorLabel
                 };
             } else {
                 return {
-                    hairstylePrompt: "glossy. Straight to wavy, thick, smooth. Long layered butterfly cut, 90s blowout style. Face-framing curtain bangs. Heavily layered mid-lengths to ends. Voluminous.",
-                    name: "90s Blowout Layered"
+                    hairstylePrompt: "glossy. Straight to wavy, thick, smooth. Long layered butterfly cut, 90s blowout style. Face-framing curtain bangs. Heavily layered mid-lengths to ends. Voluminous." + colorSuffix,
+                    name: "90s Blowout Layered" + colorLabel
                 };
             }
         });
@@ -967,10 +987,16 @@ export default function SubjectsPage() {
                                     <select name="hairColor" className="form-select" defaultValue="Dark espresso brown">
                                         <option value="Dark espresso brown">Dark Espresso Brown</option>
                                         <option value="Jet black">Jet Black</option>
+                                        <option value="Rich chocolate brown">Rich Chocolate Brown</option>
+                                        <option value="Warm chestnut brown">Warm Chestnut</option>
+                                        <option value="Ash brown">Ash Brown</option>
                                         <option value="Soft honey blonde">Soft Honey Blonde</option>
                                         <option value="Icy platinum blonde">Icy Platinum Blonde</option>
-                                        <option value="Warm copper red">Warm Copper Red</option>
-                                        <option value="Ash brown">Ash Brown</option>
+                                        <option value="Strawberry blonde">Strawberry Blonde</option>
+                                        <option value="Warm copper red">Warm Copper Red / Ginger</option>
+                                        <option value="Deep auburn">Deep Auburn</option>
+                                        <option value="Caramel balayage">Caramel Balayage</option>
+                                        <option value="Silver grey">Silver Grey</option>
                                     </select>
                                 </div>
 
@@ -1099,6 +1125,20 @@ export default function SubjectsPage() {
                                         <option value="Women">Women</option>
                                         <option value="Men">Men</option>
                                     </select>
+                                </div>
+
+                                <div style={{ marginBottom: "16px" }}>
+                                    <label style={{ fontSize: "14px", fontWeight: 500, display: "block", marginBottom: 8 }}>Hair Color:</label>
+                                    <select className="form-select" value={selectedHairColor} onChange={(e) => setSelectedHairColor(e.target.value)}>
+                                        {HAIR_COLORS.map(c => (
+                                            <option key={c.value} value={c.value}>{c.label}</option>
+                                        ))}
+                                    </select>
+                                    {selectedHairColor && (
+                                        <div className="text-xs text-secondary" style={{ marginTop: 4 }}>
+                                            All generated hairstyles will use this hair color
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div style={{ marginBottom: 16, display: "flex", gap: 8 }}>
