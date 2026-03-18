@@ -153,13 +153,20 @@ const HAIR_COLORS = [
     { value: "dark espresso brown hair color", label: "Dark Espresso Brown" },
     { value: "rich chocolate brown hair color", label: "Rich Chocolate Brown" },
     { value: "warm chestnut brown hair color", label: "Warm Chestnut" },
-    { value: "ash brown hair color, cool toned", label: "Ash Brown" },
     { value: "soft honey blonde hair color, warm golden tones", label: "Honey Blonde" },
+    { value: "ash blonde hair color, cool smoky blonde", label: "Ash Blonde" },
+    { value: "dirty blonde hair color, natural sandy blonde with darker roots", label: "Dirty Blonde" },
+    { value: "champagne blonde hair color, very pale cool blonde", label: "Champagne Blonde" },
     { value: "icy platinum blonde hair color, almost white", label: "Platinum Blonde" },
     { value: "strawberry blonde hair color, pinkish golden", label: "Strawberry Blonde" },
     { value: "warm copper red hair color, vibrant ginger", label: "Copper Red / Ginger" },
+    { value: "bright cherry red hair color, vibrant bold red", label: "Cherry Red" },
+    { value: "deep burgundy wine red hair color", label: "Burgundy / Wine Red" },
     { value: "deep auburn hair color, dark reddish brown", label: "Deep Auburn" },
+    { value: "bronde hair color, perfect blend of brown and blonde", label: "Bronde" },
+    { value: "chocolate brown hair color with soft honey highlights", label: "Brown with Honey Highlights" },
     { value: "caramel balayage hair color, blended warm tones from dark roots to caramel ends", label: "Caramel Balayage" },
+    { value: "dark brown to blonde ombre hair color, smooth gradient", label: "Brown to Blonde Ombre" },
     { value: "silver grey hair color, modern and edgy", label: "Silver Grey" },
 ];
 
@@ -1037,14 +1044,22 @@ export default function SubjectsPage() {
                                         <option value="Dark espresso brown">Dark Espresso Brown</option>
                                         <option value="Jet black">Jet Black</option>
                                         <option value="Rich chocolate brown">Rich Chocolate Brown</option>
-                                        <option value="Warm chestnut brown">Warm Chestnut</option>
+                                        <option value="Warm chestnut brown">Warm Chestnut Brown</option>
                                         <option value="Ash brown">Ash Brown</option>
                                         <option value="Soft honey blonde">Soft Honey Blonde</option>
+                                        <option value="Ash blonde">Ash Blonde</option>
+                                        <option value="Dirty blonde">Dirty Blonde</option>
+                                        <option value="Champagne blonde">Champagne Blonde</option>
                                         <option value="Icy platinum blonde">Icy Platinum Blonde</option>
                                         <option value="Strawberry blonde">Strawberry Blonde</option>
-                                        <option value="Warm copper red">Warm Copper Red / Ginger</option>
+                                        <option value="Warm copper red / Ginger">Warm Copper Red / Ginger</option>
+                                        <option value="Cherry red">Cherry Red</option>
+                                        <option value="Burgundy / Wine red">Burgundy / Wine Red</option>
                                         <option value="Deep auburn">Deep Auburn</option>
+                                        <option value="Bronde">Bronde</option>
+                                        <option value="Brown with honey highlights">Brown with Honey Highlights</option>
                                         <option value="Caramel balayage">Caramel Balayage</option>
+                                        <option value="Brown to blonde ombre">Brown to Blonde Ombre</option>
                                         <option value="Silver grey">Silver Grey</option>
                                     </select>
                                 </div>
